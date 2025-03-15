@@ -304,6 +304,17 @@ def process_image_with_plane_detection(image_dir, image_id, frame_str, spatial_w
         plt.imshow(composite_with_planes)
         plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Plane Detection Overlay")
         plt.axis("off")
-        plt.show()
+
+        # Ensure the output directory exists
+        output_dir = "data/results"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Create a filename for the saved image
+        output_filename = f"{os.path.basename(image_dir)}_frame_{frame_str}_overlay.png"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Save the figure without displaying it
+        plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
+        plt.close()  # Close the figure to free up memory
     
     return composite_with_planes
