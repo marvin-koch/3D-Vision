@@ -186,3 +186,7 @@ dmypy.json
 
 ### VS Code
 .vscode
+
+
+### Mac ###
+*.ds_store
