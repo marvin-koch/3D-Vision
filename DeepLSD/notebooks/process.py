@@ -1,4 +1,5 @@
 from utils_methods import raydepth2depth, load_color_image, load_depth_map, load_normal_map, compute_variation, sobel_line_neighborhood, overlay_lines_on_image_custom
+from utils_methods import colorize_segmentation_map, overlay_plane_segmentation, cluster_planes, compute_plane_features
 import os
 import numpy as np
 import cv2
@@ -216,3 +217,73 @@ def plot_process(image_ids, base_data_dir, frame_str, depth_thresholds, normal_t
             grid_out_path = os.path.join(image_dir, f"parameter_comparison_{frame_str}.png")
             fig.savefig(grid_out_path)
             print(f"Saved parameter comparison grid to {grid_out_path}")
+
+
+
+
+#****************************************************************************************************
+#****************************************************************************************************
+#****************************************************************************************************
+#****************************************************************************************************
+#****************************************************************************************************
+#****************************************************************************************************
+
+
+
+def process_image_with_plane_detection_and_color_plot(image_dir, image_id, frame_str, 
+                                                      spatial_weight=0.5, depth_weight=1.0, eps=0.5, 
+                                                      min_samples=50, sample_rate=0.2,
+                                                      threshold=100000, display_result=True):
+    """
+    Detects physical planes using per-pixel plane estimation and DBSCAN with random sampling,
+    Returns:
+      composite_with_planes: The overlay image with segmentation boundaries.
+      colored_seg: The colorized segmentation image.
+    """
+    # Use the same camera views as in your process_image function.
+    cam_view_color = "scene_cam_00_final_preview"
+    cam_view_geom = "scene_cam_00_geometry_hdf5"
+    
+    # Load images using your original functions.
+    color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
+    normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
+    depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
+    
+    if color_img is None or depth_map is None or normal_map is None:
+        print(f"Missing data in {image_dir}; skipping plane detection.")
+        return None, None
+    
+    h, w = color_img.shape[:2]
+    # Compute camera intrinsic matrix (same as in process_image)
+    fov_x = np.pi / 3 
+    f = w / (2 * np.tan(fov_x / 2))
+    default_K = np.array([[f, 0, w / 2],
+                          [0, f, h / 2],
+                          [0, 0, 1]])
+    
+    # Compute per-pixel plane features.
+    features, coords, valid_mask = compute_plane_features(normal_map, depth_map, default_K, spatial_weight=spatial_weight, depth_weight=depth_weight)
+    
+    # Cluster features using DBSCAN with random sampling.
+    segmentation_map = cluster_planes(features, coords, (h, w), eps=eps, min_samples=min_samples, sample_rate=sample_rate, threshold=threshold)
+    
+    # Overlay segmentation boundaries on the original color image.
+    composite_with_planes = overlay_plane_segmentation(color_img, segmentation_map)
+    
+    # Create a colored segmentation image.
+    colored_seg = colorize_segmentation_map(segmentation_map)
+    
+    if display_result:
+        plt.figure(figsize=(10, 10))
+        plt.imshow(composite_with_planes)
+        plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Plane Detection Overlay")
+        plt.axis("off")
+        plt.show()
+        
+        plt.figure(figsize=(10, 10))
+        plt.imshow(colored_seg)
+        plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Colored Plane Segmentation")
+        plt.axis("off")
+        plt.show()
+    
+    return composite_with_planes, colored_seg

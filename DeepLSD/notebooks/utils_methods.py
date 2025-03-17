@@ -133,7 +133,7 @@ def overlay_lines_on_image_custom(image, lines, is_struct, line_color_struct, li
 
 def pixel_to_3d(x, y, depth, K):
     """
-    Convert pixel coordinate (x, y) with depth value into a 3D point in camera coordinates.
+    Convert pixel coordinate a 3D point in camera coordinates.
     """
     f = K[0, 0]
     cx = K[0, 2]
@@ -143,18 +143,12 @@ def pixel_to_3d(x, y, depth, K):
     Z = depth
     return np.array([X, Y, Z])
 
-def compute_plane_features(normal_map, depth_map, K, spatial_weight=0.5):
+def compute_plane_features(normal_map, depth_map, K, spatial_weight=0.5, depth_weight=1.0):
     """
     Compute per-pixel features for plane clustering.
     
     For each valid pixel (depth > 0), we build a feature vector:
       [n_x, n_y, n_z, d, spatial_weight * (x / width), spatial_weight * (y / height)]
-    where d = - n dot P is the plane parameter computed from the 3D point P.
-    
-    Returns:
-      features: Array of shape (N, 6) for valid pixels.
-      coords: Array of shape (N, 2) with (row, col) coordinates for valid pixels.
-      valid_mask: A boolean mask of shape (h, w) indicating valid pixels.
     """
     h, w = depth_map.shape
     xx, yy = np.meshgrid(np.arange(w), np.arange(h))
@@ -187,26 +181,27 @@ def compute_plane_features(normal_map, depth_map, K, spatial_weight=0.5):
     # Normalize spatial coordinates
     spatial_x = (xx_valid / float(w)).reshape(-1, 1)
     spatial_y = (yy_valid / float(h)).reshape(-1, 1)
+
+     # Normalize depth values to [0,1] (using maximum valid depth)
+    norm_depth = (depth_valid.reshape(-1, 1) / (np.max(depth_valid) + 1e-8))
     
-    # Assemble feature vector: normals, plane parameter, and weighted spatial coordinates
-    features = np.hstack((normals_valid, d_params.reshape(-1, 1), spatial_weight * spatial_x, spatial_weight * spatial_y))
+    # Assemble feature vector: normals, plane parameter, weighted spatial coordinates, and weighted normalized depth.
+    features = np.hstack((normals_valid,
+                          d_params.reshape(-1, 1),
+                          spatial_weight * spatial_x,
+                          spatial_weight * spatial_y,
+                          depth_weight * norm_depth))
+                          
     coords = np.stack((yy_valid, xx_valid), axis=1)  # (row, col)
     
     valid_mask = valid_mask_flat.reshape(h, w)
     return features, coords, valid_mask
 
-def cluster_planes(features, coords, image_shape, eps=0.2, min_samples=10, sample_rate=0.2):
+def cluster_planes(features, coords, image_shape, eps=0.2, min_samples=10, sample_rate=0.2, threshold=10000):
     """
-    Cluster plane features using DBSCAN on a random sample of features (after normalization),
-    then assign labels to all features using nearest neighbor search.
-    
-    Parameters:
-      eps: DBSCAN eps parameter (try lower values like 0.1-0.2).
-      min_samples: DBSCAN min_samples parameter (try lower values like 10-20).
-      sample_rate: Fraction of valid pixels to sample for DBSCAN clustering.
-    
+    Cluster plane features using DBSCAN on a random sample of features.
     Returns:
-      segmentation_map: A 2D array (of shape image_shape) where each valid pixel is assigned a cluster label.
+      segmentation_map: A 2D array where each valid pixel is assigned a cluster label.
                         Noise pixels are labeled -1.
     """
     # Normalize the features (zero mean, unit variance)
@@ -231,8 +226,8 @@ def cluster_planes(features, coords, image_shape, eps=0.2, min_samples=10, sampl
     distances = distances.flatten()
     nn_indices = nn_indices.flatten()
     
-    # Assign label if the nearest neighbor is within eps, else mark as noise (-1)
-    full_labels = np.array([sample_labels[idx] if dist <= 100000 else -1           #*************************** dist
+    # Assign label
+    full_labels = np.array([sample_labels[idx] if dist <= threshold else -1           # ***************************
                               for idx, dist in zip(nn_indices, distances)])
     
     h, w = image_shape
@@ -283,8 +278,6 @@ def overlay_plane_segmentation(color_img, segmentation_map):
 def colorize_segmentation_map(segmentation_map):
     """
     Given a 2D segmentation map, assign a random color to each unique plane label.
-    Noise pixels (label -1) are set to black.
-    Returns a color image of the same spatial size.
     """
     unique_labels = np.unique(segmentation_map)
     print("Unique labels:", len(unique_labels))
@@ -302,67 +295,10 @@ def colorize_segmentation_map(segmentation_map):
         colorized[mask] = color
     return colorized
 
-def process_image_with_plane_detection_and_color_plot(image_dir, image_id, frame_str, 
-                                                      spatial_weight=0.5, eps=0.5, 
-                                                      min_samples=50, sample_rate=0.2, 
-                                                      display_result=True):
-    """
-    Detects physical planes using per-pixel plane estimation and DBSCAN with random sampling,
-    then produces two plots:
-      1. The original color image with plane boundaries overlaid in green.
-      2. A full-color segmentation map where each pixel is colored by its plane label.
-    
-    This function uses your original load_* functions to load the image data.
-    
-    Returns:
-      composite_with_planes: The overlay image with segmentation boundaries.
-      colored_seg: The colorized segmentation image.
-    """
-    # Use the same camera views as in your process_image function.
-    cam_view_color = "scene_cam_00_final_preview"
-    cam_view_geom = "scene_cam_00_geometry_hdf5"
-    
-    # Load images using your original functions.
-    color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
-    normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
-    depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
-    
-    if color_img is None or depth_map is None or normal_map is None:
-        print(f"Missing data in {image_dir}; skipping plane detection.")
-        return None, None
-    
-    h, w = color_img.shape[:2]
-    # Compute camera intrinsic matrix (same as in process_image)
-    fov_x = np.pi / 3 
-    f = w / (2 * np.tan(fov_x / 2))
-    default_K = np.array([[f, 0, w / 2],
-                          [0, f, h / 2],
-                          [0, 0, 1]])
-    
-    # Compute per-pixel plane features.
-    features, coords, valid_mask = compute_plane_features(normal_map, depth_map, default_K, spatial_weight=spatial_weight)
-    
-    # Cluster features using DBSCAN with random sampling.
-    segmentation_map = cluster_planes(features, coords, (h, w), eps=eps, min_samples=min_samples, sample_rate=sample_rate)
-    
-    # Overlay segmentation boundaries on the original color image.
-    composite_with_planes = overlay_plane_segmentation(color_img, segmentation_map)
-    
-    # Create a colored segmentation image.
-    colored_seg = colorize_segmentation_map(segmentation_map)
-    
-    if display_result:
-        plt.figure(figsize=(10, 10))
-        plt.imshow(composite_with_planes)
-        plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Plane Detection Overlay")
-        plt.axis("off")
-        plt.show()
-        
-        plt.figure(figsize=(10, 10))
-        plt.imshow(colored_seg)
-        plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Colored Plane Segmentation")
-        plt.axis("off")
-        plt.show()
-    
-    return composite_with_planes, colored_seg
+
+
+
+#****************************************************************************************************
+#****************************************************************************************************
+#****************************************************************************************************
 
