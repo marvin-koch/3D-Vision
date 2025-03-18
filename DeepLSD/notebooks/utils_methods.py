@@ -59,6 +59,15 @@ def load_normal_map(image_dir,  image_id, frame_str, cam_view):
         normal = np.array(f['dataset'])
     return normal.astype(np.float32)
 
+def load_world_coordinates_map(image_dir,  image_id, frame_str, cam_view):
+
+    position_file = find_file(image_dir, image_id,  f"frame.{frame_str}.position.hdf5", cam_view)
+    if position_file is None:
+        print("Position file not found in", image_dir, "with camera view", cam_view)
+        return None
+    with h5py.File(position_file, 'r') as f:
+        position = np.array(f['dataset'])
+    return position.astype(np.float32)
 
 #****************************************************************************************************
 #****************************************************************************************************
