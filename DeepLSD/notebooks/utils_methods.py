@@ -68,7 +68,7 @@ def load_normal_map(image_dir,  image_id, frame_str, cam_view):
 def compute_variation(mapping, k, normalize=False):
     """
     Computes the Sobel variation of a mapping (depth or normal) using a kernel size k.
-    Normalizes the result by subtracting the mean and dividing by the standard deviation.
+    Optionally ormalizes the result by subtracting the mean and dividing by the standard deviation.
     """
     grad_x = cv2.Sobel(mapping, cv2.CV_64F, 1, 0, ksize=k)
     grad_y = cv2.Sobel(mapping, cv2.CV_64F, 0, 1, ksize=k)
@@ -197,7 +197,7 @@ def compute_plane_features(normal_map, depth_map, K, spatial_weight=0.5, depth_w
     valid_mask = valid_mask_flat.reshape(h, w)
     return features, coords, valid_mask
 
-def cluster_planes(features, coords, image_shape, eps=0.2, min_samples=10, sample_rate=0.2, threshold=10000):
+def cluster_planes(features, coords, image_shape, eps=0.2, min_samples=10, sample_rate=0.2, threshold=0.2):
     """
     Cluster plane features using DBSCAN on a random sample of features.
     Returns:
