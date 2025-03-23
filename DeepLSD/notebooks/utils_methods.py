@@ -59,6 +59,18 @@ def load_normal_map(image_dir,  image_id, frame_str, cam_view):
         normal = np.array(f['dataset'])
     return normal.astype(np.float32)
 
+def load_world_coordinates(image_dir,  image_id, frame_str, cam_view):
+
+    wc_file = find_file(image_dir, image_id,  f"frame.{frame_str}.position.hdf5", cam_view)
+    if wc_file is None:
+        print("Normal file not found in", image_dir, "with camera view", cam_view)
+        return None
+    with h5py.File(wc_file, 'r') as f:
+        #print("Keys in the postion file:", list(f.keys()))
+        wc = np.array(f['dataset'])
+        #print("Shape of position data:", wc.shape)
+    return wc.astype(np.float32)
+
 
 #****************************************************************************************************
 #****************************************************************************************************
@@ -143,7 +155,7 @@ def pixel_to_3d(x, y, depth, K):
     Z = depth
     return np.array([X, Y, Z])
 
-def compute_plane_features(normal_map, depth_map, K, spatial_weight=0.5, depth_weight=1.0):
+def compute_plane_features(normal_map, depth_map, wc_map=None, K=None, spatial_weight=0.5, depth_weight=1.0):
     """
     Compute per-pixel features for plane clustering.
     
@@ -174,7 +186,10 @@ def compute_plane_features(normal_map, depth_map, K, spatial_weight=0.5, depth_w
         x = xx_valid[i]
         y = yy_valid[i]
         d_val = depth_valid[i]
-        points_3d[i, :] = pixel_to_3d(x, y, d_val, K)
+        if wc_map is None:
+            points_3d[i, :] = pixel_to_3d(x, y, d_val, K)
+        else:
+            points_3d[i, :] = wc_map[int(y), int(x), :]
         
     # Compute plane parameter: d = - n dot P
     d_params = -np.sum(normals_valid * points_3d, axis=1)

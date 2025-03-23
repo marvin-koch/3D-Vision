@@ -1,5 +1,5 @@
-from utils_methods import raydepth2depth, load_color_image, load_depth_map, load_normal_map, compute_variation, sobel_line_neighborhood, overlay_lines_on_image_custom
-from utils_methods import colorize_segmentation_map, overlay_plane_segmentation, cluster_planes, compute_plane_features
+from utils_methods import raydepth2depth, load_color_image, load_depth_map, load_normal_map, load_world_coordinates, compute_variation, sobel_line_neighborhood
+from utils_methods import colorize_segmentation_map, overlay_lines_on_image_custom, overlay_plane_segmentation, cluster_planes, compute_plane_features
 import os
 import numpy as np
 import cv2
@@ -233,7 +233,7 @@ def plot_process(image_ids, base_data_dir, frame_str, depth_thresholds, normal_t
 def process_image_with_plane_detection_and_color_plot(image_dir, image_id, frame_str, 
                                                       spatial_weight=0.5, depth_weight=1.0, eps=0.5, 
                                                       min_samples=50, sample_rate=0.2,
-                                                      threshold=100000, display_result=True):
+                                                      threshold=100000, world_coordinates=False, display_result=True):
     """
     Detects physical planes using per-pixel plane estimation and DBSCAN with random sampling,
     Returns:
@@ -248,6 +248,9 @@ def process_image_with_plane_detection_and_color_plot(image_dir, image_id, frame
     color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
     normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
     depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
+    wc_map = None
+    if world_coordinates:
+        wc_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
     
     if color_img is None or depth_map is None or normal_map is None:
         print(f"Missing data in {image_dir}; skipping plane detection.")
@@ -262,7 +265,7 @@ def process_image_with_plane_detection_and_color_plot(image_dir, image_id, frame
                           [0, 0, 1]])
     
     # Compute per-pixel plane features.
-    features, coords, valid_mask = compute_plane_features(normal_map, depth_map, default_K, spatial_weight=spatial_weight, depth_weight=depth_weight)
+    features, coords, valid_mask = compute_plane_features(normal_map, depth_map, wc_map=wc_map, K=default_K, spatial_weight=spatial_weight, depth_weight=depth_weight)
     
     # Cluster features using DBSCAN with random sampling.
     segmentation_map = cluster_planes(features, coords, (h, w), eps=eps, min_samples=min_samples, sample_rate=sample_rate, threshold=threshold)
