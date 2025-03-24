@@ -1,4 +1,3 @@
-# pipeline.py
 import os
 import matplotlib.pyplot as plt
 from line_understanding.geometry import calculate_plane_for_map, get_line_pixels

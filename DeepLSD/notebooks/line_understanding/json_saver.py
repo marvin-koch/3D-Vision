@@ -43,4 +43,4 @@ def save_lines_to_json(image_id, line_info, output_dir="json_output"):
     with open(json_file, "w") as f:
         # Convert numpy types to native Python types before dumping.
         json.dump(convert_np(json_dict), f, indent=4)
-    print(f"Saved JSON data to {json_file}")
+
