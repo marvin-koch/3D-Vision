@@ -1,6 +1,6 @@
 # 3D-Vision
 
-Generate a batch of ground trut
+Generate a batch of ground truths
 ```
 python /DeepLSD/notebooks/generate_ground_truth_batch -i <start_image> -n <num_images> -f <file_type>
 ```
