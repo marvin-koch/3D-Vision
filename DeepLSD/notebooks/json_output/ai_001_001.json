@@ -13,7 +13,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -27,7 +27,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -41,7 +41,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -55,7 +55,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -69,7 +69,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -83,7 +83,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -97,7 +97,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -134,8 +134,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                10376,
-                11858
+                11862,
+                13844
             ]
         },
         {
@@ -150,7 +150,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -164,7 +164,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10393
+            "coplanarity_label": 11909
         },
         {
             "base_line": [
@@ -178,7 +178,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1184
         },
         {
             "base_line": [
@@ -192,7 +192,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -206,7 +206,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10391
+            "coplanarity_label": 11907
         },
         {
             "base_line": [
@@ -243,7 +243,7 @@
                 ]
             ],
             "coplanarity_labels": [
-                4351,
+                4613,
                 -1
             ]
         },
@@ -259,7 +259,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -273,7 +273,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9210
         },
         {
             "base_line": [
@@ -349,8 +349,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                4840,
-                10376
+                5109,
+                11858
             ]
         },
         {
@@ -365,7 +365,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13837
         },
         {
             "base_line": [
@@ -379,7 +379,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -393,7 +393,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13839
         },
         {
             "base_line": [
@@ -407,7 +407,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1185
         },
         {
             "base_line": [
@@ -421,7 +421,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10392
+            "coplanarity_label": 11908
         },
         {
             "base_line": [
@@ -435,7 +435,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -449,7 +449,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -486,8 +486,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                12478,
-                8616
+                14688,
+                9947
             ]
         },
         {
@@ -502,7 +502,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1184
         },
         {
             "base_line": [
@@ -539,8 +539,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                12060,
-                4840
+                14059,
+                5109
             ]
         },
         {
@@ -555,7 +555,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6929
+            "coplanarity_label": 7369
         },
         {
             "base_line": [
@@ -569,7 +569,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7445
+            "coplanarity_label": 7918
         },
         {
             "base_line": [
@@ -606,8 +606,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                10376,
-                10376
+                11859,
+                11859
             ]
         },
         {
@@ -622,7 +622,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -636,7 +636,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -650,7 +650,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -664,7 +664,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -692,7 +692,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7445
+            "coplanarity_label": 7918
         },
         {
             "base_line": [
@@ -706,7 +706,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -720,7 +720,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 14688
         },
         {
             "base_line": [
@@ -773,7 +773,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13835
         },
         {
             "base_line": [
@@ -787,7 +787,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -801,7 +801,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7140
         },
         {
             "base_line": [
@@ -815,7 +815,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -829,7 +829,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7140
         },
         {
             "base_line": [
@@ -843,7 +843,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -857,7 +857,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9226
         },
         {
             "base_line": [
@@ -871,7 +871,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12478
+            "coplanarity_label": 14688
         },
         {
             "base_line": [
@@ -908,8 +908,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                12478,
-                2268
+                14688,
+                2481
             ]
         },
         {
@@ -924,7 +924,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13834
         },
         {
             "base_line": [
@@ -938,7 +938,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7445
+            "coplanarity_label": 7918
         },
         {
             "base_line": [
@@ -952,7 +952,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 4810
+            "coplanarity_label": 5079
         },
         {
             "base_line": [
@@ -966,7 +966,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -980,7 +980,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13844
         },
         {
             "base_line": [
@@ -994,7 +994,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11650
+            "coplanarity_label": 13293
         },
         {
             "base_line": [
@@ -1031,8 +1031,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                4351,
-                4351
+                4613,
+                4613
             ]
         },
         {
@@ -1047,7 +1047,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13830
         },
         {
             "base_line": [
@@ -1061,7 +1061,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -1075,7 +1075,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9213
         },
         {
             "base_line": [
@@ -1128,7 +1128,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13844
         },
         {
             "base_line": [
@@ -1142,7 +1142,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11857
         },
         {
             "base_line": [
@@ -1156,7 +1156,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9228
         },
         {
             "base_line": [
@@ -1193,7 +1193,7 @@
                 ]
             ],
             "coplanarity_labels": [
-                8100,
+                9230,
                 -1
             ]
         },
@@ -1209,7 +1209,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -1223,7 +1223,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10391
+            "coplanarity_label": 11907
         },
         {
             "base_line": [
@@ -1260,7 +1260,7 @@
                 ]
             ],
             "coplanarity_labels": [
-                10376,
+                11860,
                 -1
             ]
         },
@@ -1290,7 +1290,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -1304,7 +1304,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13845
         },
         {
             "base_line": [
@@ -1318,7 +1318,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1185
         },
         {
             "base_line": [
@@ -1355,7 +1355,7 @@
                 ]
             ],
             "coplanarity_labels": [
-                8100,
+                9222,
                 -1
             ]
         },
@@ -1371,7 +1371,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 8784
         },
         {
             "base_line": [
@@ -1385,7 +1385,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -1399,7 +1399,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1183
         },
         {
             "base_line": [
@@ -1413,7 +1413,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7141
         },
         {
             "base_line": [
@@ -1427,7 +1427,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -1441,7 +1441,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1187
         },
         {
             "base_line": [
@@ -1455,7 +1455,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -1469,7 +1469,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6928
+            "coplanarity_label": 7368
         },
         {
             "base_line": [
@@ -1483,7 +1483,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -1511,7 +1511,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -1525,7 +1525,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9196
         },
         {
             "base_line": [
@@ -1553,7 +1553,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -1567,7 +1567,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13834
         },
         {
             "base_line": [
@@ -1581,7 +1581,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13844
         },
         {
             "base_line": [
@@ -1595,7 +1595,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10292
+            "coplanarity_label": 11773
         },
         {
             "base_line": [
@@ -1609,7 +1609,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1186
         },
         {
             "base_line": [
@@ -1623,7 +1623,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -1637,7 +1637,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7141
         },
         {
             "base_line": [
@@ -1651,7 +1651,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -1665,7 +1665,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7141
         },
         {
             "base_line": [
@@ -1693,7 +1693,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -1721,7 +1721,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13835
         },
         {
             "base_line": [
@@ -1758,8 +1758,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11966,
-                8100
+                13963,
+                13963
             ]
         },
         {
@@ -1774,7 +1774,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 4810
+            "coplanarity_label": 5079
         },
         {
             "base_line": [
@@ -1788,7 +1788,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -1802,7 +1802,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -1816,7 +1816,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -1830,7 +1830,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -1882,7 +1882,7 @@
             ],
             "coplanarity_labels": [
                 -1,
-                10292
+                -1
             ]
         },
         {
@@ -1920,8 +1920,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                6714,
-                6714
+                7144,
+                7144
             ]
         },
         {
@@ -1936,7 +1936,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 4810
+            "coplanarity_label": 5079
         },
         {
             "base_line": [
@@ -1950,7 +1950,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6926
+            "coplanarity_label": 7366
         },
         {
             "base_line": [
@@ -1964,7 +1964,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -2041,7 +2041,7 @@
             ],
             "coplanarity_labels": [
                 -1,
-                10376
+                11860
             ]
         },
         {
@@ -2079,8 +2079,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11859,
-                11859
+                13845,
+                13845
             ]
         },
         {
@@ -2095,7 +2095,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13830
         },
         {
             "base_line": [
@@ -2109,7 +2109,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9229
         },
         {
             "base_line": [
@@ -2123,7 +2123,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2137,7 +2137,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9230
         },
         {
             "base_line": [
@@ -2151,7 +2151,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2165,7 +2165,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9212
         },
         {
             "base_line": [
@@ -2179,7 +2179,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2230,8 +2230,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                12478,
-                12478
+                14688,
+                14688
             ]
         },
         {
@@ -2246,7 +2246,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -2283,8 +2283,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                10390,
-                11858
+                11904,
+                11904
             ]
         },
         {
@@ -2299,7 +2299,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -2313,7 +2313,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -2341,7 +2341,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9229
         },
         {
             "base_line": [
@@ -2378,8 +2378,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                3760,
-                3760
+                4013,
+                4013
             ]
         },
         {
@@ -2394,7 +2394,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 3760
+            "coplanarity_label": 4013
         },
         {
             "base_line": [
@@ -2408,7 +2408,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9196
         },
         {
             "base_line": [
@@ -2422,7 +2422,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2436,7 +2436,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -2450,7 +2450,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -2464,7 +2464,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2478,7 +2478,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2492,7 +2492,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -2520,7 +2520,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13828
         },
         {
             "base_line": [
@@ -2534,7 +2534,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -2571,8 +2571,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                10390,
-                10390
+                11904,
+                11904
             ]
         },
         {
@@ -2587,7 +2587,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13836
         },
         {
             "base_line": [
@@ -2624,8 +2624,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                6583,
-                6583
+                7008,
+                7008
             ]
         },
         {
@@ -2640,7 +2640,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2654,7 +2654,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11908
         },
         {
             "base_line": [
@@ -2668,7 +2668,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13852
         },
         {
             "base_line": [
@@ -2682,7 +2682,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11858
         },
         {
             "base_line": [
@@ -2696,7 +2696,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13837
         },
         {
             "base_line": [
@@ -2733,8 +2733,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11859,
-                11859
+                13831,
+                13831
             ]
         },
         {
@@ -2749,7 +2749,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -2763,7 +2763,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -2777,7 +2777,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6927
+            "coplanarity_label": 7367
         },
         {
             "base_line": [
@@ -2791,7 +2791,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2805,7 +2805,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2819,7 +2819,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13832
         },
         {
             "base_line": [
@@ -2833,7 +2833,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -2847,7 +2847,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -2875,7 +2875,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1184
         },
         {
             "base_line": [
@@ -2912,8 +2912,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11859,
-                11859
+                13839,
+                4613
             ]
         },
         {
@@ -2928,7 +2928,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1185
         },
         {
             "base_line": [
@@ -2942,7 +2942,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6926
+            "coplanarity_label": 7366
         },
         {
             "base_line": [
@@ -2956,7 +2956,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -2970,7 +2970,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -2984,7 +2984,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9216
         },
         {
             "base_line": [
@@ -2998,7 +2998,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3012,7 +3012,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -3026,7 +3026,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13827
         },
         {
             "base_line": [
@@ -3040,7 +3040,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1189
         },
         {
             "base_line": [
@@ -3105,8 +3105,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                988,
-                11859
+                1186,
+                13852
             ]
         },
         {
@@ -3121,7 +3121,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13835
         },
         {
             "base_line": [
@@ -3149,7 +3149,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -3163,7 +3163,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -3191,7 +3191,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3205,7 +3205,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3219,7 +3219,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3233,7 +3233,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3270,8 +3270,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11858,
-                11858
+                -1,
+                13855
             ]
         },
         {
@@ -3286,7 +3286,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13844
         },
         {
             "base_line": [
@@ -3300,7 +3300,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13835
         },
         {
             "base_line": [
@@ -3314,7 +3314,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1184
         },
         {
             "base_line": [
@@ -3328,7 +3328,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -3342,7 +3342,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13839
         },
         {
             "base_line": [
@@ -3356,7 +3356,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -3370,7 +3370,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3384,7 +3384,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 8577
         },
         {
             "base_line": [
@@ -3421,8 +3421,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                6549,
-                989
+                6974,
+                1196
             ]
         },
         {
@@ -3437,7 +3437,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -3451,7 +3451,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13835
         },
         {
             "base_line": [
@@ -3465,7 +3465,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1189
         },
         {
             "base_line": [
@@ -3502,8 +3502,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                7445,
-                8326
+                7918,
+                9598
             ]
         },
         {
@@ -3518,7 +3518,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -3532,7 +3532,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13841
         },
         {
             "base_line": [
@@ -3546,7 +3546,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13848
         },
         {
             "base_line": [
@@ -3627,7 +3627,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 3760
+            "coplanarity_label": 4013
         },
         {
             "base_line": [
@@ -3680,7 +3680,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -3694,7 +3694,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -3708,7 +3708,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 4351
+            "coplanarity_label": 4613
         },
         {
             "base_line": [
@@ -3722,7 +3722,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1185
         },
         {
             "base_line": [
@@ -3750,7 +3750,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -3764,7 +3764,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -3778,7 +3778,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1190
         },
         {
             "base_line": [
@@ -3792,7 +3792,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1186
         },
         {
             "base_line": [
@@ -3806,7 +3806,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13845
         },
         {
             "base_line": [
@@ -3820,7 +3820,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1185
         },
         {
             "base_line": [
@@ -3834,7 +3834,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -3848,7 +3848,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -3876,7 +3876,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1190
         },
         {
             "base_line": [
@@ -3890,7 +3890,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6928
+            "coplanarity_label": 7368
         },
         {
             "base_line": [
@@ -3957,7 +3957,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1187
         },
         {
             "base_line": [
@@ -3971,7 +3971,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -3985,7 +3985,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -3999,7 +3999,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -4013,7 +4013,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7143
         },
         {
             "base_line": [
@@ -4027,7 +4027,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9196
         },
         {
             "base_line": [
@@ -4041,7 +4041,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9227
         },
         {
             "base_line": [
@@ -4055,7 +4055,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13849
         },
         {
             "base_line": [
@@ -4069,7 +4069,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13847
         },
         {
             "base_line": [
@@ -4083,7 +4083,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -4120,8 +4120,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                8100,
-                8100
+                9208,
+                9208
             ]
         },
         {
@@ -4136,7 +4136,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8616
+            "coplanarity_label": 9947
         },
         {
             "base_line": [
@@ -4164,7 +4164,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -4217,7 +4217,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4245,7 +4245,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -4259,7 +4259,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -4312,7 +4312,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -4340,7 +4340,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4354,7 +4354,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13827
         },
         {
             "base_line": [
@@ -4368,7 +4368,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13833
         },
         {
             "base_line": [
@@ -4396,7 +4396,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -4410,7 +4410,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -4447,8 +4447,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11859,
-                11859
+                13831,
+                13831
             ]
         },
         {
@@ -4463,7 +4463,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1192
         },
         {
             "base_line": [
@@ -4477,7 +4477,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4514,8 +4514,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                8100,
-                8100
+                9214,
+                9214
             ]
         },
         {
@@ -4567,8 +4567,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11410,
-                11858
+                13047,
+                13047
             ]
         },
         {
@@ -4622,7 +4622,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": -1
         },
         {
             "base_line": [
@@ -4636,7 +4636,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13830
         },
         {
             "base_line": [
@@ -4673,8 +4673,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                7445,
-                6583
+                7918,
+                7008
             ]
         },
         {
@@ -4689,7 +4689,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4703,7 +4703,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4717,7 +4717,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4731,7 +4731,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -4745,7 +4745,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -4824,8 +4824,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11858,
-                11858
+                13840,
+                13840
             ]
         },
         {
@@ -4840,7 +4840,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13429
         },
         {
             "base_line": [
@@ -4854,7 +4854,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -4868,7 +4868,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4882,7 +4882,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -4933,8 +4933,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11858,
-                11858
+                13838,
+                13838
             ]
         },
         {
@@ -4949,7 +4949,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11860
         },
         {
             "base_line": [
@@ -4963,7 +4963,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5001,7 +5001,7 @@
             ],
             "coplanarity_labels": [
                 -1,
-                4351
+                4613
             ]
         },
         {
@@ -5016,7 +5016,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9226
         },
         {
             "base_line": [
@@ -5030,7 +5030,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9197
         },
         {
             "base_line": [
@@ -5044,7 +5044,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13842
         },
         {
             "base_line": [
@@ -5058,7 +5058,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -5072,7 +5072,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -5086,7 +5086,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -5100,7 +5100,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1188
         },
         {
             "base_line": [
@@ -5137,7 +5137,7 @@
                 ]
             ],
             "coplanarity_labels": [
-                8100,
+                9230,
                 -1
             ]
         },
@@ -5192,7 +5192,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5206,7 +5206,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -5220,7 +5220,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -5234,7 +5234,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8616
+            "coplanarity_label": 9947
         },
         {
             "base_line": [
@@ -5248,7 +5248,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5301,7 +5301,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1192
         },
         {
             "base_line": [
@@ -5329,7 +5329,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9216
         },
         {
             "base_line": [
@@ -5357,7 +5357,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1183
         },
         {
             "base_line": [
@@ -5371,7 +5371,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9228
         },
         {
             "base_line": [
@@ -5399,7 +5399,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -5413,7 +5413,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9195
         },
         {
             "base_line": [
@@ -5427,7 +5427,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9197
         },
         {
             "base_line": [
@@ -5503,8 +5503,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11858,
-                11858
+                13838,
+                13838
             ]
         },
         {
@@ -5519,7 +5519,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5556,8 +5556,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                988,
-                8100
+                1187,
+                9228
             ]
         },
         {
@@ -5611,7 +5611,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9228
         },
         {
             "base_line": [
@@ -5625,7 +5625,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9195
         },
         {
             "base_line": [
@@ -5639,7 +5639,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11858
         },
         {
             "base_line": [
@@ -5653,7 +5653,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13830
         },
         {
             "base_line": [
@@ -5667,7 +5667,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8616
+            "coplanarity_label": 9947
         },
         {
             "base_line": [
@@ -5695,7 +5695,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -5709,7 +5709,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5723,7 +5723,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -5737,7 +5737,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9196
         },
         {
             "base_line": [
@@ -5751,7 +5751,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5765,7 +5765,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1184
         },
         {
             "base_line": [
@@ -5779,7 +5779,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8616
+            "coplanarity_label": 9947
         },
         {
             "base_line": [
@@ -5807,7 +5807,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5821,7 +5821,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1191
         },
         {
             "base_line": [
@@ -5835,7 +5835,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -5888,7 +5888,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13849
         },
         {
             "base_line": [
@@ -5902,7 +5902,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5916,7 +5916,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -5953,8 +5953,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                8100,
-                8100
+                9201,
+                9194
             ]
         },
         {
@@ -5969,7 +5969,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -5983,7 +5983,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1193
         },
         {
             "base_line": [
@@ -5997,7 +5997,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9196
         },
         {
             "base_line": [
@@ -6011,7 +6011,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -6025,7 +6025,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1191
         },
         {
             "base_line": [
@@ -6039,7 +6039,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -6053,7 +6053,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11858
         },
         {
             "base_line": [
@@ -6067,7 +6067,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10376
+            "coplanarity_label": 11859
         },
         {
             "base_line": [
@@ -6095,7 +6095,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9218
         },
         {
             "base_line": [
@@ -6132,8 +6132,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                988,
-                8100
+                1188,
+                9231
             ]
         },
         {
@@ -6171,7 +6171,7 @@
                 ]
             ],
             "coplanarity_labels": [
-                8095,
+                8577,
                 -1
             ]
         },
@@ -6187,7 +6187,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13849
         },
         {
             "base_line": [
@@ -6201,7 +6201,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -6243,7 +6243,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13830
         },
         {
             "base_line": [
@@ -6257,7 +6257,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -6299,7 +6299,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": -1
         },
         {
             "base_line": [
@@ -6366,7 +6366,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6403,8 +6403,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                11859,
-                11859
+                13845,
+                13845
             ]
         },
         {
@@ -6433,7 +6433,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -6447,7 +6447,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1191
         },
         {
             "base_line": [
@@ -6461,7 +6461,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9216
         },
         {
             "base_line": [
@@ -6531,7 +6531,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1183
         },
         {
             "base_line": [
@@ -6559,7 +6559,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8094
+            "coplanarity_label": 8574
         },
         {
             "base_line": [
@@ -6573,7 +6573,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6587,7 +6587,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13840
         },
         {
             "base_line": [
@@ -6601,7 +6601,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6629,7 +6629,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7144
         },
         {
             "base_line": [
@@ -6643,7 +6643,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13840
         },
         {
             "base_line": [
@@ -6657,7 +6657,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1183
         },
         {
             "base_line": [
@@ -6671,7 +6671,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9209
         },
         {
             "base_line": [
@@ -6685,7 +6685,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -6699,7 +6699,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6713,7 +6713,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1183
         },
         {
             "base_line": [
@@ -6727,7 +6727,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -6755,7 +6755,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6783,7 +6783,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6797,7 +6797,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -6811,7 +6811,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 8100
+            "coplanarity_label": 9199
         },
         {
             "base_line": [
@@ -6825,7 +6825,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11741
+            "coplanarity_label": 13392
         },
         {
             "base_line": [
@@ -6878,7 +6878,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6892,7 +6892,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -6906,7 +6906,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -6920,7 +6920,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 988
+            "coplanarity_label": 1193
         },
         {
             "base_line": [
@@ -6948,7 +6948,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -7013,8 +7013,8 @@
                 ]
             ],
             "coplanarity_labels": [
-                4351,
-                4351
+                4613,
+                4613
             ]
         },
         {
@@ -7043,7 +7043,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11859
+            "coplanarity_label": 13837
         },
         {
             "base_line": [
@@ -7057,7 +7057,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -7071,7 +7071,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11741
+            "coplanarity_label": 13392
         },
         {
             "base_line": [
@@ -7085,7 +7085,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 6714
+            "coplanarity_label": 7142
         },
         {
             "base_line": [
@@ -7099,7 +7099,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -7113,7 +7113,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -7127,7 +7127,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 7442
+            "coplanarity_label": 7882
         },
         {
             "base_line": [
@@ -7155,7 +7155,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -7169,7 +7169,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11858
+            "coplanarity_label": 13849
         },
         {
             "base_line": [
@@ -7183,7 +7183,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 2268
+            "coplanarity_label": 2481
         },
         {
             "base_line": [
@@ -7197,7 +7197,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11741
+            "coplanarity_label": 13392
         },
         {
             "base_line": [
@@ -7211,7 +7211,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -7225,7 +7225,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -7239,7 +7239,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 10390
+            "coplanarity_label": 11904
         },
         {
             "base_line": [
@@ -7253,7 +7253,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 12061
+            "coplanarity_label": 14060
         },
         {
             "base_line": [
@@ -7281,7 +7281,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 11715
+            "coplanarity_label": 13366
         },
         {
             "base_line": [
@@ -7295,7 +7295,7 @@
                 ]
             ],
             "type": "textural",
-            "coplanarity_label": 4351
+            "coplanarity_label": 4613
         }
     ]
 }
