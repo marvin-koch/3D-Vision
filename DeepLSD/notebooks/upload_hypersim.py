@@ -2,10 +2,34 @@ import os
 import subprocess
 import time
 import glob
+import re
+import shutil
 
+def generate_image_list(start_image, num_images):
+    """Generate a list of image IDs based on the given start image and number of images needed."""
+    
+    match = re.match(r"ai_(\d{3})_00(\d)", start_image)
+    if not match:
+        raise ValueError("Invalid start image format. Expected pattern: ai_00x_000y (e.g., ai_003_0005)")
+
+    start_x, start_y = int(match.group(1)), int(match.group(2))
+    desired_images = []
+
+    x, y = start_x, start_y
+    for _ in range(num_images):
+        desired_images.append(f"ai_{x:03}_00{y}")
+        
+        # Increment y first; if it exceeds 9, reset and increment x
+        y += 1
+        if y > 9:
+            y = 0
+            x += 1
+            # No need to wrap around x anymore; it can go up to 999
+
+    return desired_images
 
 def upload_images(desired_images, files_to_download):
-
+    
     base_data_dir = "data"
     if not os.path.exists(base_data_dir):
         os.makedirs(base_data_dir)
@@ -97,4 +121,10 @@ def upload_images(desired_images, files_to_download):
                 pass
 
 
-
+def delete_images(desired_images):
+    base_data_dir = "data"
+    for image_id in desired_images:
+        image_dir = os.path.join(base_data_dir, image_id)
+        if os.path.exists(image_dir):
+            shutil.rmtree(image_dir)
+            print(f"Deleted {image_dir} after processing.")

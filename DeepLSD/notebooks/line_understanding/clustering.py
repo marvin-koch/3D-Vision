@@ -2,14 +2,22 @@ import numpy as np
 import cv2
 import hdbscan
 from sklearn.neighbors import NearestNeighbors
+from sklearn.impute import SimpleImputer
 
-def cluster_coplanar_points(features, world_coordinates, eps=0.5, min_samples=5, sample_rate=1, threshold=1):
+def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=False, 
+        cluster_selection_epsilon=0.01, 
+        min_cluster_size=10, 
+        allow_single_cluster=False, sample_rate=1, threshold=1):
     """
     Cluster coplanar lines using HDBSCAN.
     """
     if len(features) == 0:
         return []
-
+    # Create an imputer to fill NaN values with the mean of the column
+    if np.any(np.isnan(features)):
+        imputer = SimpleImputer(strategy='mean')
+        features = imputer.fit_transform(features)
+        
     h, w = world_coordinates.shape[:2]
     n_points = features.shape[0]
 
@@ -21,13 +29,16 @@ def cluster_coplanar_points(features, world_coordinates, eps=0.5, min_samples=5,
     
     sample_features = features[sample_indices]
     sample_labels = hdbscan.HDBSCAN(
-        approx_min_span_tree=False, 
-        cluster_selection_epsilon=0.01, 
-        min_cluster_size=10, 
+        approx_min_span_tree=approx_min_span_tree, 
+        cluster_selection_epsilon=cluster_selection_epsilon, 
+        min_cluster_size=min_cluster_size, 
         core_dist_n_jobs=-1, 
-        allow_single_cluster=False
+        allow_single_cluster=allow_single_cluster
     ).fit_predict(sample_features)
-    
+
+
+ 
+
     nbrs = NearestNeighbors(n_neighbors=1, metric="euclidean").fit(sample_features)
     distances, nn_indices = nbrs.kneighbors(features)
     distances = distances.flatten()

@@ -6,7 +6,7 @@ from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from line_understanding.utility_methods import (
     raydepth2depth, load_color_image, load_depth_map,
-    load_normal_map, load_world_coordinates, compute_variation, sobel_line_neighborhood
+    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid
 )
 
 
@@ -54,9 +54,9 @@ def create_optimal_offset_lines(line, normal_map, offset_amount=1.0, num_samples
 
 
 def process_image(image_dir, image_id, frame_str, net, device,
-                  depth_thresh, normal_thresh, thickness,
+                  depth_thresh=0.05, normal_thresh=0.5, thickness=1, structural_thresh=0.6,
                   method="neighborhood", depth_normal_func=np.max,
-                  depth_normal_func_str="Max", norm_agg_func=np.sum,
+                  depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
                   struct_color=(0, 0, 255), text_color=(255, 0, 0)):
     """
     Process a single image:
@@ -101,20 +101,19 @@ def process_image(image_dir, image_id, frame_str, net, device,
             pred_lines = pred_lines.cpu().numpy()
     
     # Compute variation maps.
-    sobel_depth_map = compute_variation(depth_map, 11)
+    sobel_depth_map = compute_variation(depth_map, 11, depth=True)
+    
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
         
     # Classify each predicted line.
     is_struct = []
+    scores = []
     for l in pred_lines:
-        line_for_class = l.reshape(2, 2) if l.shape == (4,) else l
-        ld_neigh, ln_neigh = sobel_line_neighborhood(sobel_depth_map, sobel_normal_map, line_for_class, thickness=thickness)
-        max_depth = depth_normal_func(ld_neigh)
-        max_normal = depth_normal_func(ln_neigh)
-        depth_bool = max_depth > depth_thresh
-        normal_bool = max_normal > normal_thresh
-        is_struct.append(depth_bool or normal_bool)
+        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l)
+        scores.append(max(sigmoid(depth_normal_func(ln), lam=25 ,tau=normal_thresh), sigmoid(depth_normal_func(ld), lam=250 ,tau=depth_thresh)))  # Soft thresholding 0.01
+    
+    is_struct = [s > structural_thresh for s in scores]
 
     print(f"[{method.capitalize()} Method] {os.path.basename(image_dir)}: Detected {len(pred_lines)} lines; {sum(is_struct)} structural.")
 
@@ -139,7 +138,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
             # Record one entry for the base line with its two offsets
             line_info.append({
                 "base_line": line.tolist(),
-                "type": "structural",
+                "score": scores[i],
                 "offset_lines": [line1.tolist(), line2.tolist()],
                 "new_line_indices": [idx1, idx2]
             })
@@ -157,7 +156,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
             new_lines_list.append(line)
             line_info.append({
                 "base_line": line.tolist(),
-                "type": "textural",
+                "score": scores[i],
                 "new_line_indices": [idx]
             })
             cv2.line(composite_after,
@@ -166,5 +165,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
                      non_structural_color, thickness)
 
     new_lines_array = np.array(new_lines_list)
-    return composite_after, new_lines_array, color_img, normal_map, world_coordinates_map, line_info
+    return composite_after, new_lines_array, color_img, normal_map, world_coordinates_map, line_info, scores, is_struct, pred_lines
+
+
 

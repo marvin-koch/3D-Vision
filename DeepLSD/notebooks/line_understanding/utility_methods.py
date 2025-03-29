@@ -69,21 +69,75 @@ def load_world_coordinates(image_dir,  image_id, frame_str, cam_view):
 #****************************************************************************************************
 
 
-def compute_variation(mapping, k, normalize=False):
+def compute_variation(mapping, k, depth=False):
     """
     Computes the Sobel variation of a mapping (depth or normal) using a kernel size k.
-    Optionally ormalizes the result by subtracting the mean and dividing by the standard deviation.
+    Normalizes the result by subtracting the mean and dividing by the standard deviation.
     """
+   
     grad_x = cv2.Sobel(mapping, cv2.CV_64F, 1, 0, ksize=k)
     grad_y = cv2.Sobel(mapping, cv2.CV_64F, 0, 1, ksize=k)
+
     variation = np.sqrt(grad_x**2 + grad_y**2)
 
-    normalized = variation
-    if normalize: 
-        mean = np.mean(variation)
-        std_dev = np.std(variation)
-        normalized = (variation - mean) / std_dev
-    return normalized
+    
+    # mean = np.mean(variation)
+    # std_dev = np.std(variation)
+    # normalized = (variation - mean) / std_dev
+    # return normalized
+    max_depth = 399742.56
+    min_depth = 2.83e-12
+
+    if depth:
+        norm = (variation - min_depth) /(max_depth -min_depth)
+    else:
+        norm = (variation - 0) / (6.043567e+14 - 0)
+    return norm
+
+def sigmoid(x, lam=10, tau=0.01):
+    """
+    Compute sigmoid function for soft thresholding.
+    - lam: scaling factor (higher = sharper transition)
+    - tau: threshold shift
+    """
+    return 1 / (1 + np.exp(-lam * (x - tau)))
+
+def sobel_line(sobel_depth, sobel_normal, line, trim_ratio=0.25):
+    """
+    Computes the Sobel response in a trimmed neighborhood along a given line.
+
+    Parameters:
+        
+    sobel_depth: 2D array of Sobel-filtered depth image.
+    sobel_normal: 2D array of Sobel-filtered normal image.
+    line: 2x2 array representing endpoints [[x1, y1], [x2, y2]].
+    thickness: Line thickness for the neighborhood mask.
+    trim_ratio: Ratio (0-0.5) to trim from both ends of the line.
+
+        Returns:
+        
+    Tuple of masked Sobel depth and normal in the trimmed line neighborhood."""
+    p1 = np.array(line[0], dtype=np.float32)
+    p2 = np.array(line[1], dtype=np.float32)
+
+    # Direction vector and length
+    direction = p2 - p1
+    length = np.linalg.norm(direction)
+    unit_dir = direction / (length + 1e-8)
+
+    # Shorten line by trim_ratio from both ends
+    trim_len = length * trim_ratio
+    new_p1 = p1 + unit_dir * trim_len
+    new_p2 = p2 - unit_dir * trim_len
+
+    # Convert to integer pixel coordinates
+    x1, y1 = int(round(new_p1[0])), int(round(new_p1[1]))
+    x2, y2 = int(round(new_p2[0])), int(round(new_p2[1]))
+
+    # Create masks
+    mask_depth = cv2.line(np.zeros_like(sobel_depth), (x1, y1), (x2, y2), 1, 1)
+    mask_normal = cv2.line(np.zeros_like(sobel_normal), (x1, y1), (x2, y2), 1, 1)
+    return mask_depth * sobel_depth, mask_normal * sobel_normal
 
 def sobel_line_neighborhood(sobel_depth, sobel_normal, line, thickness=5):
     """

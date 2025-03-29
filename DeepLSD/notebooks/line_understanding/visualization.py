@@ -31,3 +31,18 @@ def plot_coplanar_lines(lines, labels, image):
         )
     plt.axis("off")
     plt.show()
+    
+def plot_lines_confidence(img, lines, confidences, indices=(0, 1), alpha=1):
+    """ Plots lines with color intensity based on confidence scores """
+    fig, ax = plt.subplots()
+    #norm = plt.Normalize(min(confidences), max(confidences))
+    cmap = plt.cm.get_cmap("coolwarm")
+    
+    for i, l in enumerate(lines):
+        color = cmap((confidences[i]))
+        line = plt.Line2D((l[0, 0], l[1, 0]), (l[0, 1], l[1, 1]), linewidth=2, color=color, alpha=alpha)
+        ax.add_line(line)
+    
+    ax.imshow(img, cmap='gray')
+    plt.colorbar(plt.cm.ScalarMappable(cmap=cmap), ax=ax, label='Confidence Score')
+    plt.show()
