@@ -94,7 +94,6 @@ def process_image_pipeline(image_id, frame_str, net, device,
 
 
 
-
 def plot_pipeline_results(processed_data, frame_str):
     """
     Plot the segmentation maps and coplanar lines using the processed data.
@@ -112,14 +111,14 @@ def plot_pipeline_results(processed_data, frame_str):
 
     # Plot original clustering result.
     plt.figure(figsize=(10, 10))
-    plt.imshow(original_map, cmap="tab20")
+    plt.imshow(original_map)
     plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Colored Plane Segmentation")
     plt.axis("off")
     plt.show()
 
     # Plot processed segmentation map.
     plt.figure(figsize=(10, 10))
-    plt.imshow(segmentation_map, cmap="tab20")
+    plt.imshow(segmentation_map)
     plt.title(f"{os.path.basename(image_dir)} - Frame {frame_str}: Processed Segmentation Map")
     plt.axis("off")
     plt.show()
