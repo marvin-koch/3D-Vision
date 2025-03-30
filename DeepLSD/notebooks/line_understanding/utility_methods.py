@@ -191,6 +191,7 @@ def compute_variation(mapping, k, depth=False):
 
     if depth:
         norm = (variation - min_depth) /(max_depth -min_depth)
+        #norm = variation
     else:
         norm = (variation - 0) / (6.043567e+14 - 0)
     return norm
