@@ -120,6 +120,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
     default_K = np.array([[f, 0, w / 2], [0, f, h / 2], [0, 0, 1]])
 
     depth_map = raydepth2depth(depth_map, default_K)
+    
     gray_img = cv2.cvtColor(color_img, cv2.COLOR_RGB2GRAY)
 
     # Detect lines with DeepLSD.
@@ -134,7 +135,10 @@ def process_image(image_dir, image_id, frame_str, net, device,
     sobel_depth_map = compute_variation(depth_map, 11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
+
+    plt.figure()
     plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
+    plt.show()
         
     # Classify each predicted line.
     is_struct = []
@@ -215,6 +219,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
                      non_structural_color, thickness)
 
     composite_after_rgb = cv2.cvtColor(composite_after, cv2.COLOR_BGR2RGB)
+    plt.figure()
     plt.imshow(composite_after_rgb)
     plt.axis("off")
     plt.show()
