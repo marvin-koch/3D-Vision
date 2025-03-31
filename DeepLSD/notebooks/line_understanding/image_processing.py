@@ -1,7 +1,8 @@
 import os
 import cv2
 import numpy as np
-import torch
+import torch 
+
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from line_understanding.utility_methods import (
@@ -98,7 +99,7 @@ def compute_shifted_line(line, depth_map, w, h, offset=1.0, num_samples=100):
 
 def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=0.05, normal_thresh=0.5, thickness=1, structural_thresh=0.6,
-            method="neighborhood", depth_normal_func=np.max,
+            method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
             struct_color=(0, 0, 255), text_color=(255, 0, 0)):
 
@@ -140,11 +141,59 @@ def process_image(image_dir, image_id, frame_str, net, device,
     is_struct = []
     is_depth_seperated  = []
     scores = []
+    max_depths = []
+    max_normals = []
+
+    
+    normal_thresh = 1.25 * 1e7
+    depth_thresh = 125
     for l in pred_lines:
         ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l)
-        scores.append(max(sigmoid(depth_normal_func(ln), lam=25, tau=normal_thresh),
-                          sigmoid(depth_normal_func(ld), lam=250, tau=depth_thresh)))
-        is_depth_seperated.append(sigmoid(depth_normal_func(ld), lam=250, tau=depth_thresh) > 0.5)
+
+        sqrt_max_depth = depthfunc(ld)
+        log_max_normal = normal_func(ln)
+        
+        depth_sigmoid = sigmoid(sqrt_max_depth, lam=1, tau=depth_thresh)
+        normal_sigmoid = sigmoid(log_max_normal, lam=1, tau=normal_thresh)
+        scores.append(max(normal_sigmoid, depth_sigmoid))
+
+        
+        max_depths.append(sqrt_max_depth)
+        max_normals.append(log_max_normal)
+   
+        is_depth_seperated.append(depth_sigmoid > 0.5)
+ 
+
+    # Sort the list
+    sorted_values_depth = sorted(max_depths)
+    plt.figure()
+    plt.scatter(range(len(sorted_values_depth)), sorted_values_depth, color='b', marker='o')
+    plt.axhline(y=depth_thresh, color='r', linestyle='--')
+
+    plt.xlabel('Rank')
+    plt.ylabel('Value')
+    plt.title('Scatter Plot of Sorted Sqrt Max Depths')
+    plt.show()
+    
+    
+    sorted_values_normal = sorted(max_normals)
+    plt.figure()
+    plt.scatter(range(len(sorted_values_normal)), sorted_values_normal, color='b', marker='o')
+    plt.axhline(y=normal_thresh, color='r', linestyle='--')
+
+    plt.xlabel('Rank')
+    plt.ylabel('Value')
+    plt.title('Scatter Plot of Sorted Sqrt Max Normals')
+    plt.show()
+
+    sorted_values_scores = sorted(scores)
+    plt.figure()
+    plt.scatter(range(len(sorted_values_scores)), sorted_values_scores, color='r', marker='o')
+    plt.xlabel('Rank')
+    plt.ylabel('Value')
+    plt.title('Scatter Plot of Sorted Scores')
+    plt.show()
+
     is_struct = [s > structural_thresh for s in scores]
     
     print(f"[{method.capitalize()} Method] {os.path.basename(image_dir)}: Detected {len(pred_lines)} lines; {sum(is_struct)} structural.")
@@ -215,9 +264,11 @@ def process_image(image_dir, image_id, frame_str, net, device,
                      non_structural_color, thickness)
 
     composite_after_rgb = cv2.cvtColor(composite_after, cv2.COLOR_BGR2RGB)
+    plt.figure()
     plt.imshow(composite_after_rgb)
     plt.axis("off")
     plt.show()
 
     new_lines_array = np.array(new_lines_list)
+    
     return composite_after, new_lines_array, color_img, normal_map, world_coordinates_map, line_info, scores, is_struct, pred_lines

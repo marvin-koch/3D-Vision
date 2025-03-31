@@ -10,7 +10,38 @@ def get_line_pixels(line, maps):
     height, width = maps.shape[:2]
 
     blank_image = np.zeros((height, width), dtype=np.uint8)
-    cv2.line(blank_image, (x1, y1), (x2, y2), color=255, thickness=3)
+    cv2.line(blank_image, (x1, y1), (x2, y2), color=255, thickness=1) #TODO it was 3 before, we changed it to 1
+    
+    y_coords, x_coords = np.where(blank_image == 255)
+    return list(zip(x_coords, y_coords))
+
+def get_line_pixels_trim(line, maps, trim_ratio=0.25):
+    """
+    Get all pixel coordinates along a line using cv2.line.
+    """
+  
+
+    p1 = np.array(line[0], dtype=np.float32)
+    p2 = np.array(line[1], dtype=np.float32)
+
+    # Direction vector and length
+    direction = p2 - p1
+    length = np.linalg.norm(direction)
+    unit_dir = direction / (length + 1e-8)
+
+    # Shorten line by trim_ratio from both ends
+    trim_len = length * trim_ratio
+    new_p1 = p1 + unit_dir * trim_len
+    new_p2 = p2 - unit_dir * trim_len
+
+    # Convert to integer pixel coordinates
+    x1, y1 = int(round(new_p1[0])), int(round(new_p1[1]))
+    x2, y2 = int(round(new_p2[0])), int(round(new_p2[1]))
+
+    height, width = maps.shape[:2]
+
+    blank_image = np.zeros((height, width), dtype=np.uint8)
+    cv2.line(blank_image, (x1, y1), (x2, y2), color=255, thickness=3) #TODO it was 3 before, we changed it to 1
     
     y_coords, x_coords = np.where(blank_image == 255)
     return list(zip(x_coords, y_coords))

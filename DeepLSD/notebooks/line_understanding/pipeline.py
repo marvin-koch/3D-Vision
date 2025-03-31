@@ -1,17 +1,24 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from line_understanding.geometry import calculate_plane_for_map, get_line_pixels
+from line_understanding.geometry import calculate_plane_for_map, get_line_pixels, get_line_pixels_trim
 from line_understanding.clustering import cluster_coplanar_points, find_line_planes
 from line_understanding.image_processing import process_image
 from line_understanding.visualization import plot_coplanar_lines, plot_lines_confidence
+
+def log_max(x):
+    return np.log(1 + np.max(x))
+
+def sqrt_max(x):
+    return np.sqrt(np.max(x))
 
 def process_image_pipeline(image_id, frame_str, net, device, 
                            base_data_dir="data", 
                            depth_thresh=0.05, 
                            normal_thresh=0.5, 
                            thickness=1, 
-                           depth_normal_func=lambda x: x.max(), 
+                           normal_func=sqrt_max, 
+                           depth_func=sqrt_max,
                            norm_agg_func=lambda x, axis: np.linalg.norm(x, axis=axis)):
     """
     Process a single image and compute all necessary data.
@@ -33,7 +40,8 @@ def process_image_pipeline(image_id, frame_str, net, device,
     composite_after, pred_lines, img, normals, world_coordinates, line_info, scores, isstruct, original_lines = process_image(
         image_dir, image_id, frame_str, net, device,
         depth_thresh, normal_thresh, thickness,
-        depth_normal_func=depth_normal_func,
+        normal_func=normal_func,
+        depthfunc=depth_func,
         norm_agg_func=norm_agg_func
     )
     if composite_after is None:
@@ -45,11 +53,11 @@ def process_image_pipeline(image_id, frame_str, net, device,
 
     # Cluster the plane map.
     segmentation_map, original_map = cluster_coplanar_points(
-        plane_map, world_coordinates, sample_rate=1, threshold=1
+        plane_map, world_coordinates, cluster_selection_epsilon=0.05, min_cluster_size=150#0.01, sample_rate=1, threshold=1 #0.02
     )
 
     # Determine coplanarity label for each line.
-    all_coplanarity_labels = find_line_planes(pred_lines, segmentation_map, get_line_pixels)
+    all_coplanarity_labels = find_line_planes(pred_lines, segmentation_map, get_line_pixels_trim)
 
     coplanarity_labels_original_lines = []
     # Update each line_info entry with its corresponding coplanarity labels.
@@ -125,5 +133,6 @@ def plot_pipeline_results(processed_data, frame_str):
 
     # Visualize the coplanar lines.
     plot_coplanar_lines(pred_lines, labels, img)
+        
     
     plot_lines_confidence(img, processed_data["original_lines"], processed_data["scores"])

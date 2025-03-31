@@ -28,6 +28,7 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
         sample_indices = np.arange(n_points)
     
     sample_features = features[sample_indices]
+    
     sample_labels = hdbscan.HDBSCAN(
         approx_min_span_tree=approx_min_span_tree, 
         cluster_selection_epsilon=cluster_selection_epsilon, 
@@ -80,6 +81,8 @@ def find_line_planes(lines, segmentation_map, get_line_pixels_func):
     for line in lines:
         pixel_coords = get_line_pixels_func(line, segmentation_map)
         labels = [segmentation_map[y, x] for x, y in pixel_coords]
-        most_common_label = max(set(labels), key=labels.count)
+        
+        most_common_label = max(set(labels), key=labels.count)  # Find the most common label
+        
         line_labels.append(most_common_label)
     return line_labels

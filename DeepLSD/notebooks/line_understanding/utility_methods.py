@@ -80,7 +80,7 @@ def compute_variation(mapping, k, depth=False):
 
     variation = np.sqrt(grad_x**2 + grad_y**2)
 
-    
+    return variation
     # mean = np.mean(variation)
     # std_dev = np.std(variation)
     # normalized = (variation - mean) / std_dev
@@ -93,6 +93,7 @@ def compute_variation(mapping, k, depth=False):
     else:
         norm = (variation - 0) / (6.043567e+14 - 0)
     return norm
+
 
 def sigmoid(x, lam=10, tau=0.01):
     """
@@ -111,7 +112,6 @@ def sobel_line(sobel_depth, sobel_normal, line, trim_ratio=0.25):
     sobel_depth: 2D array of Sobel-filtered depth image.
     sobel_normal: 2D array of Sobel-filtered normal image.
     line: 2x2 array representing endpoints [[x1, y1], [x2, y2]].
-    thickness: Line thickness for the neighborhood mask.
     trim_ratio: Ratio (0-0.5) to trim from both ends of the line.
 
         Returns:
@@ -139,7 +139,7 @@ def sobel_line(sobel_depth, sobel_normal, line, trim_ratio=0.25):
     mask_normal = cv2.line(np.zeros_like(sobel_normal), (x1, y1), (x2, y2), 1, 1)
     return mask_depth * sobel_depth, mask_normal * sobel_normal
 
-def sobel_line_neighborhood(sobel_depth, sobel_normal, line, thickness=5):
+def sobel_line_neighborhood(sobel_depth, sobel_normal, line, thickness=1):
     """
     """
     x1, y1 = int(round(line[0, 0])), int(round(line[0, 1]))
