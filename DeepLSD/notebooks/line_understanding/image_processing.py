@@ -5,7 +5,7 @@ import torch
 
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
-from line_understanding.utility_methods import (
+from .utility_methods import (
     raydepth2depth, load_color_image, load_depth_map,
     load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid
 )

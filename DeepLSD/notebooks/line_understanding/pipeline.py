@@ -1,10 +1,10 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from line_understanding.geometry import calculate_plane_for_map, get_line_pixels, get_line_pixels_trim
-from line_understanding.clustering import cluster_coplanar_points, find_line_planes
-from line_understanding.image_processing import process_image
-from line_understanding.visualization import plot_coplanar_lines, plot_lines_confidence
+from .geometry import calculate_plane_for_map, get_line_pixels, get_line_pixels_trim
+from .clustering import cluster_coplanar_points, find_line_planes
+from .image_processing import process_image
+from .visualization import plot_coplanar_lines, plot_lines_confidence
 
 def log_max(x):
     return np.log(1 + np.max(x))
