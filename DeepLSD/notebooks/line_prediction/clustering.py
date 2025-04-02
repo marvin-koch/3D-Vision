@@ -56,6 +56,7 @@ def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min
     #     r, c = int(coords[i, 0]), int(coords[i, 1])
     #     segmentation_map[r, c] = label
     segmentation_map = full_labels.reshape((h,w))
+    
     # Post-process: for each cluster (ignoring noise), use connected components to split spatially disjoint regions.
     final_segmentation = -1 * np.ones((h, w), dtype=np.int32)
     new_label = 0
@@ -77,11 +78,13 @@ def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min
             final_segmentation[(mask == 1) & (comps == comp)] = new_label
 
             new_label += 1
+            
+
     return final_segmentation, segmentation_map
 
 
 
-def find_line_planes(lines, valid_mask, segmentation_map, get_line_pixels_func):
+def find_line_planes(lines, segmentation_map,valid_mask, get_line_pixels_func):
  
     line_labels = []
     for line in lines:
@@ -90,8 +93,9 @@ def find_line_planes(lines, valid_mask, segmentation_map, get_line_pixels_func):
         labels = []
         for x, y in pixel_coords:
             labels.append(segmentation_map[y, x])
-
+            
         if len(labels) == 0:
+            print("No labels found for line")
             line_labels.append(-1)
         else: 
             most_common_label = max(set(labels), key=labels.count)

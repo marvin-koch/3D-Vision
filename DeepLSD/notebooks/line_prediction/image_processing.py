@@ -101,7 +101,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
-            struct_color=(0, 0, 255), text_color=(255, 0, 0), dataset="hypersim"):
+            struct_color=(0, 0, 255), text_color=(255, 0, 0), normal_k_size=11, dataset="hypersim"):
 
     # Load image data using helper functions.
     cam_view_color = "scene_cam_00_final_preview"
@@ -121,7 +121,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
     elif dataset == "moge_gt":
         color_img = load_color_image_moge_gt(image_dir)
         depth_map = load_depth_map_png(image_dir)
-        normal_map = calculate_normal_map_from_depth(depth_map, ksize=3)
+        normal_map = calculate_normal_map_from_depth(depth_map, ksize=normal_k_size)
         default_K = load_intrinsics_json(image_dir)
         world_coordinates_map = reconstruct_3d_from_depth(depth_map, default_K)
         
@@ -129,7 +129,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
         print("moge_pred")
         color_img = load_color_image_moge_gt(image_dir)
         depth_map = load_depth_map(image_dir,image_id, "", "", dataset="moge_pred")
-        normal_map = calculate_normal_map_from_depth(depth_map, ksize=3)
+        normal_map = calculate_normal_map_from_depth(depth_map, ksize=normal_k_size)
         default_K = load_K(image_dir, image_id)
         valid_mask = load_mask(image_dir, image_id)
         world_coordinates_map = load_world_coordinates(image_dir,image_id, "", "", dataset="moge_pred")
@@ -155,8 +155,11 @@ def process_image(image_dir, image_id, frame_str, net, device,
     sobel_depth_map = compute_variation(depth_map, 11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
+    plot_images([valid_mask], ["Valid Mask"], cmaps='gray')
+
     plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
-        
+    plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
+
     # Classify each predicted line.
     is_struct = []
     is_depth_seperated  = []

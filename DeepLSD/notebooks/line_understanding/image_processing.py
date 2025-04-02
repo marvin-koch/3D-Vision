@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from .utility_methods import (
     raydepth2depth, load_color_image, load_depth_map, load_depth_map_png, calculate_normal_map_from_depth, reconstruct_3d_from_depth,
-    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_color_image_moge_gt
+    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_color_image_moge_gt, compute_variation_laplace
 )
 from deeplsd.geometry.viz_2d import plot_images
 
@@ -112,6 +112,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     if dataset == "hypersim":
         color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
+        h, w = color_img.shape[:2]
+
         normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
         depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
         fov_x = np.pi / 3 
@@ -121,6 +123,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
         world_coordinates_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
     elif dataset == "moge_gt":
         color_img = load_color_image_moge_gt(image_dir)
+        h, w = color_img.shape[:2]
+
         depth_map = load_depth_map_png(image_dir)
         normal_map = calculate_normal_map_from_depth(depth_map, ksize=3)
         default_K = load_intrinsics_json(image_dir)
@@ -131,7 +135,6 @@ def process_image(image_dir, image_id, frame_str, net, device,
         return None, None, None, None, None, None, None, None, None
 
 
-    h, w = color_img.shape[:2]
 
     gray_img = cv2.cvtColor(color_img, cv2.COLOR_RGB2GRAY)
 
@@ -144,10 +147,13 @@ def process_image(image_dir, image_id, frame_str, net, device,
             pred_lines = pred_lines.cpu().numpy()
 
     # Compute variation maps.
-    sobel_depth_map = compute_variation(depth_map, 11, depth=True)
+    sobel_depth_map = compute_variation(depth_map,11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
     plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
+    plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
+
+
         
     # Classify each predicted line.
     is_struct = []
