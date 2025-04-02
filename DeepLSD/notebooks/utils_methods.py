@@ -4,7 +4,7 @@ import glob
 import numpy as np
 import cv2
 import h5py
-
+import json
 
 from sklearn.neighbors import NearestNeighbors
 
@@ -48,6 +48,16 @@ def load_depth_map(image_dir, image_id, frame_str, cam_view):
         depth = np.array(f['dataset'])
     return depth.astype(np.float32)
 
+def load_depth_map_png(image_dir, image_id, cam_view):
+
+    depth_file = find_file(image_dir,  image_id, f"depth.png", cam_view)
+    if depth_file is None:
+        print("Depth file not found in", image_dir, "with camera view", cam_view)
+        return None
+    depth = cv2.imread(depth_file, cv2.IMREAD_GRAYSCALE)
+    
+    return np.array(depth).astype(np.float32)
+
 
 def load_normal_map(image_dir,  image_id, frame_str, cam_view):
 
@@ -71,7 +81,60 @@ def load_world_coordinates(image_dir,  image_id, frame_str, cam_view):
         #print("Shape of position data:", wc.shape)
     return wc.astype(np.float32)
 
+def load_intrinsics_json(image_dir, image_id, frame_str, cam_view):
+    K_file = find_file(image_dir, image_id, f"meta.json", cam_view)
+    # Parse the JSON data
+    with open(K_file, 'r') as file:
+        data = json.load(file)
+    # Convert the 'intrinsics' list into a NumPy array
+    intrinsics_matrix = np.array(data["intrinsics"])
+    
+    return intrinsics_matrix.astype(np.float64)
 
+def reconstruct_3d_from_depth(depth, intrinsics):
+    H, W = depth.shape
+    fx, fy = intrinsics[0, 0], intrinsics[1, 1]
+    cx, cy = intrinsics[0, 2], intrinsics[1, 2]
+
+    # Create meshgrid of pixel coordinates
+    x, y = np.meshgrid(np.arange(W), np.arange(H))
+
+    # Convert to normalized camera coordinates
+    x_cam = (x - cx) / fx
+    y_cam = (y - cy) / fy
+
+    # Backproject to 3D
+    X = x_cam * depth
+    Y = y_cam * depth
+    Z = depth
+
+    # Stack into 3D points (H, W, 3)
+    points_3d = np.stack((X, Y, Z), axis=-1)
+    return points_3d
+
+def calculate_normal_map_from_depth(depth_map, ksize=3):
+    # Compute gradients
+    grad_x = cv2.Sobel(depth_map, cv2.CV_32F, 1, 0, ksize=ksize)
+    grad_y = cv2.Sobel(depth_map, cv2.CV_32F, 0, 1, ksize=ksize)
+
+    # Compute normal vectors
+    normal_x = -grad_x
+    normal_y = -grad_y
+    normal_z = np.ones_like(depth_map)
+
+    # Normalize the normals
+    norm = np.sqrt(normal_x**2 + normal_y**2 + normal_z**2)
+    normal_x /= norm
+    normal_y /= norm
+    normal_z /= norm
+
+    # Convert to RGB
+    # normal_map = np.stack([(normal_x + 1) / 2 * 255,
+    #                     (normal_y + 1) / 2 * 255,
+    #                     (normal_z + 1) / 2 * 255], axis=-1).astype(np.float64)
+    normal_map = np.stack([normal_x, normal_y, normal_z], axis=-1).astype(np.float64)
+
+    return normal_map
 #****************************************************************************************************
 #****************************************************************************************************
 #****************************************************************************************************
