@@ -5,9 +5,10 @@ import torch
 
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
+
 from .utility_methods import (
-    raydepth2depth, load_color_image, load_depth_map,
-    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid
+    raydepth2depth, load_color_image, load_depth_map, load_depth_map_png, calculate_normal_map_from_depth, reconstruct_3d_from_depth,
+    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_color_image_moge_gt, compute_variation_laplace
 )
 from deeplsd.geometry.viz_2d import plot_images
 
@@ -98,30 +99,45 @@ def compute_shifted_line(line, depth_map, w, h, offset=1.0, num_samples=100):
 
 
 def process_image(image_dir, image_id, frame_str, net, device,
-            depth_thresh=0.05, normal_thresh=0.5, thickness=1, structural_thresh=0.6,
+            depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
-            struct_color=(0, 0, 255), text_color=(255, 0, 0)):
+            struct_color=(0, 0, 255), text_color=(255, 0, 0), dataset="hypersim"):
 
     # Load image data using helper functions.
     cam_view_color = "scene_cam_00_final_preview"
     cam_view_geom = "scene_cam_00_geometry_hdf5"
-    color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
-    normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
-    depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
-    world_coordinates_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
+    gt = "gt"
+    moge = "moge"
 
+    if dataset == "hypersim":
+        color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
+        h, w = color_img.shape[:2]
+
+        normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
+        depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
+        fov_x = np.pi / 3 
+        f = w / (2 * np.tan(fov_x / 2))
+        default_K = np.array([[f, 0, w / 2], [0, f, h / 2], [0, 0, 1]])
+        depth_map = raydepth2depth(depth_map, default_K)
+        world_coordinates_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
+    elif dataset == "moge_gt":
+        color_img = load_color_image_moge_gt(image_dir)
+        h, w = color_img.shape[:2]
+
+        depth_map = load_depth_map_png(image_dir)
+        normal_map = calculate_normal_map_from_depth(depth_map, ksize=3)
+        default_K = load_intrinsics_json(image_dir)
+        world_coordinates_map = reconstruct_3d_from_depth(depth_map, default_K)
+        
     if color_img is None or depth_map is None or normal_map is None:
         print(f"Missing data in {image_dir}; skipping processing.")
         return None, None, None, None, None, None, None, None, None
 
-    h, w = color_img.shape[:2]
-    fov_x = np.pi / 3 
-    f = w / (2 * np.tan(fov_x / 2))
-    default_K = np.array([[f, 0, w / 2], [0, f, h / 2], [0, 0, 1]])
 
     depth_map = raydepth2depth(depth_map, default_K)
     
+
     gray_img = cv2.cvtColor(color_img, cv2.COLOR_RGB2GRAY)
 
     # Detect lines with DeepLSD.
@@ -133,13 +149,14 @@ def process_image(image_dir, image_id, frame_str, net, device,
             pred_lines = pred_lines.cpu().numpy()
 
     # Compute variation maps.
-    sobel_depth_map = compute_variation(depth_map, 11, depth=True)
+    sobel_depth_map = compute_variation(depth_map,11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
 
     plt.figure()
     plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
     plt.show()
+
         
     # Classify each predicted line.
     is_struct = []
@@ -148,9 +165,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
     max_depths = []
     max_normals = []
 
-    
-    normal_thresh = 1.25 * 1e7
-    depth_thresh = 125
+
     for l in pred_lines:
         ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l)
 

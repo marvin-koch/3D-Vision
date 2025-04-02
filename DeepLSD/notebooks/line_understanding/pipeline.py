@@ -19,7 +19,10 @@ def process_image_pipeline(image_id, frame_str, net, device,
                            thickness=1, 
                            normal_func=sqrt_max, 
                            depth_func=sqrt_max,
-                           norm_agg_func=lambda x, axis: np.linalg.norm(x, axis=axis)):
+                           norm_agg_func=lambda x, axis: np.linalg.norm(x, axis=axis),
+                           cluster_selection_epsilon=0.01, 
+                            min_cluster_size=10, 
+                           dataset="hypersim"):
     """
     Process a single image and compute all necessary data.
     
@@ -42,7 +45,8 @@ def process_image_pipeline(image_id, frame_str, net, device,
         depth_thresh, normal_thresh, thickness,
         normal_func=normal_func,
         depthfunc=depth_func,
-        norm_agg_func=norm_agg_func
+        norm_agg_func=norm_agg_func,
+        dataset=dataset
     )
     if composite_after is None:
         print(f"Skipping image {image_id} due to missing data.")
@@ -53,7 +57,7 @@ def process_image_pipeline(image_id, frame_str, net, device,
 
     # Cluster the plane map.
     segmentation_map, original_map = cluster_coplanar_points(
-        plane_map, world_coordinates, cluster_selection_epsilon=0.05, min_cluster_size=150#0.01, sample_rate=1, threshold=1 #0.02
+        plane_map, world_coordinates, cluster_selection_epsilon=cluster_selection_epsilon, min_cluster_size=min_cluster_size#0.01, sample_rate=1, threshold=1 #0.02
     )
 
     # Determine coplanarity label for each line.

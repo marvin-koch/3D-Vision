@@ -3,7 +3,7 @@ import glob
 import numpy as np
 import cv2
 import h5py
-
+import json
 
 import numpy as np
 
@@ -15,13 +15,31 @@ def find_file(image_dir, image_id,  pattern, cam_view):
     files = glob.glob(search_pattern, recursive=True)
     return files[0] if files else None
 
+def find_file_moge_gt(image_dir,  pattern):
 
-def load_color_image(image_dir, image_id,  frame_str, cam_view):
+    search_pattern = os.path.join(image_dir, pattern)
+    print(search_pattern)
+    files = glob.glob(search_pattern, recursive=True)
+    return files[0] if files else None
 
-    color_file = find_file(image_dir, image_id,  f"frame.{frame_str}.color.jpg", cam_view)
+def load_color_image_moge_gt(image_dir):
+    return load_color_image(image_dir, "", "", "", dataset="moge_gt")
+
+def load_color_image(image_dir, image_id,  frame_str, cam_view, dataset="hypersim"):
+
+    file_name = ""
+    if dataset=="hypersim":
+        file_name = f"frame.{frame_str}.color.jpg"
+        color_file = find_file(image_dir, image_id, file_name, cam_view)
+
+    elif dataset =="moge_gt":
+        file_name = f"image.jpg"
+        color_file = find_file_moge_gt(image_dir, file_name)
+
     if color_file is None:
         print("Color image not found in", image_dir, "with camera view", cam_view)
         return None
+    
     img = cv2.imread(color_file)
     if img is None:
         print("Failed to load", color_file)
@@ -40,6 +58,15 @@ def load_depth_map(image_dir, image_id, frame_str, cam_view):
         depth = np.array(f['dataset'])
     return depth.astype(np.float32)
 
+def load_depth_map_png(image_dir):
+
+    depth_file = find_file_moge_gt(image_dir, f"depth.png")
+    if depth_file is None:
+        print("Depth file not found in", image_dir)
+        return None
+    depth = cv2.imread(depth_file, cv2.IMREAD_GRAYSCALE)
+    
+    return np.array(depth).astype(np.float32)
 
 def load_normal_map(image_dir,  image_id, frame_str, cam_view):
 
@@ -63,7 +90,80 @@ def load_world_coordinates(image_dir,  image_id, frame_str, cam_view):
         #print("Shape of position data:", wc.shape)
     return wc.astype(np.float32)
 
+def load_K(image_dir,  image_id, frame_str, cam_view):
 
+    normal_file = find_file(image_dir, image_id,  f"frame.{frame_str}.K.hdf5", cam_view)
+    if normal_file is None:
+        print("Normal file not found in", image_dir, "with camera view", cam_view)
+        return None
+    with h5py.File(normal_file, 'r') as f:
+        normal = np.array(f['dataset'])
+    return normal.astype(np.float32)
+
+def load_mask(image_dir,  image_id, frame_str, cam_view):
+
+    normal_file = find_file(image_dir, image_id,  f"frame.{frame_str}.mask.hdf5", cam_view)
+    if normal_file is None:
+        print("Normal file not found in", image_dir, "with camera view", cam_view)
+        return None
+    with h5py.File(normal_file, 'r') as f:
+        normal = np.array(f['dataset'])
+    return normal.astype(np.float32)
+
+def load_intrinsics_json(image_dir):
+    K_file = find_file_moge_gt(image_dir, f"meta.json")
+    # Parse the JSON data
+    with open(K_file, 'r') as file:
+        data = json.load(file)
+    # Convert the 'intrinsics' list into a NumPy array
+    intrinsics_matrix = np.array(data["intrinsics"])
+    
+    return intrinsics_matrix.astype(np.float64)
+
+def reconstruct_3d_from_depth(depth, intrinsics):
+    H, W = depth.shape
+    fx, fy = intrinsics[0, 0], intrinsics[1, 1]
+    cx, cy = intrinsics[0, 2], intrinsics[1, 2]
+
+    # Create meshgrid of pixel coordinates
+    x, y = np.meshgrid(np.arange(W), np.arange(H))
+
+    # Convert to normalized camera coordinates
+    x_cam = (x - cx) / fx
+    y_cam = (y - cy) / fy
+
+    # Backproject to 3D
+    X = x_cam * depth
+    Y = y_cam * depth
+    Z = depth
+
+    # Stack into 3D points (H, W, 3)
+    points_3d = np.stack((X, Y, Z), axis=-1)
+    return points_3d
+
+def calculate_normal_map_from_depth(depth_map, ksize=3):
+    # Compute gradients
+    grad_x = cv2.Sobel(depth_map, cv2.CV_32F, 1, 0, ksize=ksize)
+    grad_y = cv2.Sobel(depth_map, cv2.CV_32F, 0, 1, ksize=ksize)
+
+    # Compute normal vectors
+    normal_x = -grad_x
+    normal_y = -grad_y
+    normal_z = np.ones_like(depth_map)
+
+    # Normalize the normals
+    norm = np.sqrt(normal_x**2 + normal_y**2 + normal_z**2)
+    normal_x /= norm
+    normal_y /= norm
+    normal_z /= norm
+
+    # Convert to RGB
+    # normal_map = np.stack([(normal_x + 1) / 2 * 255,
+    #                     (normal_y + 1) / 2 * 255,
+    #                     (normal_z + 1) / 2 * 255], axis=-1).astype(np.float64)
+    normal_map = np.stack([normal_x, normal_y, normal_z], axis=-1).astype(np.float64)
+
+    return normal_map
 #****************************************************************************************************
 #****************************************************************************************************
 #****************************************************************************************************
@@ -81,6 +181,7 @@ def compute_variation(mapping, k, depth=False):
     variation = np.sqrt(grad_x**2 + grad_y**2)
 
     return variation
+"""
     # mean = np.mean(variation)
     # std_dev = np.std(variation)
     # normalized = (variation - mean) / std_dev
@@ -94,7 +195,20 @@ def compute_variation(mapping, k, depth=False):
     else:
         norm = (variation - 0) / (6.043567e+14 - 0)
     return norm
+"""
 
+def compute_variation_laplace(mapping, k, depth=False):
+    """
+    Computes the Sobel variation of a mapping (depth or normal) using a kernel size k.
+    Normalizes the result by subtracting the mean and dividing by the standard deviation.
+    """
+   
+    laplacian = cv2.Laplacian(mapping, cv2.CV_64F, ksize=k)
+    
+    # Take the absolute value to measure the magnitude of variation
+    variation = np.abs(laplacian)
+
+    return variation
 
 def sigmoid(x, lam=10, tau=0.01):
     """
@@ -103,6 +217,7 @@ def sigmoid(x, lam=10, tau=0.01):
     - tau: threshold shift
     """
     return 1 / (1 + np.exp(-lam * (x - tau)))
+
 
 def sobel_line(sobel_depth, sobel_normal, line, trim_ratio=0.25):
     """
