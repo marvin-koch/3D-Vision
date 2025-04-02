@@ -8,7 +8,6 @@ def get_line_feature(image_id, coordinates):
     """
     ADD MATINE'S FEATURE EXTRACTION
     """
-    
     return np.ones(10)
 
 class GraphDataset(Dataset):
