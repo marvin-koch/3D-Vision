@@ -51,7 +51,7 @@ def compute_plane_point(point, normal):
     Compute plane coefficients from a 3D point and its normal vector.
     """
     denom = np.linalg.norm(normal)
-    normal = normal / denom  # Normalize the normal vector
+    normal = normal / (denom + 1e-12) # Normalize the normal vector
     a, b, c = normal
     d = -np.dot(normal, point)
     return np.array([a, b, c, d])  # Return plane coefficients

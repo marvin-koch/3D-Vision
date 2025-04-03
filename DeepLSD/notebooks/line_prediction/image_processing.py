@@ -96,7 +96,44 @@ def compute_shifted_line(line, depth_map, w, h, offset=1.0, num_samples=100):
     return shifted_line
 
 
+def compute_normal_map_from_world(world_coords, mask=None, ksize=3):
+            """
+            Compute a normal map from a world coordinate map.
 
+            Args:
+                world_coords (np.ndarray): 3D world coordinate map of shape (H, W, 3) where each pixel maps to a 3D point.
+                mask (np.ndarray, optional): Binary mask of shape (H, W) indicating valid pixels (1 valid, 0 invalid).
+                ksize (int, optional): Kernel size for the Sobel operator (default is 3).
+
+            Returns:
+                np.ndarray: Normal map of shape (H, W, 3) with unit surface normals.
+            """
+            # Optionally mark invalid pixels as NaN to avoid propagation in derivative calculations.
+            if mask is not None:
+                world_coords = np.where(mask[..., None] == 1, world_coords, np.nan)
+
+            # Initialize arrays for x and y gradients.
+            grad_x = np.zeros_like(world_coords, dtype=np.float32)
+            grad_y = np.zeros_like(world_coords, dtype=np.float32)
+
+            for channel in range(3):
+                grad_x[..., channel] = cv2.Sobel(world_coords[..., channel], cv2.CV_32F, 1, 0, ksize=ksize)
+                grad_y[..., channel] = cv2.Sobel(world_coords[..., channel], cv2.CV_32F, 0, 1, ksize=ksize)
+
+            # Compute the cross product of the gradients. This gives a vector perpendicular to the surface.
+            normals = np.cross(grad_x, grad_y)
+
+            # Normalize the normals to unit length.
+            norm = np.linalg.norm(normals, axis=2, keepdims=True)
+            norm[norm == 0] = 1  # Avoid division by zero.
+            normals = normals / norm
+
+            # For pixels outside the valid mask, set normals to zero.
+            if mask is not None:
+                normals[mask == 0] = 0
+
+            return normals.astype(np.float32)
+        
 def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
@@ -129,10 +166,13 @@ def process_image(image_dir, image_id, frame_str, net, device,
         print("moge_pred")
         color_img = load_color_image_moge_gt(image_dir)
         depth_map = load_depth_map(image_dir,image_id, "", "", dataset="moge_pred")
-        normal_map = calculate_normal_map_from_depth(depth_map, ksize=normal_k_size)
         default_K = load_K(image_dir, image_id)
         valid_mask = load_mask(image_dir, image_id)
+        depth_map = raydepth2depth(depth_map, default_K)
+
         world_coordinates_map = load_world_coordinates(image_dir,image_id, "", "", dataset="moge_pred")
+        normal_map = compute_normal_map_from_world(world_coordinates_map,mask=valid_mask, ksize=normal_k_size)
+
         
     if color_img is None or depth_map is None or normal_map is None:
         print(f"Missing data in {image_dir}; skipping processing.")
@@ -152,7 +192,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
             pred_lines = pred_lines.cpu().numpy()
 
     # Compute variation maps.
-    sobel_depth_map = compute_variation(depth_map, 11, depth=True)
+    sobel_depth_map = compute_variation_laplace(depth_map,11, depth=True)
+
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
     plot_images([valid_mask], ["Valid Mask"], cmaps='gray')
@@ -160,6 +201,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
     plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
     plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
 
+        
     # Classify each predicted line.
     is_struct = []
     is_depth_seperated  = []
@@ -169,18 +211,18 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
 
     for l in pred_lines:
-        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, valid_mask, l)
+        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l)
 
-        sqrt_max_depth = depthfunc(ld)
-        log_max_normal = normal_func(ln)
+        max_depth = depthfunc(ld)
+        max_normal = normal_func(ln)
         
-        depth_sigmoid = sigmoid(sqrt_max_depth, lam=1, tau=depth_thresh)
-        normal_sigmoid = sigmoid(log_max_normal, lam=1, tau=normal_thresh)
+        depth_sigmoid = sigmoid(max_depth, lam=0.1, tau=depth_thresh)
+        normal_sigmoid = sigmoid(max_normal, lam=0.1, tau=normal_thresh)
         scores.append(max(normal_sigmoid, depth_sigmoid))
 
         
-        max_depths.append(sqrt_max_depth)
-        max_normals.append(log_max_normal)
+        max_depths.append(max_depth)
+        max_normals.append(max_normal)
    
         is_depth_seperated.append(depth_sigmoid > 0.5)
  
@@ -193,7 +235,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     plt.xlabel('Rank')
     plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Sqrt Max Depths')
+    plt.title('Scatter Plot of Sorted Max Depths')
     plt.show()
     
     
@@ -204,7 +246,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     plt.xlabel('Rank')
     plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Sqrt Max Normals')
+    plt.title('Scatter Plot of Sorted Max Normals')
     plt.show()
 
     sorted_values_scores = sorted(scores)
@@ -214,7 +256,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
     plt.ylabel('Value')
     plt.title('Scatter Plot of Sorted Scores')
     plt.show()
-
+    
     is_struct = [s > structural_thresh for s in scores]
     
     print(f"[{method.capitalize()} Method] {os.path.basename(image_dir)}: Detected {len(pred_lines)} lines; {sum(is_struct)} structural.")

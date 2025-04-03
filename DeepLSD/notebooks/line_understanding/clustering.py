@@ -18,10 +18,13 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
         imputer = SimpleImputer(strategy='mean')
         features = imputer.fit_transform(features)
         
+        
     h, w = world_coordinates.shape[:2]
+    
+    print("World_coordinates", h, w)
     n_points = features.shape[0]
 
-    if sample_rate < 1.0:
+    if sample_rate < 1:
         n_sample = int(n_points * sample_rate)
         sample_indices = np.random.choice(n_points, size=n_sample, replace=False)
     else:
@@ -29,26 +32,35 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
     
     sample_features = features[sample_indices]
     
+    print("start hdbscan")
     sample_labels = hdbscan.HDBSCAN(
         approx_min_span_tree=approx_min_span_tree, 
         cluster_selection_epsilon=cluster_selection_epsilon, 
         min_cluster_size=min_cluster_size, 
         core_dist_n_jobs=-1, 
         allow_single_cluster=allow_single_cluster
+        
     ).fit_predict(sample_features)
 
 
- 
+    if sample_rate < 1.0:
+        print("start nearestneighbors")
 
-    nbrs = NearestNeighbors(n_neighbors=1, metric="euclidean").fit(sample_features)
-    distances, nn_indices = nbrs.kneighbors(features)
-    distances = distances.flatten()
-    nn_indices = nn_indices.flatten()
-    
-    full_labels = np.array([
-        sample_labels[idx] if dist <= threshold else -1 
-        for idx, dist in zip(nn_indices, distances)
-    ])
+        nbrs = NearestNeighbors(n_neighbors=1, metric="euclidean").fit(sample_features)
+        distances, nn_indices = nbrs.kneighbors(features)
+        distances = distances.flatten()
+        nn_indices = nn_indices.flatten()
+        """
+        full_labels = np.array([
+            sample_labels[idx] if dist <= threshold else -1 
+            for idx, dist in zip(nn_indices, distances)
+        ])
+        
+        segmentation_map = full_labels.reshape((h, w))
+        """
+        full_labels = np.where(distances <= threshold, sample_labels[nn_indices], -1)
+    else:
+        full_labels = sample_labels
     
     segmentation_map = full_labels.reshape((h, w))
     
@@ -57,16 +69,41 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
     new_label = 0
     unique_labels = np.unique(segmentation_map)
     
+    print("start dilation")
+    kernel_large = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    """
     for label in unique_labels:
         if label == -1:
             continue
         mask = (segmentation_map == label).astype(np.uint8)
-        kernel_size = 1 if np.sum(mask) < 100 else 5  # Smaller clusters get less dilation.
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
+        # Smaller clusters get less dilation.
+        if np.sum(mask) < 100:
+            final_segmentation[(mask == 1)] = new_label
+            new_label += 1
+        else:
+            kernel = kernel_large
+            dilated_mask = cv2.dilate(mask, kernel, iterations=3)
+            num_components, comps = cv2.connectedComponents(dilated_mask, connectivity=8)
+            for comp in range(1, num_components):
+                final_segmentation[(mask == 1) & (comps == comp)] = new_label
+                new_label += 1
+    """
+    kernel_small = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
+
+    for label in unique_labels:
+        if label == -1:
+            continue
+        mask = (segmentation_map == label).astype(np.uint8)
+        #mask = cv2.medianBlur(mask, 3)
+
+        kernel = kernel_small if np.sum(mask) < 100 else kernel_large # Small clusters = less dilation
+
         dilated_mask = cv2.dilate(mask, kernel, iterations=3)
+
         num_components, comps = cv2.connectedComponents(dilated_mask, connectivity=8)
-        for comp in range(1, num_components):  # Skip background.
+        for comp in range(1, num_components):  # Skip background (component 0)
             final_segmentation[(mask == 1) & (comps == comp)] = new_label
+
             new_label += 1
             
     return final_segmentation, segmentation_map
@@ -77,6 +114,7 @@ def find_line_planes(lines, segmentation_map, get_line_pixels_func):
     """
     For each line, determine the most common plane label by sampling pixels from the segmentation map.
     """
+    
     line_labels = []
     for line in lines:
         pixel_coords = get_line_pixels_func(line, segmentation_map)
