@@ -139,7 +139,7 @@ def reconstruct_3d_from_depth(depth, intrinsics):
 
     # Stack into 3D points (H, W, 3)
     points_3d = np.stack((X, Y, Z), axis=-1)
-    return points_3d
+    return points_3d.astype(np.float32)
 
 def calculate_normal_map_from_depth(depth_map, ksize=3):
     # Compute gradients

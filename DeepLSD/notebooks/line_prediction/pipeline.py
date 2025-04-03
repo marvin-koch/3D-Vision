@@ -6,19 +6,14 @@ from line_prediction.clustering import cluster_coplanar_points, find_line_planes
 from line_prediction.image_processing import process_image
 from line_understanding.visualization import plot_coplanar_lines, plot_lines_confidence
 
-def log_max(x):
-    return np.log(1 + np.max(x))
-
-def sqrt_max(x):
-    return np.sqrt(np.max(x))
 
 def prediction_pipeline(image_id, frame_str, net, device, 
                            base_data_dir="data", 
                            depth_thresh=0.05, 
                            normal_thresh=0.5, 
                            thickness=1, 
-                           normal_func=sqrt_max, 
-                           depth_func=sqrt_max,
+                           normal_func=np.max, 
+                           depth_func=np.max,
                            norm_agg_func=lambda x, axis: np.linalg.norm(x, axis=axis),
                            cluster_selection_epsilon=0.01, 
                             min_cluster_size=10, 

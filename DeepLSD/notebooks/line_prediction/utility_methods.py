@@ -198,19 +198,20 @@ def compute_variation(mapping, k, depth=False):
     variation = np.sqrt(grad_x**2 + grad_y**2)
 
     return variation
-    # mean = np.mean(variation)
-    # std_dev = np.std(variation)
-    # normalized = (variation - mean) / std_dev
-    # return normalized
-    max_depth = 399742.56
-    min_depth = 2.83e-12
 
-    if depth:
-        norm = (variation - min_depth) /(max_depth -min_depth)
-    else:
-        norm = (variation - 0) / (6.043567e+14 - 0)
-    return norm
 
+def compute_variation_laplace(mapping, k, depth=False):
+    """
+    Computes the Sobel variation of a mapping (depth or normal) using a kernel size k.
+    Normalizes the result by subtracting the mean and dividing by the standard deviation.
+    """
+   
+    laplacian = cv2.Laplacian(mapping, cv2.CV_64F, ksize=k)
+    
+    # Take the absolute value to measure the magnitude of variation
+    variation = np.abs(laplacian)
+
+    return variation
 
 def sigmoid(x, lam=10, tau=0.01):
     """

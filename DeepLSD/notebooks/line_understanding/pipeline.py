@@ -17,8 +17,8 @@ def process_image_pipeline(image_id, frame_str, net, device,
                            depth_thresh=0.05, 
                            normal_thresh=0.5, 
                            thickness=1, 
-                           normal_func=sqrt_max, 
-                           depth_func=sqrt_max,
+                           normal_func=np.max, 
+                           depth_func=np.max,
                            norm_agg_func=lambda x, axis: np.linalg.norm(x, axis=axis),
                            cluster_selection_epsilon=0.01, 
                             min_cluster_size=10, 
@@ -48,6 +48,7 @@ def process_image_pipeline(image_id, frame_str, net, device,
         norm_agg_func=norm_agg_func,
         dataset=dataset
     )
+    
     if composite_after is None:
         print(f"Skipping image {image_id} due to missing data.")
         return None
