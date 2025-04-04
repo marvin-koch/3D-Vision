@@ -1,0 +1,42 @@
+{
+  "os":  "macOS-14.4-arm64-arm-64bit",
+  "python":  "CPython 3.9.21",
+  "startedAt":  "2025-04-03T17:43:59.543391Z",
+  "program":  "/Users/matinurdu/Desktop/ETH_Zürich/FS25/3D-Vision/DeepLSD/notebooks/generate_gnn_data.ipynb",
+  "git":  {
+    "remote":  "https://github.com/marvin-koch/3D-Vision.git",
+    "commit":  "8177792056b4a14484d93a710e4cc85bc82f6170"
+  },
+  "email":  "matin@urdu.de.com",
+  "root":  ".",
+  "host":  "student-net-hpx-0072.intern.ethz.ch",
+  "executable":  "/Users/matinurdu/Desktop/ETH_Zürich/FS25/3D-Vision/.venv/bin/python",
+  "cpu_count":  12,
+  "cpu_count_logical":  12,
+  "disk":  {
+    "/":  {
+      "total":  "494384795648",
+      "used":  "337171697664"
+    },
+    "/System/Volumes/Data":  {
+      "total":  "494384795648",
+      "used":  "337171697664"
+    }
+  },
+  "memory":  {
+    "total":  "19327352832"
+  },
+  "cpu":  {
+    "count":  12,
+    "countLogical":  12
+  },
+  "apple":  {
+    "name":  "Apple M3 Pro",
+    "ecpuCores":  6,
+    "pcpuCores":  6,
+    "gpuCores":  18,
+    "memoryGb":  18,
+    "swapTotalBytes":  "5368709120",
+    "ramTotalBytes":  "19327352832"
+  }
+}

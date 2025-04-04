@@ -142,7 +142,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
-            struct_color=(0, 0, 255), text_color=(255, 0, 0), dataset="hypersim"):
+            struct_color=(0, 0, 255), text_color=(255, 0, 0), dataset="hypersim", plot_imgs = True):
 
     # Load image data using helper functions.
     cam_view_color = "scene_cam_00_final_preview"
@@ -182,7 +182,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
         depth_map = raydepth2depth(depth_map, default_K)
 
-        plot_images([normalize_img(depth_map)], ["Depth Original"], cmaps='gray')
+        
        
         # # Convert depth to float32 if it isn't already.
         # depth_map_float = depth_map.astype(np.float32)
@@ -206,7 +206,9 @@ def process_image(image_dir, image_id, frame_str, net, device,
         print(normal_map.shape)
         # Plot the filtered depth maps side by side.
         #plot_images([normalize_img(depth_map_filtered)], ["Filtered depth"], cmaps='gray')
-        plot_images([normal_map], ["Normal map"], cmaps='gray')
+        if plot_imgs:
+            plot_images([normalize_img(depth_map)], ["Depth Original"], cmaps='gray')
+            plot_images([normal_map], ["Normal map"], cmaps='gray')
        
         
     if color_img is None or depth_map is None or normal_map is None:
@@ -229,9 +231,9 @@ def process_image(image_dir, image_id, frame_str, net, device,
     sobel_depth_map = compute_variation_laplace(depth_map,11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
-    
-    plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
-    plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
+    if plot_imgs:
+        plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
+        plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
 
 
         
@@ -262,33 +264,37 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     # Sort the list
     sorted_values_depth = sorted(max_depths)
-    plt.figure()
-    plt.scatter(range(len(sorted_values_depth)), sorted_values_depth, color='b', marker='o')
-    plt.axhline(y=depth_thresh, color='r', linestyle='--')
-
-    plt.xlabel('Rank')
-    plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Max Depths')
-    plt.show()
-    
-    
     sorted_values_normal = sorted(max_normals)
-    plt.figure()
-    plt.scatter(range(len(sorted_values_normal)), sorted_values_normal, color='b', marker='o')
-    plt.axhline(y=normal_thresh, color='r', linestyle='--')
-
-    plt.xlabel('Rank')
-    plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Max Normals')
-    plt.show()
-
     sorted_values_scores = sorted(scores)
-    plt.figure()
-    plt.scatter(range(len(sorted_values_scores)), sorted_values_scores, color='r', marker='o')
-    plt.xlabel('Rank')
-    plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Scores')
-    plt.show()
+
+    if plot_imgs:
+        plt.figure()
+        plt.scatter(range(len(sorted_values_depth)), sorted_values_depth, color='b', marker='o')
+        plt.axhline(y=depth_thresh, color='r', linestyle='--')
+
+        plt.xlabel('Rank')
+        plt.ylabel('Value')
+        plt.title('Scatter Plot of Sorted Max Depths')
+        plt.show()
+        
+        
+        
+        plt.figure()
+        plt.scatter(range(len(sorted_values_normal)), sorted_values_normal, color='b', marker='o')
+        plt.axhline(y=normal_thresh, color='r', linestyle='--')
+
+        plt.xlabel('Rank')
+        plt.ylabel('Value')
+        plt.title('Scatter Plot of Sorted Max Normals')
+        plt.show()
+
+        
+        plt.figure()
+        plt.scatter(range(len(sorted_values_scores)), sorted_values_scores, color='r', marker='o')
+        plt.xlabel('Rank')
+        plt.ylabel('Value')
+        plt.title('Scatter Plot of Sorted Scores')
+        plt.show()
 
     is_struct = [s > structural_thresh for s in scores]
     
@@ -360,10 +366,11 @@ def process_image(image_dir, image_id, frame_str, net, device,
                      non_structural_color, thickness)
 
     composite_after_rgb = cv2.cvtColor(composite_after, cv2.COLOR_BGR2RGB)
-    plt.figure()
-    plt.imshow(composite_after_rgb)
-    plt.axis("off")
-    plt.show()
+    if plot_imgs:
+        plt.figure()
+        plt.imshow(composite_after_rgb)
+        plt.axis("off")
+        plt.show()
 
     new_lines_array = np.array(new_lines_list)
     
