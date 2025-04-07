@@ -186,3 +186,35 @@ dmypy.json
 
 ### VS Code
 .vscode
+
+# Ignore HDF5 files
+*.h5
+*.hdf5
+
+# Ignore JPG files
+*.jpg
+*.jpeg
+*.JPG
+*.JPEG
+
+
+# --- General ---
+**/.DS_Store
+
+# --- Notebooks Data & Outputs ---
+
+# Ignore the main data directory within notebooks
+DeepLSD/notebooks/data/
+
+# Ignore wandb logs and artifacts
+DeepLSD/notebooks/wandb/
+
+# Ignore model checkpoints
+DeepLSD/notebooks/checkpoints/
+
+# Ignore generated graph datasets
+DeepLSD/notebooks/graph_dataset/
+
+# Ignore specific experiment directories if they primarily contain generated outputs
+# Adjust this if GAT-Line-Regression-Simple contains essential code you want to track
+DeepLSD/notebooks/GAT-Line-Regression-Simple/
