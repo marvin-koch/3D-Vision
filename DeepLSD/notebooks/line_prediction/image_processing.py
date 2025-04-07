@@ -7,7 +7,7 @@ from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from line_prediction.utility_methods import (
     raydepth2depth, load_color_image, load_depth_map, load_depth_map_png, calculate_normal_map_from_depth, reconstruct_3d_from_depth,
-    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_K, load_mask, load_color_image_moge_gt
+    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_K, load_mask, load_color_image_moge_gt, compute_variation_laplace
 )
 from deeplsd.geometry.viz_2d import plot_images
 
@@ -138,7 +138,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
-            struct_color=(0, 0, 255), text_color=(255, 0, 0), normal_k_size=11, dataset="hypersim"):
+            struct_color=(0, 0, 255), text_color=(255, 0, 0), normal_k_size=1, dataset="hypersim"):
 
     # Load image data using helper functions.
     cam_view_color = "scene_cam_00_final_preview"
@@ -165,10 +165,17 @@ def process_image(image_dir, image_id, frame_str, net, device,
     elif dataset == "moge_pred":
         print("moge_pred")
         color_img = load_color_image_moge_gt(image_dir)
+        h,w = color_img.shape[:2]
         depth_map = load_depth_map(image_dir,image_id, "", "", dataset="moge_pred")
         default_K = load_K(image_dir, image_id)
+        if default_K[0, 0] < 1:  # heuristic check
+            print("correct K")
+            default_K[0, 0] *= w  # fx
+            default_K[0, 2] *= w  # cx
+            default_K[1, 1] *= h  # fy
+            default_K[1, 2] *= h  # cy   
         valid_mask = load_mask(image_dir, image_id)
-        depth_map = raydepth2depth(depth_map, default_K)
+        #depth_map = raydepth2depth(depth_map, default_K)
 
         world_coordinates_map = load_world_coordinates(image_dir,image_id, "", "", dataset="moge_pred")
         normal_map = compute_normal_map_from_world(world_coordinates_map,mask=valid_mask, ksize=normal_k_size)
@@ -211,7 +218,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
 
     for l in pred_lines:
-        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l)
+        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, valid_mask, l)
 
         max_depth = depthfunc(ld)
         max_normal = normal_func(ln)

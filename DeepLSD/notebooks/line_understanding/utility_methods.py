@@ -209,13 +209,23 @@ def compute_variation_laplace(mapping, k, depth=False):
 
     return variation
 
-def sigmoid(x, lam=10, tau=0.01):
+def sigmoid(x, lam=10, tau=0.01, overflow_threshold=1000):
     """
     Compute sigmoid function for soft thresholding.
     - lam: scaling factor (higher = sharper transition)
     - tau: threshold shift
     """
-    return 1 / (1 + np.exp(-lam * (x - tau)))
+    
+    exponent = -lam * (x - tau)
+
+    if exponent > overflow_threshold:
+        return 0.0
+    elif exponent < -overflow_threshold:
+        return 1.0
+    else:
+        return 1 / (1 + np.exp(exponent))
+
+
 
 
 def sobel_line(sobel_depth, sobel_normal, line, trim_ratio=0.25):
