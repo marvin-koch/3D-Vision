@@ -207,6 +207,9 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
     plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
+    
+    sobel_depth_map = np.nan_to_num(sobel_depth_map, nan=0.0)
+    sobel_normal_map = np.nan_to_num(sobel_normal_map, nan=0.0)
 
         
     # Classify each predicted line.
