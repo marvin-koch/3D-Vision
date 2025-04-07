@@ -256,13 +256,19 @@ def process_image(image_dir, image_id, frame_str, net, device,
     max_depths = []
     max_normals = []
 
+    sobel_depth_map = np.nan_to_num(sobel_depth_map, nan=0.0)
+    sobel_normal_map = np.nan_to_num(sobel_normal_map, nan=0.0)
 
     for l in pred_lines:
-        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l)
-
+        ld, ln = sobel_line(sobel_depth_map, sobel_normal_map, l, trim_ratio=0.25)
+   
         max_depth = depthfunc(ld)
         max_normal = normal_func(ln)
         
+        print(np.isnan(ld).any())
+        print(np.isnan(ln).any())
+
+                
         depth_sigmoid = sigmoid(max_depth, lam=0.01, tau=depth_thresh)
         normal_sigmoid = sigmoid(max_normal, lam=0.01, tau=normal_thresh)
         scores.append(max(normal_sigmoid, depth_sigmoid))
@@ -272,8 +278,9 @@ def process_image(image_dir, image_id, frame_str, net, device,
         max_normals.append(max_normal)
    
         is_depth_seperated.append(depth_sigmoid > 0.5)
- 
-
+    
+    print("Print Scores")
+    print("Scores", scores)
     # Sort the list
     sorted_values_depth = sorted(max_depths)
     plt.figure()
