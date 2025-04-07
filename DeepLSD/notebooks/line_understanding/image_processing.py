@@ -125,8 +125,8 @@ def compute_normal_map_from_world(world_coords, mask=None, ksize=3):
 
             # Normalize the normals to unit length.
             norm = np.linalg.norm(normals, axis=2, keepdims=True)
-            norm[norm == 0] = 1  # Avoid division by zero.
-            normals = normals / norm
+            #norm[norm == 0] = 1  # Avoid division by zero.
+            normals = normals / (norm + 1e-13)
 
             # For pixels outside the valid mask, set normals to zero.
             if mask is not None:
@@ -159,6 +159,14 @@ def process_image(image_dir, image_id, frame_str, net, device,
         fov_x = np.pi / 3 
         f = w / (2 * np.tan(fov_x / 2))
         default_K = np.array([[f, 0, w / 2], [0, f, h / 2], [0, 0, 1]])
+        
+        if default_K[0, 0] < 1:  # heuristic check
+            print("correct K")
+            default_K[0, 0] *= w  # fx
+            default_K[0, 2] *= w  # cx
+            default_K[1, 1] *= h  # fy
+            default_K[1, 2] *= h  # cy   
+            
         depth_map = raydepth2depth(depth_map, default_K)
         world_coordinates_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
         
@@ -179,10 +187,19 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
         depth_map = load_depth_map_png(image_dir)
         default_K = load_intrinsics_json(image_dir)
-
-        depth_map = raydepth2depth(depth_map, default_K)
-
         
+        if default_K[0, 0] < 1:  # heuristic check
+            default_K[0, 0] *= w  # fx
+            default_K[0, 2] *= w  # cx
+            default_K[1, 1] *= h  # fy
+            default_K[1, 2] *= h  # cy   
+                 
+        #depth_map = raydepth2depth(depth_map, default_K)
+        world_coordinates_map = reconstruct_3d_from_depth(depth_map, default_K)
+
+        normal_map = compute_normal_map_from_world(world_coordinates_map, ksize=1)
+        #normal_map = calculate_normal_map_from_depth(depth_map.astype(np.float32), ksize=1)
+        plot_images([normalize_img(depth_map)], ["Depth Original"], cmaps='gray')
        
         # # Convert depth to float32 if it isn't already.
         # depth_map_float = depth_map.astype(np.float32)
@@ -195,10 +212,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
         
         # #Apply bilateral filter with the current parameters.
         # depth_map_filtered = cv2.bilateralFilter(depth_map_float, d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace)
-        world_coordinates_map = reconstruct_3d_from_depth(depth_map, default_K)
 
-        normal_map = compute_normal_map_from_world(world_coordinates_map, ksize=3)
-        
          
         print(color_img.shape)
         print(depth_map.shape)
@@ -251,8 +265,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
         max_depth = depthfunc(ld)
         max_normal = normal_func(ln)
         
-        depth_sigmoid = sigmoid(max_depth, lam=0.1, tau=depth_thresh)
-        normal_sigmoid = sigmoid(max_normal, lam=0.1, tau=normal_thresh)
+        depth_sigmoid = sigmoid(max_depth, lam=0.01, tau=depth_thresh)
+        normal_sigmoid = sigmoid(max_normal, lam=0.01, tau=normal_thresh)
         scores.append(max(normal_sigmoid, depth_sigmoid))
 
         

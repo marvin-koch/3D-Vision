@@ -41,6 +41,9 @@ def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min
         allow_single_cluster=allow_single_cluster
     ).fit_predict(sample_features)
     
+    sample_features = np.nan_to_num(sample_features, nan=0)  # Replace NaN with 0
+    features = np.nan_to_num(features, nan=0)  # Replace NaN with 0
+
     nbrs = NearestNeighbors(n_neighbors=1, metric="euclidean").fit(sample_features)
     distances, nn_indices = nbrs.kneighbors(features)
     distances = distances.flatten()
