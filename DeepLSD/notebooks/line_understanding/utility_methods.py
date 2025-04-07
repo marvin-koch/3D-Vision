@@ -209,7 +209,7 @@ def compute_variation_laplace(mapping, k, depth=False):
 
     return variation
 
-def sigmoid(x, lam=10, tau=0.01, overflow_threshold=1000):
+def sigmoid(x, lam=10, tau=0.01, overflow_threshold=700):
     """
     Compute sigmoid function for soft thresholding.
     - lam: scaling factor (higher = sharper transition)
