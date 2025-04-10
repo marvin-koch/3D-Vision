@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Parse the arguments from the command line
     args = parser.parse_args()
     file_type = str(args.file_type)
-    frame_str = "0001"
+    frame_str = "0009"
     start_image = str(args.start_image)
     num_images = int(args.n_images)
     desired_images = generate_image_list(start_image, num_images)

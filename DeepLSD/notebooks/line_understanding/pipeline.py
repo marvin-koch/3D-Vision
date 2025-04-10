@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 from .geometry import calculate_plane_for_map, get_line_pixels, get_line_pixels_trim
 from .clustering import cluster_coplanar_points, find_line_planes
 from .image_processing import process_image
@@ -63,6 +64,7 @@ def process_image_pipeline(image_id, frame_str, net, device,
 
     # Determine coplanarity label for each line.
     all_coplanarity_labels = find_line_planes(pred_lines, segmentation_map, get_line_pixels_trim)
+    start = time.time()
 
     coplanarity_labels_original_lines = []
     # Update each line_info entry with its corresponding coplanarity labels.
@@ -85,6 +87,11 @@ def process_image_pipeline(image_id, frame_str, net, device,
                 if label in coplanarity_labels_original_lines[j] and label != -1:
                     coplanarity_matrix[i, j] = 1
 
+    end = time.time()
+    length = end - start 
+    
+    print("Create Coplanar Matrix:", length, "seconds!")
+    
     # Then return a dictionary that includes line_info:
     return {
         "image_dir": image_dir,

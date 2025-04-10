@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-
+import time
 def get_line_pixels(line, maps):
     """
     Get all pixel coordinates along a line using cv2.line.
@@ -52,16 +52,43 @@ def compute_plane_point(point, normal):
     """
     denom = np.linalg.norm(normal)
     normal = normal / (denom + 1e-12) # Normalize the normal vector
+    x,y,z = point
     a, b, c = normal
     d = -np.dot(normal, point)
-    return np.array([a, b, c, d])  # Return plane coefficients
+    
+    if d < 0:
+        a *= -1
+        b *= -1
+        c *= -1
+        d *= -1
+        
+    #d = np.log1p(d)
+       
+    point_norm = np.linalg.norm([x, y])
+    if point_norm > 0:
+        x_scaled = x / point_norm
+        y_scaled = y / point_norm
+    else:
+        x_scaled, y_scaled = 0.0, 0.0
+        
+    return np.array([a, b, c, d ,x_scaled,y_scaled])  # Return plane coefficients
 
 def calculate_plane_for_map(normal_map, world_coordinates):
     """
     Calculate a plane for every pixel in the normal map using the corresponding world coordinate.
     """
+    
+    start = time.time()
+
     plane_map = []
     for y in range(normal_map.shape[0]):
         for x in range(normal_map.shape[1]):
             plane_map.append(compute_plane_point(world_coordinates[y, x], normal_map[y, x]))
+            
+
+    end = time.time()
+    length = end - start 
+    
+    print("Calculating plane for each pixel :", length, "seconds!")
+
     return np.array(plane_map)

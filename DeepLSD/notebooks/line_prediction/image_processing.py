@@ -166,7 +166,11 @@ def process_image(image_dir, image_id, frame_str, net, device,
         print("moge_pred")
         color_img = load_color_image_moge_gt(image_dir)
         h,w = color_img.shape[:2]
+        color_img = cv2.resize(color_img, dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
         depth_map = load_depth_map(image_dir,image_id, "", "", dataset="moge_pred")
+        depth_map = cv2.resize(depth_map,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
         default_K = load_K(image_dir, image_id)
         if default_K[0, 0] < 1:  # heuristic check
             print("correct K")
@@ -175,11 +179,24 @@ def process_image(image_dir, image_id, frame_str, net, device,
             default_K[1, 1] *= h  # fy
             default_K[1, 2] *= h  # cy   
         valid_mask = load_mask(image_dir, image_id)
+        
+        valid_mask = cv2.resize(valid_mask,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
         #depth_map = raydepth2depth(depth_map, default_K)
 
         world_coordinates_map = load_world_coordinates(image_dir,image_id, "", "", dataset="moge_pred")
-        normal_map = compute_normal_map_from_world(world_coordinates_map,mask=valid_mask, ksize=normal_k_size)
+        world_coordinates_map = cv2.resize(world_coordinates_map ,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
 
+        normal_map = compute_normal_map_from_world(world_coordinates_map,mask=valid_mask, ksize=normal_k_size)
+        h,w = color_img.shape[:2]
+        
+        normal_map_cleaned = cv2.medianBlur(normal_map.astype(np.float32), 5)
+
+
+        norms = np.linalg.norm(normal_map_cleaned, axis=2, keepdims=True)
+        norms[norms < 1e-6] = 1.0
+        normal_map_cleaned = normal_map_cleaned / norms
+               
         
     if color_img is None or depth_map is None or normal_map is None:
         print(f"Missing data in {image_dir}; skipping processing.")
@@ -344,4 +361,4 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     new_lines_array = np.array(new_lines_list)
     
-    return composite_after, new_lines_array, color_img, normal_map, world_coordinates_map, valid_mask, line_info, scores, is_struct, pred_lines
+    return composite_after, new_lines_array, color_img, normal_map_cleaned, world_coordinates_map, valid_mask, line_info, scores, is_struct, pred_lines
