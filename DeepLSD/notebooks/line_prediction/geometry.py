@@ -52,10 +52,26 @@ def compute_plane_point(point, normal):
     Compute plane coefficients from a 3D point and its normal vector.
     """
     denom = np.linalg.norm(normal)
-    normal = normal / denom  # Normalize the normal vector
+    normal = normal / (denom + 1e-12) # Normalize the normal vector
+    x,y,z = point
     a, b, c = normal
     d = -np.dot(normal, point)
-    return np.array([a, b, c, d])  # Return plane coefficients
+    
+       
+    if d < 0:
+        a *= -1
+        b *= -1
+        c *= -1
+        d *= -1
+        
+    point_norm = np.linalg.norm([x, y])
+    if point_norm > 0:
+        x_scaled = x / point_norm
+        y_scaled = y / point_norm
+    else:
+        x_scaled, y_scaled = 0.0, 0.0
+        
+    return np.array([a, b, c, d ,x_scaled,y_scaled])  # Return plane coefficients
 
 def calculate_plane_for_map(normal_map, world_coordinates):
     """
@@ -65,4 +81,4 @@ def calculate_plane_for_map(normal_map, world_coordinates):
     for y in range(normal_map.shape[0]):
         for x in range(normal_map.shape[1]):
             plane_map.append(compute_plane_point(world_coordinates[y, x], normal_map[y, x]))
-    return np.array(plane_map).reshape(normal_map.shape[0], normal_map.shape[1], 4)
+    return np.array(plane_map).reshape(normal_map.shape[0], normal_map.shape[1], 6)

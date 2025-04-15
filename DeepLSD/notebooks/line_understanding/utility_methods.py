@@ -8,7 +8,44 @@ import torch
 
 import numpy as np
 
+def compute_normal_map_from_world(world_coords, mask=None, ksize=3):
+            """
+            Compute a normal map from a world coordinate map.
 
+            Args:
+                world_coords (np.ndarray): 3D world coordinate map of shape (H, W, 3) where each pixel maps to a 3D point.
+                mask (np.ndarray, optional): Binary mask of shape (H, W) indicating valid pixels (1 valid, 0 invalid).
+                ksize (int, optional): Kernel size for the Sobel operator (default is 3).
+
+            Returns:
+                np.ndarray: Normal map of shape (H, W, 3) with unit surface normals.
+            """
+            # Optionally mark invalid pixels as NaN to avoid propagation in derivative calculations.
+            if mask is not None:
+                world_coords = np.where(mask[..., None] == 1, world_coords, np.nan)
+
+            # Initialize arrays for x and y gradients.
+            grad_x = np.zeros_like(world_coords, dtype=np.float32)
+            grad_y = np.zeros_like(world_coords, dtype=np.float32)
+
+            for channel in range(3):
+                grad_x[..., channel] = cv2.Sobel(world_coords[..., channel], cv2.CV_32F, 1, 0, ksize=ksize)
+                grad_y[..., channel] = cv2.Sobel(world_coords[..., channel], cv2.CV_32F, 0, 1, ksize=ksize)
+
+            # Compute the cross product of the gradients. This gives a vector perpendicular to the surface.
+            normals = np.cross(grad_x, grad_y)
+
+            # Normalize the normals to unit length.
+            norm = np.linalg.norm(normals, axis=2, keepdims=True)
+            #norm[norm == 0] = 1  # Avoid division by zero.
+            normals = normals / (norm + 1e-13)
+
+            # For pixels outside the valid mask, set normals to zero.
+            if mask is not None:
+                normals[mask == 0] = 0
+
+            return normals.astype(np.float32)
+        
 def find_file(image_dir, image_id,  pattern, cam_view):
 
     search_pattern = os.path.join(image_dir, image_id, "images", cam_view, pattern)
@@ -212,7 +249,7 @@ def compute_variation_laplace(mapping, k, depth=False):
 
     return variation
 
-def sigmoid(x, lam=10, tau=0.01, overflow_threshold=1000):
+def sigmoid(x, lam=10, tau=0.01, overflow_threshold=700):
     """
     Compute sigmoid function for soft thresholding.
     - lam: scaling factor (higher = sharper transition)
@@ -263,10 +300,15 @@ def sobel_line(sobel_depth, sobel_normal, line, trim_ratio=0.25):
     x2, y2 = int(round(new_p2[0])), int(round(new_p2[1]))
 
     # Create masks
+    
     mask_depth = cv2.line(np.zeros_like(sobel_depth), (x1, y1), (x2, y2), 1, 1)
     mask_normal = cv2.line(np.zeros_like(sobel_normal), (x1, y1), (x2, y2), 1, 1)
-    return mask_depth * sobel_depth, mask_normal * sobel_normal
+    
+   
+    ld, ln = mask_depth * sobel_depth, mask_normal * sobel_normal
 
+    
+    return ld, ln
 def sobel_line_neighborhood(sobel_depth, sobel_normal, line, thickness=1):
     """
     """

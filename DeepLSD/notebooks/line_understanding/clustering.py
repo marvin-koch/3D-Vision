@@ -1,16 +1,20 @@
 import numpy as np
 import cv2
 import hdbscan
+import time
 from sklearn.neighbors import NearestNeighbors
 from sklearn.impute import SimpleImputer
 
-def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=False, 
+def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=True, 
         cluster_selection_epsilon=0.01, 
         min_cluster_size=10, 
         allow_single_cluster=False, sample_rate=1, threshold=1):
     """
     Cluster coplanar lines using HDBSCAN.
     """
+    
+    start = time.time()
+
     if len(features) == 0:
         return []
     # Create an imputer to fill NaN values with the mean of the column
@@ -42,6 +46,11 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
         
     ).fit_predict(sample_features)
 
+    end = time.time()
+    length = end - start 
+    
+    print("HDBSCAN :", length, "seconds!")
+    start = time.time()
 
     if sample_rate < 1.0:
         print("start nearestneighbors")
@@ -71,23 +80,7 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
     
     print("start dilation")
     kernel_large = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    """
-    for label in unique_labels:
-        if label == -1:
-            continue
-        mask = (segmentation_map == label).astype(np.uint8)
-        # Smaller clusters get less dilation.
-        if np.sum(mask) < 100:
-            final_segmentation[(mask == 1)] = new_label
-            new_label += 1
-        else:
-            kernel = kernel_large
-            dilated_mask = cv2.dilate(mask, kernel, iterations=3)
-            num_components, comps = cv2.connectedComponents(dilated_mask, connectivity=8)
-            for comp in range(1, num_components):
-                final_segmentation[(mask == 1) & (comps == comp)] = new_label
-                new_label += 1
-    """
+    
     kernel_small = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
 
     for label in unique_labels:
@@ -105,7 +98,11 @@ def cluster_coplanar_points(features, world_coordinates, approx_min_span_tree=Fa
             final_segmentation[(mask == 1) & (comps == comp)] = new_label
 
             new_label += 1
-            
+    
+    end = time.time()
+    length = end - start 
+    
+    print("Dilation :", length, "seconds!")
     return final_segmentation, segmentation_map
 
 
@@ -115,6 +112,9 @@ def find_line_planes(lines, segmentation_map, get_line_pixels_func):
     For each line, determine the most common plane label by sampling pixels from the segmentation map.
     """
     
+    start = time.time()
+
+    
     line_labels = []
     for line in lines:
         pixel_coords = get_line_pixels_func(line, segmentation_map)
@@ -123,4 +123,12 @@ def find_line_planes(lines, segmentation_map, get_line_pixels_func):
         most_common_label = max(set(labels), key=labels.count)  # Find the most common label
         
         line_labels.append(most_common_label)
+        
+    
+    end = time.time()
+    length = end - start 
+
+    print("Find Line Planes :", length, "seconds!")
+    
     return line_labels
+

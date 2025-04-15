@@ -4,7 +4,7 @@ import hdbscan
 from sklearn.neighbors import NearestNeighbors
 from sklearn.impute import SimpleImputer
 
-def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min_span_tree=False, cluster_selection_epsilon=0.01, 
+def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min_span_tree=True, cluster_selection_epsilon=0.01, 
         min_cluster_size=10, 
         allow_single_cluster=False, sample_rate=1, threshold=1):
     """
@@ -28,8 +28,8 @@ def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min
 
     sample_features = features[valid_mask > 0]
 
-    sample_features = sample_features.reshape(-1, 4)
-    features = features.reshape(-1,4)
+    sample_features = sample_features.reshape(-1, 6)
+    features = features.reshape(-1,6)
 
     #0.17
     #sample_labels = DBSCAN(eps=eps, min_samples=min_samples, metric='euclidean', algorithm="ball_tree").fit_predict(sample_features)
@@ -74,7 +74,7 @@ def cluster_coplanar_points(features, world_coordinates, valid_mask,  approx_min
         kernel_size = 1 if np.sum(mask) < 100 else 5  # Small clusters = less dilation
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
 
-        dilated_mask = cv2.dilate(mask, kernel, iterations=3)
+        dilated_mask = cv2.dilate(mask, kernel, iterations=2)
 
         num_components, comps = cv2.connectedComponents(dilated_mask, connectivity=8)
         for comp in range(1, num_components):  # Skip background (component 0)

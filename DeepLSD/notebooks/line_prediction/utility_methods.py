@@ -7,6 +7,68 @@ import json
 
 import numpy as np
 
+def reproject_depth_to_points(depth_map, intrinsics):
+    """
+    Reproject a depth map to 3D camera coordinates using camera intrinsics.
+    
+    Args:
+        depth_map (np.ndarray): (H, W) depth map.
+        intrinsics (np.ndarray): (3, 3) camera intrinsics.
+    
+    Returns:
+        np.ndarray: 3D point cloud of shape (H, W, 3).
+    """
+    H, W = depth_map.shape
+    if default_K[0, 0] < 1:  # heuristic check
+        default_K[0, 0] *= W  # fx
+        default_K[0, 2] *= W  # cx
+        default_K[1, 1] *= H  # fy
+        default_K[1, 2] *= H  # cy
+    i, j = np.indices((H, W))
+    fx = intrinsics[0, 0]
+    fy = intrinsics[1, 1]
+    cx = intrinsics[0, 2]
+    cy = intrinsics[1, 2]
+    
+    X = (j - cx) * depth_map / fx
+    Y = (i - cy) * depth_map / fy
+    Z = depth_map
+    points = np.stack((X, Y, Z), axis=-1)
+    return points
+
+# Normal Map Computation Function
+def compute_normal_map_from_points(points, ksize=3):
+    """
+    Compute a normal map from a 3D point cloud using spatial gradients.
+    
+    Args:
+        points (np.ndarray): 3D points of shape (H, W, 3).
+        mask (np.ndarray, optional): Binary mask (H, W) where valid pixels == 1.
+        ksize (int, optional): Kernel size for the Sobel operator.
+        
+    Returns:
+        np.ndarray: Normal map of shape (H, W, 3) with unit normals.
+    """
+    points = np.ascontiguousarray(points.astype(np.float32))
+
+    grad_x = np.zeros_like(points, dtype=np.float32)
+    grad_y = np.zeros_like(points, dtype=np.float32)
+    
+    for channel in range(3):
+        channel_data = np.ascontiguousarray(points[..., channel])
+        grad_x[..., channel] = cv2.Sobel(channel_data, cv2.CV_32F, 1, 0, ksize=ksize)
+        grad_y[..., channel] = cv2.Sobel(channel_data, cv2.CV_32F, 0, 1, ksize=ksize)
+    
+    # Compute cross product to obtain normals.
+    normals = np.cross(grad_x, grad_y)
+    
+    # Normalize the normals.
+    norm = np.linalg.norm(normals, axis=2, keepdims=True)
+    norm[norm == 0] = 1  # Prevent division by zero.
+    normals = normals / norm
+    
+        
+    return normals
 
 def find_file(image_dir, image_id,  pattern, cam_view):
 
@@ -213,7 +275,7 @@ def compute_variation_laplace(mapping, k, depth=False):
 
     return variation
 
-def sigmoid(x, lam=10, tau=0.01, overflow_threshold=1000):
+def sigmoid(x, lam=10, tau=0.01, overflow_threshold=700):
     """
     Compute sigmoid function for soft thresholding.
     - lam: scaling factor (higher = sharper transition)

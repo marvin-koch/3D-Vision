@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 import torch 
+import time
 
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
@@ -9,9 +10,81 @@ import matplotlib.pyplot as plt
 from .utility_methods import (
     raydepth2depth, load_color_image, load_depth_map, load_depth_map_png, calculate_normal_map_from_depth, reconstruct_3d_from_depth,
     load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_color_image_moge_gt, 
-    compute_variation_laplace, sample_line_features
+    compute_variation_laplace, compute_normal_map_from_world, sample_line_features
 )
 from deeplsd.geometry.viz_2d import plot_images
+def quantize_normals(normals, bins=10):
+    """
+    Quantize unit normals into discrete bins over the sphere.
+    
+    Parameters:
+      normals : numpy.ndarray
+          A [H, W, 3] array of unit normals.
+      bins : int
+          Number of bins per axis (total number of bins = bins^2).
+          
+    Returns:
+      quantized : numpy.ndarray
+          A [H, W] array containing quantized bin indices.
+    """
+    # Extract components of the normals
+    x, y, z = normals[..., 0], normals[..., 1], normals[..., 2]
+    
+
+    # Convert Cartesian to spherical coordinates:
+    # theta: polar angle (0 to pi)
+    theta = np.arccos(np.clip(z, -1, 1))
+    # phi: azimuth (from -pi to pi)
+    phi = np.arctan2(y, x)
+
+    # Quantize theta and phi into discrete bins:
+    # Multiply by bins and then use floor to get the bin index.
+    theta_bin = np.floor(theta / np.pi * bins).astype(int)
+    phi_bin   = np.floor((phi + np.pi) / (2 * np.pi) * bins).astype(int)
+
+    # Clip indices to ensure they are within [0, bins-1]
+    theta_bin = np.clip(theta_bin, 0, bins - 1)
+    phi_bin   = np.clip(phi_bin, 0, bins - 1)
+
+    # Combine the two bin indices into a single index:
+    quantized = theta_bin * bins + phi_bin
+    return quantized
+
+
+import numpy as np
+
+def dequantize_normals(quantized, bins=10):
+    """
+    Convert quantized bin indices back into approximate normal vectors.
+    
+    Parameters:
+      quantized : numpy.ndarray
+          A [H, W] array of quantized bin indices.
+      bins : int
+          Number of bins per axis used in the original quantization.
+          
+    Returns:
+      normals : numpy.ndarray
+          A [H, W, 3] array of approximate unit normals reconstructed from the bins.
+    """
+    # Recover the theta and phi bin indices from the combined quantized value.
+    theta_bin = quantized // bins
+    phi_bin = quantized % bins
+
+    # Compute the center of each bin in spherical coordinates.
+    # Each theta bin covers an interval of pi / bins, so we take the center value.
+    theta = (theta_bin + 0.5) * (np.pi / bins)
+    # Each phi bin covers an interval of (2*pi) / bins; adjust for the offset of -pi.
+    phi = (phi_bin + 0.5) * (2 * np.pi / bins) - np.pi
+
+    # Convert the spherical coordinates back to Cartesian coordinates.
+    x = np.sin(theta) * np.cos(phi)
+    y = np.sin(theta) * np.sin(phi)
+    z = np.cos(theta)
+
+    # Stack the Cartesian coordinates into a [H, W, 3] array.
+    normals = np.stack([x, y, z], axis=-1)
+    return normals
 
 def create_optimal_offset_lines(line, normal_map, offset_amount=1.0, num_samples=100, angle_steps=36):
     """
@@ -97,44 +170,6 @@ def compute_shifted_line(line, depth_map, w, h, offset=1.0, num_samples=100):
     shifted_line = line + chosen_offset
     return shifted_line
 
-def compute_normal_map_from_world(world_coords, mask=None, ksize=3):
-            """
-            Compute a normal map from a world coordinate map.
-
-            Args:
-                world_coords (np.ndarray): 3D world coordinate map of shape (H, W, 3) where each pixel maps to a 3D point.
-                mask (np.ndarray, optional): Binary mask of shape (H, W) indicating valid pixels (1 valid, 0 invalid).
-                ksize (int, optional): Kernel size for the Sobel operator (default is 3).
-
-            Returns:
-                np.ndarray: Normal map of shape (H, W, 3) with unit surface normals.
-            """
-            # Optionally mark invalid pixels as NaN to avoid propagation in derivative calculations.
-            if mask is not None:
-                world_coords = np.where(mask[..., None] == 1, world_coords, np.nan)
-
-            # Initialize arrays for x and y gradients.
-            grad_x = np.zeros_like(world_coords, dtype=np.float32)
-            grad_y = np.zeros_like(world_coords, dtype=np.float32)
-
-            for channel in range(3):
-                grad_x[..., channel] = cv2.Sobel(world_coords[..., channel], cv2.CV_32F, 1, 0, ksize=ksize)
-                grad_y[..., channel] = cv2.Sobel(world_coords[..., channel], cv2.CV_32F, 0, 1, ksize=ksize)
-
-            # Compute the cross product of the gradients. This gives a vector perpendicular to the surface.
-            normals = np.cross(grad_x, grad_y)
-
-            # Normalize the normals to unit length.
-            norm = np.linalg.norm(normals, axis=2, keepdims=True)
-            #norm[norm == 0] = 1  # Avoid division by zero.
-            normals = normals / (norm + 1e-13)
-
-            # For pixels outside the valid mask, set normals to zero.
-            if mask is not None:
-                normals[mask == 0] = 0
-
-            return normals.astype(np.float32)
-        
 def normalize_img(img):
     """Normalize image to [0, 1] range."""
     return (img - img.min()) / (img.max() - img.min())
@@ -162,6 +197,9 @@ def process_image(image_dir, image_id, frame_str, net, device,
     cam_view_geom = "scene_cam_00_geometry_hdf5"
     gt = "gt"
     moge = "moge"
+    
+    start = time.time()
+
 
     if dataset == "hypersim":
         color_img = load_color_image(image_dir, image_id, frame_str, cam_view_color)
@@ -197,8 +235,24 @@ def process_image(image_dir, image_id, frame_str, net, device,
         """
         color_img = load_color_image_moge_gt(image_dir)
         h, w = color_img.shape[:2]
-
+        color_img = cv2.resize(color_img, dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
         depth_map = load_depth_map_png(image_dir)
+        depth_map = cv2.resize(depth_map,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+        
+        h,w = color_img.shape[:2]
+
+        plot_images([normalize_img(depth_map)], ["Depth Original"], cmaps='gray')
+
+        # d = 15 # e.g., 5, 9, 15 - adjust based on noise scale
+
+        # sigmaColor = 25
+
+        # sigmaSpace = 25 # Often similar to d/2 or d
+
+        depth_map_cleaned = cv2.medianBlur(depth_map, 5)
+        
+        plot_images([normalize_img(depth_map_cleaned)], ["Depth Cleaned"], cmaps='gray')
+
         default_K = load_intrinsics_json(image_dir)
         
         if default_K[0, 0] < 1:  # heuristic check
@@ -208,11 +262,27 @@ def process_image(image_dir, image_id, frame_str, net, device,
             default_K[1, 2] *= h  # cy   
                  
         #depth_map = raydepth2depth(depth_map, default_K)
-        world_coordinates_map = reconstruct_3d_from_depth(depth_map, default_K)
+        world_coordinates_map_def = reconstruct_3d_from_depth(depth_map, default_K)
+
+        world_coordinates_map = reconstruct_3d_from_depth(depth_map_cleaned, default_K)
+        
+        normal_map_def = compute_normal_map_from_world(world_coordinates_map_def, ksize=1)
 
         normal_map = compute_normal_map_from_world(world_coordinates_map, ksize=1)
+        
+        
+        normal_map_cleaned = cv2.medianBlur(normal_map.astype(np.float32), 5)
+
+
+        norms = np.linalg.norm(normal_map_cleaned, axis=2, keepdims=True)
+        norms[norms < 1e-6] = 1.0
+        normal_map_cleaned = normal_map_cleaned / norms
+                
+                
+        #normal_map_cleaned = dequantize_normals(quantize_normals(normal_map_def, bins=10),bins=10)
+        
+        
         #normal_map = calculate_normal_map_from_depth(depth_map.astype(np.float32), ksize=1)
-        plot_images([normalize_img(depth_map)], ["Depth Original"], cmaps='gray')
        
         # # Convert depth to float32 if it isn't already.
         # depth_map_float = depth_map.astype(np.float32)
@@ -233,7 +303,13 @@ def process_image(image_dir, image_id, frame_str, net, device,
         print(normal_map.shape)
         # Plot the filtered depth maps side by side.
         #plot_images([normalize_img(depth_map_filtered)], ["Filtered depth"], cmaps='gray')
-        plot_images([normal_map], ["Normal map"], cmaps='gray')
+        
+        normal_map_viz = (normal_map_cleaned + 1) / 2
+        plot_images([(normal_map_def + 1) / 2], ["Original Normal map"], cmaps='gray')
+
+        plot_images([(normal_map + 1) / 2], ["Normal map with cleaned depth"], cmaps='gray')
+
+        plot_images([normal_map_viz], ["Normal map with cleaned depth and bins"], cmaps='gray')
        
         
     if color_img is None or depth_map is None or normal_map is None:
@@ -244,6 +320,13 @@ def process_image(image_dir, image_id, frame_str, net, device,
     depth_map = raydepth2depth(depth_map, default_K)
     
     gray_img = cv2.cvtColor(color_img, cv2.COLOR_RGB2GRAY)
+    
+    
+    end = time.time()
+    length = end - start 
+    start = time.time()
+
+    print("Loading :", length, "seconds!")
 
     # Detect lines with DeepLSD
     global df_intermediate_features
@@ -259,23 +342,33 @@ def process_image(image_dir, image_id, frame_str, net, device,
         if isinstance(pred_lines, torch.Tensor):
             pred_lines = pred_lines.cpu().numpy()
     
-    
     # get embeddings for intermediate layers.
     combined_features = torch.cat([df_intermediate_features, angle_intermediate_features], dim=1)
     downsample_ratio = color_img.shape[1] / combined_features.shape[3]
     df_hook_handle.remove()
     angle_hook_handle.remove()
+            
+   
+    end = time.time()
+    length = end - start 
+    print("DeepLSD :", length, "seconds!")
+    start = time.time()
 
     # Compute variation maps.
     sobel_depth_map = compute_variation_laplace(depth_map,11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
-
+    
     if plot:
-        plt.figure()
         plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
-        plt.show()
-        
+        plot_images([sobel_normal_map], ["Normal sobel"], cmaps='gray')
+     
+    end = time.time()
+    length = end - start 
+    print("Sobel :", length, "seconds!")
+    start = time.time()
+
+
     # Classify each predicted line.
     is_struct = []
     is_depth_seperated  = []
@@ -292,8 +385,6 @@ def process_image(image_dir, image_id, frame_str, net, device,
         max_depth = depthfunc(ld)
         max_normal = normal_func(ln)
         
-        print(np.isnan(ld).any())
-        print(np.isnan(ln).any())
 
                 
         depth_sigmoid = sigmoid(max_depth, lam=0.01, tau=depth_thresh)
@@ -342,6 +433,14 @@ def process_image(image_dir, image_id, frame_str, net, device,
     is_struct = [s > structural_thresh for s in scores]
     
     print(f"[{method.capitalize()} Method] {os.path.basename(image_dir)}: Detected {len(pred_lines)} lines; {sum(is_struct)} structural.")
+
+
+     
+    end = time.time()
+    length = end - start 
+    print("Struct vs Textural :", length, "seconds!")
+    start = time.time()
+
 
     non_structural_color = text_color
     structural_color1 = (128, 0, 128)  # purple
@@ -411,6 +510,13 @@ def process_image(image_dir, image_id, frame_str, net, device,
                      (int(round(line[1, 0])), int(round(line[1, 1]))),
                      non_structural_color, thickness)
 
+
+    end = time.time()
+    length = end - start 
+    
+    print("Splitting Lines :", length, "seconds!")
+    
+    
     composite_after_rgb = cv2.cvtColor(composite_after, cv2.COLOR_BGR2RGB)
     if plot:
         plt.figure()
@@ -420,4 +526,5 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
     new_lines_array = np.array(new_lines_list)
     
-    return composite_after, new_lines_array, color_img, normal_map, world_coordinates_map, line_info, scores, is_struct, pred_lines
+    
+    return composite_after, new_lines_array, color_img, normal_map_cleaned, world_coordinates_map, line_info, scores, is_struct, pred_lines
