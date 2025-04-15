@@ -32,7 +32,7 @@ def save_lines_to_json(image_id, line_info, coplanarity_matrix, output_dir="json
         line_dict = {
             "coordinates": entry["base_line"],
             "confidence_score": entry["score"],
-            
+            "embedding_DeepLSD": entry["line_embedding"]
         }
         lines_data.append(line_dict)
 

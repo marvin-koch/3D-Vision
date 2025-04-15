@@ -44,10 +44,12 @@ if __name__ == "__main__":
     if file_type == "json":
         for image_id in desired_images:
             processed_data = process_image_pipeline(image_id, frame_str, net, device, depth_thresh=3500, normal_thresh=(1.25 * 1e7)**2, cluster_selection_epsilon=0.01, 
-                min_cluster_size=10)            
+                min_cluster_size=10, plot=False)            
         if processed_data is not None:
-                plot_pipeline_results(processed_data, frame_str)
+                #plot_pipeline_results(processed_data, frame_str)
                 save_lines_to_json(image_id, processed_data["line_info"],processed_data["coplanarity_matrix"])
+        else:
+            print("processed_data is None")
     elif file_type == "hdf5":       
         # Open HDF5 file for writing
         output_dir = "hdf5_output"
@@ -56,7 +58,7 @@ if __name__ == "__main__":
         with h5py.File(hdf5_file, 'w') as f:
             for image_id in desired_images:
                 processed_data = process_image_pipeline(image_id, frame_str, net, device, depth_thresh=3500, normal_thresh=(1.25 * 1e7)**2, cluster_selection_epsilon=0.01, 
-                    min_cluster_size=10)                  
+                    min_cluster_size=10, plot=False)                  
                 if processed_data is not None:
                     img_data = save_lines_to_json(image_id, processed_data["line_info"],processed_data["coplanarity_matrix"], save=False)
                     image_group = f.create_group(img_data['image_id'])
