@@ -22,7 +22,8 @@ def process_image_pipeline(image_id, frame_str, net, device,
                            norm_agg_func=lambda x, axis: np.linalg.norm(x, axis=axis),
                            cluster_selection_epsilon=0.01, 
                             min_cluster_size=10, 
-                           dataset="hypersim"):
+                           dataset="hypersim",
+                           plot=True):
     """
     Process a single image and compute all necessary data.
     
@@ -46,7 +47,8 @@ def process_image_pipeline(image_id, frame_str, net, device,
         normal_func=normal_func,
         depthfunc=depth_func,
         norm_agg_func=norm_agg_func,
-        dataset=dataset
+        dataset=dataset,
+        plot=plot
     )
     
     if composite_after is None:
@@ -100,7 +102,7 @@ def process_image_pipeline(image_id, frame_str, net, device,
         "line_info": line_info,
         "coplanarity_matrix": coplanarity_matrix,
         "scores": scores,
-        "original_lines": original_lines    
+        "original_lines": original_lines,
         
     }
 

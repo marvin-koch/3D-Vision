@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 
 from .utility_methods import (
     raydepth2depth, load_color_image, load_depth_map, load_depth_map_png, calculate_normal_map_from_depth, reconstruct_3d_from_depth,
-    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_color_image_moge_gt, compute_variation_laplace
+    load_normal_map, load_world_coordinates, compute_variation, sobel_line, sigmoid, load_intrinsics_json, load_color_image_moge_gt, 
+    compute_variation_laplace, sample_line_features
 )
 from deeplsd.geometry.viz_2d import plot_images
 
@@ -138,11 +139,23 @@ def normalize_img(img):
     """Normalize image to [0, 1] range."""
     return (img - img.min()) / (img.max() - img.min())
 
+df_intermediate_features = None
+angle_intermediate_features = None
+
+def hook_df(module, input, output):
+    global df_intermediate_features
+    df_intermediate_features = output.detach()
+
+def hook_angle(module, input, output):
+    global angle_intermediate_features
+    angle_intermediate_features = output.detach()
+
+
 def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
-            struct_color=(0, 0, 255), text_color=(255, 0, 0), dataset="hypersim"):
+            struct_color=(0, 0, 255), text_color=(255, 0, 0), dataset="hypersim", plot=True):
 
     # Load image data using helper functions.
     cam_view_color = "scene_cam_00_final_preview"
@@ -232,22 +245,36 @@ def process_image(image_dir, image_id, frame_str, net, device,
     
     gray_img = cv2.cvtColor(color_img, cv2.COLOR_RGB2GRAY)
 
-    # Detect lines with DeepLSD.
+    # Detect lines with DeepLSD
+    global df_intermediate_features
+    global angle_intermediate_features
+    df_intermediate_features = None
+    angle_intermediate_features = None 
+    df_hook_handle = net.df_head[5].register_forward_hook(hook_df)
+    angle_hook_handle = net.angle_head[5].register_forward_hook(hook_angle)
     input_tensor = torch.tensor(gray_img, dtype=torch.float32, device=device)[None, None] / 255.
     with torch.no_grad():
         out = net({'image': input_tensor})
         pred_lines = out['lines'][0]
         if isinstance(pred_lines, torch.Tensor):
             pred_lines = pred_lines.cpu().numpy()
+    
+    
+    # get embeddings for intermediate layers.
+    combined_features = torch.cat([df_intermediate_features, angle_intermediate_features], dim=1)
+    downsample_ratio = color_img.shape[1] / combined_features.shape[3]
+    df_hook_handle.remove()
+    angle_hook_handle.remove()
 
     # Compute variation maps.
     sobel_depth_map = compute_variation_laplace(depth_map,11, depth=True)
     sobel_normal_map = compute_variation(normal_map, 27)
     sobel_normal_map = norm_agg_func(sobel_normal_map, axis=2)
 
-    plt.figure()
-    plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
-    plt.show()
+    if plot:
+        plt.figure()
+        plot_images([sobel_depth_map], ["Depth sobel"], cmaps='gray')
+        plt.show()
         
     # Classify each predicted line.
     is_struct = []
@@ -279,37 +306,38 @@ def process_image(image_dir, image_id, frame_str, net, device,
    
         is_depth_seperated.append(depth_sigmoid > 0.5)
     
-    print("Print Scores")
-    print("Scores", scores)
-    # Sort the list
-    sorted_values_depth = sorted(max_depths)
-    plt.figure()
-    plt.scatter(range(len(sorted_values_depth)), sorted_values_depth, color='b', marker='o')
-    plt.axhline(y=depth_thresh, color='r', linestyle='--')
+    if plot:
+        print("Print Scores")
+        print("Scores", scores)
+        # Sort the list
+        sorted_values_depth = sorted(max_depths)
+        plt.figure()
+        plt.scatter(range(len(sorted_values_depth)), sorted_values_depth, color='b', marker='o')
+        plt.axhline(y=depth_thresh, color='r', linestyle='--')
 
-    plt.xlabel('Rank')
-    plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Max Depths')
-    plt.show()
-    
-    
-    sorted_values_normal = sorted(max_normals)
-    plt.figure()
-    plt.scatter(range(len(sorted_values_normal)), sorted_values_normal, color='b', marker='o')
-    plt.axhline(y=normal_thresh, color='r', linestyle='--')
+        plt.xlabel('Rank')
+        plt.ylabel('Value')
+        plt.title('Scatter Plot of Sorted Max Depths')
+        plt.show()
+        
+        
+        sorted_values_normal = sorted(max_normals)
+        plt.figure()
+        plt.scatter(range(len(sorted_values_normal)), sorted_values_normal, color='b', marker='o')
+        plt.axhline(y=normal_thresh, color='r', linestyle='--')
 
-    plt.xlabel('Rank')
-    plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Max Normals')
-    plt.show()
+        plt.xlabel('Rank')
+        plt.ylabel('Value')
+        plt.title('Scatter Plot of Sorted Max Normals')
+        plt.show()
 
-    sorted_values_scores = sorted(scores)
-    plt.figure()
-    plt.scatter(range(len(sorted_values_scores)), sorted_values_scores, color='r', marker='o')
-    plt.xlabel('Rank')
-    plt.ylabel('Value')
-    plt.title('Scatter Plot of Sorted Scores')
-    plt.show()
+        sorted_values_scores = sorted(scores)
+        plt.figure()
+        plt.scatter(range(len(sorted_values_scores)), sorted_values_scores, color='r', marker='o')
+        plt.xlabel('Rank')
+        plt.ylabel('Value')
+        plt.title('Scatter Plot of Sorted Scores')
+        plt.show()
 
     is_struct = [s > structural_thresh for s in scores]
     
@@ -322,10 +350,10 @@ def process_image(image_dir, image_id, frame_str, net, device,
     composite_after = color_img.copy()
     new_lines_list = []  # List of all drawn lines (offsets for structural, original for textural)
     line_info = []       # Metadata for each base line
-
+        
     for i, l in enumerate(pred_lines):
         line = l.reshape(2, 2) if l.shape == (4,) else l
-
+        line_embedding = sample_line_features(combined_features, line, num_samples=10, downsample_ratio=downsample_ratio)
         # Case 1: Structural line in low depth variation => split
         if is_struct[i] and not is_depth_seperated[i]:
             offset_amount = 1.0
@@ -338,7 +366,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
                 "base_line": line.tolist(),
                 "score": scores[i],
                 "offset_lines": [line1.tolist(), line2.tolist()],
-                "new_line_indices": [idx1, idx2]
+                "new_line_indices": [idx1, idx2],
+                "line_embedding": line_embedding.tolist()
             })
             new_thickness = thickness + 1
             cv2.line(composite_after,
@@ -359,7 +388,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
                 "base_line": line.tolist(),
                 "score": scores[i],
                 "new_line_indices": [idx],
-                "shifted": True
+                "shifted": True,
+                "line_embedding": line_embedding.tolist()
             })
             cv2.line(composite_after,
                      (int(round(shifted_line[0, 0])), int(round(shifted_line[0, 1]))),
@@ -373,7 +403,8 @@ def process_image(image_dir, image_id, frame_str, net, device,
             line_info.append({
                 "base_line": line.tolist(),
                 "score": scores[i],
-                "new_line_indices": [idx]
+                "new_line_indices": [idx],
+                "line_embedding": line_embedding.tolist(),
             })
             cv2.line(composite_after,
                      (int(round(line[0, 0])), int(round(line[0, 1]))),
@@ -381,10 +412,11 @@ def process_image(image_dir, image_id, frame_str, net, device,
                      non_structural_color, thickness)
 
     composite_after_rgb = cv2.cvtColor(composite_after, cv2.COLOR_BGR2RGB)
-    plt.figure()
-    plt.imshow(composite_after_rgb)
-    plt.axis("off")
-    plt.show()
+    if plot:
+        plt.figure()
+        plt.imshow(composite_after_rgb)
+        plt.axis("off")
+        plt.show()
 
     new_lines_array = np.array(new_lines_list)
     

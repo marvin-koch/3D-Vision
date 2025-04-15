@@ -8,9 +8,9 @@ import shutil
 def generate_image_list(start_image, num_images):
     """Generate a list of image IDs based on the given start image and number of images needed."""
     
-    match = re.match(r"ai_(\d{3})_00(\d)", start_image)
+    match = re.match(r"ai_(\d{3})_00(\d{1})", start_image)
     if not match:
-        raise ValueError("Invalid start image format. Expected pattern: ai_00x_000y (e.g., ai_003_0005)")
+        raise ValueError("Invalid start image format. Expected pattern: ai_00x_00y (e.g., ai_003_005)")
 
     start_x, start_y = int(match.group(1)), int(match.group(2))
     desired_images = []
@@ -21,8 +21,8 @@ def generate_image_list(start_image, num_images):
         
         # Increment y first; if it exceeds 9, reset and increment x
         y += 1
-        if y > 9:
-            y = 0
+        if y > 6:
+            y = 1
             x += 1
             # No need to wrap around x anymore; it can go up to 999
 
@@ -41,6 +41,7 @@ def upload_images(desired_images, files_to_download):
     
     # Download Loop
     for image_id in desired_images:
+        print("downloading: ", image_id)
         # Create a folder for the image
         image_dir = os.path.join(base_data_dir, image_id)
         if not os.path.exists(image_dir):
