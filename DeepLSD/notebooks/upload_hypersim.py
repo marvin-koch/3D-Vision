@@ -129,3 +129,27 @@ def delete_images(desired_images):
         if os.path.exists(image_dir):
             shutil.rmtree(image_dir)
             print(f"Deleted {image_dir} after processing.")
+            
+            
+            
+            
+if __name__ == "__main__":
+    frame_str = "0001"
+    desired_images = [
+        "ai_001_001",
+        "ai_001_004",
+        "ai_001_005",
+        "ai_001_006",
+        "ai_001_007",
+        "ai_001_008",
+        "ai_001_009",
+        "ai_002_001",   
+    ]
+
+    files_to_download = [
+        f"frame.{frame_str}.color.jpg",
+        f"frame.{frame_str}.depth_meters.hdf5",
+        f"frame.{frame_str}.normal_world.hdf5",
+        f"frame.{frame_str}.position.hdf5"
+    ]
+    upload_images(desired_images, files_to_download)
