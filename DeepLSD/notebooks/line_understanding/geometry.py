@@ -46,7 +46,7 @@ def get_line_pixels_trim(line, maps, trim_ratio=0.25):
     y_coords, x_coords = np.where(blank_image == 255)
     return list(zip(x_coords, y_coords))
 
-def compute_plane_point(point, normal):
+def compute_plane_point(point, normal, dataset="hypersim"):
     """
     Compute plane coefficients from a 3D point and its normal vector.
     """
@@ -56,11 +56,11 @@ def compute_plane_point(point, normal):
     a, b, c = normal
     d = -np.dot(normal, point)
     
-    if d < 0:
-        a *= -1
-        b *= -1
-        c *= -1
-        d *= -1
+    # if d < 0:
+    #     a *= -1
+    #     b *= -1
+    #     c *= -1
+    #     d *= -1
         
     #d = np.log1p(d)
        
@@ -70,10 +70,13 @@ def compute_plane_point(point, normal):
         y_scaled = y / point_norm
     else:
         x_scaled, y_scaled = 0.0, 0.0
-        
-    return np.array([a, b, c, d ,x_scaled,y_scaled])  # Return plane coefficients
+    
+    if dataset=="hypersim":
+        return np.array([a, b, c, d])  # Return plane coefficients
+    else:
+        return np.array([a, b, c, d ,x_scaled,y_scaled])  # Return plane coefficients
 
-def calculate_plane_for_map(normal_map, world_coordinates):
+def calculate_plane_for_map(normal_map, world_coordinates, dataset="hypersim"):
     """
     Calculate a plane for every pixel in the normal map using the corresponding world coordinate.
     """
@@ -83,7 +86,7 @@ def calculate_plane_for_map(normal_map, world_coordinates):
     plane_map = []
     for y in range(normal_map.shape[0]):
         for x in range(normal_map.shape[1]):
-            plane_map.append(compute_plane_point(world_coordinates[y, x], normal_map[y, x]))
+            plane_map.append(compute_plane_point(world_coordinates[y, x], normal_map[y, x], dataset=dataset))
             
 
     end = time.time()

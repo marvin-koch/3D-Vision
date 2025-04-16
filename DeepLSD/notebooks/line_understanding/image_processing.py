@@ -206,6 +206,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
         h, w = color_img.shape[:2]
 
         normal_map = load_normal_map(image_dir, image_id, frame_str, cam_view_geom)
+        normal_map_cleaned = normal_map
         depth_map = load_depth_map(image_dir, image_id, frame_str, cam_view_geom)
         fov_x = np.pi / 3 
         f = w / (2 * np.tan(fov_x / 2))
@@ -255,11 +256,11 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
         default_K = load_intrinsics_json(image_dir)
         
-        if default_K[0, 0] < 1:  # heuristic check
-            default_K[0, 0] *= w  # fx
-            default_K[0, 2] *= w  # cx
-            default_K[1, 1] *= h  # fy
-            default_K[1, 2] *= h  # cy   
+        # if default_K[0, 0] < 1:  # heuristic check
+        default_K[0, 0] *= w  # fx
+        default_K[0, 2] *= w  # cx
+        default_K[1, 1] *= h  # fy
+        default_K[1, 2] *= h  # cy   
                  
         #depth_map = raydepth2depth(depth_map, default_K)
         world_coordinates_map_def = reconstruct_3d_from_depth(depth_map, default_K)

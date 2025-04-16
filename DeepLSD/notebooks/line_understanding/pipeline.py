@@ -57,7 +57,7 @@ def process_image_pipeline(image_id, frame_str, net, device,
         return None
 
     # Compute the plane map.
-    plane_map = calculate_plane_for_map(normals, world_coordinates)
+    plane_map = calculate_plane_for_map(normals, world_coordinates, dataset=dataset)
 
     # Cluster the plane map.
     segmentation_map, original_map = cluster_coplanar_points(
