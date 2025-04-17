@@ -444,9 +444,14 @@ def create_optimal_offset_lines_fast(line, normal_map, offset_amount=1.0, num_sa
             best_score = score
             best_d = d
 
+    if best_d is None:
+        # Handle the case where no valid offset vector was found
+        print("Warning: No valid offset found!")
+        # You can decide on a default value or return a default behavior
+        best_d = np.array([0.0, 0.0])  # Default direction (no offset)
+
     offset = offset_amount * best_d
     return np.array([p1 + offset, p2 + offset]), np.array([p1 - offset, p2 - offset])
-
 
 
 def compute_shifted_line_fast(line, depth_map, w, h, offset=1.0, num_samples=100):

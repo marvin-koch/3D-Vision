@@ -15,7 +15,7 @@ def convert_np(o):
     return o  # Return unchanged if already a native Python type
 
 
-def save_lines_to_json(image_id, line_info, coplanarity_matrix, output_dir="json_output", save=True):
+def save_lines_to_json(image_id, frame_str, line_info, coplanarity_matrix, output_dir="json_output", save=True):
     """
     Save detected lines along with their type and coplanarity labels into a JSON file.
 
@@ -46,7 +46,7 @@ def save_lines_to_json(image_id, line_info, coplanarity_matrix, output_dir="json
 
     if save:
         os.makedirs(output_dir, exist_ok=True)
-        json_file = os.path.join(output_dir, f"{image_id}.json")
+        json_file = os.path.join(output_dir, f"{image_id}_{frame_str}.json")
         with open(json_file, "w") as f:
             # Convert numpy types to native Python types before dumping.
             json.dump(convert_np(json_dict), f, indent=4)

@@ -17,7 +17,6 @@ def process_image(image_dir, image_id, frame_str, net, device,
     cam_view_geom = "scene_cam_00_geometry_hdf5"
     gt = "gt"
     moge = "moge"
-    frame_str = "0001"
    
 
     if dataset == "hypersim":
@@ -39,14 +38,15 @@ def process_image(image_dir, image_id, frame_str, net, device,
      
         depth_map = raydepth2depth(depth_map, default_K)
         # depth_map = depth_map.astype(np.float32)
-        #world_coordinates_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
-        plot_images([depth_map], ["Depth Original"], cmaps='gray')
+        # world_coordinates_map = load_world_coordinates(image_dir, image_id, frame_str, cam_view_geom)
+        # plot_images([depth_map], ["Depth Original"], cmaps='gray')
         # normal_map = calculate_normal_map_from_depth(depth_map, ksize=1)
         # plot_images([normal_map], ["Normal Original"], cmaps='gray')    
         
         
         # Reconstruct the 3D world coordinates from depth.
         world_coordinates_map = reproject_depth_to_points(depth_map, default_K)
+        # world_coordinates_map = hypersim_loader.load_world_coordinates(image_id, frame_str, cam_view_geom)
 
         # ---------------------------
         # Reprojection & Enhanced Plotting
@@ -57,23 +57,23 @@ def process_image(image_dir, image_id, frame_str, net, device,
         X_channel = world_coordinates_map[..., 0]
         Y_channel = world_coordinates_map[..., 1]
         Z_channel = world_coordinates_map[..., 2]
-        plot_images([X_channel, Y_channel, Z_channel],
-                    ["X Channel", "Y Channel", "Z Channel"],
-                    cmaps=['viridis', 'viridis', 'viridis'])
+        # plot_images([X_channel, Y_channel, Z_channel],
+        #             ["X Channel", "Y Channel", "Z Channel"],
+        #             cmaps=['viridis', 'viridis', 'viridis'])
 
         # Compute the normal map from the reprojected 3D points.
         normal_map_reprojected = compute_normal_map_from_points(world_coordinates_map,  ksize=1)
 
         # For visualization, map normal values from [-1, 1] to [0, 1].
         normal_map_vis = (normal_map_reprojected + 1) / 2
-        plot_images([normal_map_vis],
-                    ["Normal from Depth (3D World Projected)"],
-                    cmaps=None)
+        # plot_images([normal_map_vis],
+        #             ["Normal from Depth (3D World Projected)"],
+        #             cmaps=None)
         
 
         ###############################################################################################################################################
         normal_map = hypersim_loader.load_normal_map(image_id, frame_str, cam_view_geom)
-        plot_images([normal_map], ["Normal Original"], cmaps='gray')    
+        # plot_images([normal_map], ["Normal Original"], cmaps='gray')    
 
         seconds2 = time.time()
         print("Time to get depth and calculate normal map and wd :", seconds2- seconds)
@@ -277,15 +277,15 @@ def process_image(image_dir, image_id, frame_str, net, device,
             points = world_coordinates_map[indices]
             if points.shape[0] < min_points:
                 continue
-            model, inliers_mask = ransac_plane_fit(points, num_iterations=50, threshold=0.02, min_inliers_ratio=0.8)
+            model, inliers_mask = ransac_plane_fit(points, num_iterations=100, threshold=0.04, min_inliers_ratio=0.8)
             if model is None:
-                print(f"Cluster {label}: no valid plane model found.")
+                # print(f"Cluster {label}: no valid plane model found.")
                 continue
             inlier_points = points[inliers_mask]
             errors = compute_distance_to_plane(inlier_points, model[0], model[1])
             mean_error = np.mean(errors)
-            if mean_error > 0.05:
-                print(f"Cluster {label}: mean error {mean_error:.4f} too high, skipped as non-planar.")
+            if mean_error > 0.1:
+                # print(f"Cluster {label}: mean error {mean_error:.4f} too high, skipped as non-planar.")
                 continue
             # Refine using a least-squares fit.
             A = np.c_[inlier_points[:, 0], inlier_points[:, 1], np.ones(inlier_points.shape[0])]
@@ -300,7 +300,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
                 'inliers_mask': inliers_mask,
                 'mean_error': mean_error
             }
-            print(f"Cluster {label}: valid plane with mean error {mean_error:.4f}.")
+            # print(f"Cluster {label}: valid plane with mean error {mean_error:.4f}.")
 
         seconds8 = time.time()
         print("Time to run Ransac :", seconds8- seconds7) 
@@ -353,7 +353,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
                 # Check if clusters touch using precomputed dilated mask
                 if np.any(cv2.bitwise_and(dilated_masks[label1], masks[label2])) and \
                 are_planes_similar(cluster_planes[label1], cluster_planes[label2],
-                                    normal_threshold=0.98, distance_threshold=0.02):
+                                    normal_threshold=0.99, distance_threshold=0.01):
                     G.add_edge(label1, label2)
 
         # The connected components of the graph are the merged groups.
@@ -436,76 +436,76 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
 
         #save to json
-        save_lines_to_json(image_id, line_info, coplanarity_matrix)
+        save_lines_to_json(image_id, frame_str, line_info, coplanarity_matrix)
         
         # Display all results using matplotlib.
-        plt.figure(figsize=(15, 10))
+        # plt.figure(figsize=(15, 10))
 
-        plt.subplot(4, 3, 1)
-        plt.title('Sobel on Normal Map')
-        plt.imshow(sobel_normal, cmap='gray')
-        plt.axis('off')
+        # plt.subplot(4, 3, 1)
+        # plt.title('Sobel on Normal Map')
+        # plt.imshow(sobel_normal, cmap='gray')
+        # plt.axis('off')
 
-        plt.subplot(4, 3, 2)
-        plt.title('Thresholded Normal Edges')
-        plt.imshow(thresh_normal, cmap='gray')
-        plt.axis('off')
+        # plt.subplot(4, 3, 2)
+        # plt.title('Thresholded Normal Edges')
+        # plt.imshow(thresh_normal, cmap='gray')
+        # plt.axis('off')
 
-        plt.subplot(4, 3, 3)
-        plt.title('Sobel on Depth Map')
-        plt.imshow(sobel_depth, cmap='gray')
-        plt.axis('off')
+        # plt.subplot(4, 3, 3)
+        # plt.title('Sobel on Depth Map')
+        # plt.imshow(sobel_depth, cmap='gray')
+        # plt.axis('off')
 
-        plt.subplot(4, 3, 4)
-        plt.title('Thresholded Depth Edges')
-        plt.imshow(thresh_depth, cmap='gray')
-        plt.axis('off')
+        # plt.subplot(4, 3, 4)
+        # plt.title('Thresholded Depth Edges')
+        # plt.imshow(thresh_depth, cmap='gray')
+        # plt.axis('off')
         
-        ax5 = plt.subplot(4, 3, 5)
-        plt.title('Line Matches')
-        plt.axis('off')
-        plot_lines_bool(ax5, color_img, pred_lines, is_correct=is_struct)
+        # ax5 = plt.subplot(4, 3, 5)
+        # plt.title('Line Matches')
+        # plt.axis('off')
+        # plot_lines_bool(ax5, color_img, pred_lines, is_correct=is_struct)
 
-        plt.subplot(4, 3, 6)
-        plt.title("Result of Line Splitting")
-        plt.imshow(composite_after_rgb)
-        plt.axis("off")
-
-
-        plt.subplot(4, 3, 7)
-        plt.title('Connected Components')
-        plt.imshow(cv2.cvtColor(colored_img, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
-
-        plt.subplot(4, 3, 8)
-        plt.title('CC without nonplanar clusters')
-        plt.imshow(cv2.cvtColor(colored_new, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
-
-        plt.subplot(4, 3, 9)
-        plt.title('CC without nonplanar clusters and merged planes')
-        plt.imshow(cv2.cvtColor(colored_merged, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
+        # plt.subplot(4, 3, 6)
+        # plt.title("Result of Line Splitting")
+        # plt.imshow(composite_after_rgb)
+        # plt.axis("off")
 
 
-        plt.subplot(4, 3, 10)
-        plt.title('Dilated')
-        plt.imshow(cv2.cvtColor(colored_dilated, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
+        # plt.subplot(4, 3, 7)
+        # plt.title('Connected Components')
+        # plt.imshow(cv2.cvtColor(colored_img, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
+
+        # plt.subplot(4, 3, 8)
+        # plt.title('CC without nonplanar clusters')
+        # plt.imshow(cv2.cvtColor(colored_new, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
+
+        # plt.subplot(4, 3, 9)
+        # plt.title('CC without nonplanar clusters and merged planes')
+        # plt.imshow(cv2.cvtColor(colored_merged, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
+
+
+        # plt.subplot(4, 3, 10)
+        # plt.title('Dilated')
+        # plt.imshow(cv2.cvtColor(colored_dilated, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
       
-        ax11 = plt.subplot(4, 3, 11)
-        plt.title('Line coplanarity')
-        plot_coplanar_lines(ax11, new_lines_list, line_labels, color_img)
-        plt.axis('off')
+        # ax11 = plt.subplot(4, 3, 11)
+        # plt.title('Line coplanarity')
+        # plot_coplanar_lines(ax11, new_lines_list, line_labels, color_img)
+        # plt.axis('off')
 
             
         
-        plt.subplot(4, 3, 12)
-        plt.title('Original Image')
-        plt.imshow(cv2.cvtColor(color_img, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
+        # plt.subplot(4, 3, 12)
+        # plt.title('Original Image')
+        # plt.imshow(cv2.cvtColor(color_img, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
 
-        plt.tight_layout()
-        plt.show()
+        # plt.tight_layout()
+        # plt.show()
                 
     return None, None, None, None, None, None, None, None, None, None   

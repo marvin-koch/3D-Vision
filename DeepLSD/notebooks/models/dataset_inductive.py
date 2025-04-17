@@ -37,9 +37,9 @@ class GraphDatasetInductive(Dataset):
         feats, labels = [], []
         for ln in lines:
             emb = np.array(ln['embedding_DeepLSD'])
-            score = ln.get('confidence_score', 0.5)
+            score = ln.get('struct_score', 0.5)
             feats.append(emb)
-            labels.append(1 if score > self.struct_thresh else 0)
+            labels.append(score)
 
         x = torch.tensor(np.vstack(feats), dtype=torch.float)
         y = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
