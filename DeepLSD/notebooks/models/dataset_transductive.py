@@ -11,8 +11,8 @@ def get_line_feature(image_id, coordinates):
     
     return np.ones(10)
 
-class GraphDataset(Dataset):
-    def __init__(self, json_dir, struct_thresh=0.8, textural_thresh=0.6):
+class GraphDatasetTransductive(Dataset):
+    def __init__(self, json_dir, struct_thresh=0.6, textural_thresh=0.4):
 
         self.json_files = [
             os.path.join(json_dir, f)
@@ -83,6 +83,13 @@ class GraphDataset(Dataset):
         test_mask[indices[val_end:]] = True
 
 
+        src, dst = edge_index
+        # Build edge-level masks: an edge is in train if both its endpoints are in train_mask
+        train_edge_mask = train_mask[src] & train_mask[dst]
+        val_edge_mask   = val_mask[src]   & val_mask[dst]
+        test_edge_mask  = test_mask[src]  & test_mask[dst]        
+
+
         # the Data object
         data_object = Data(
             x=torch.tensor(node_features, dtype=torch.float),
@@ -93,6 +100,10 @@ class GraphDataset(Dataset):
         data_object.train_mask = train_mask
         data_object.val_mask = val_mask
         data_object.test_mask = test_mask
+
         data_object.edge_labels = edge_labels
+        data_object.train_edge_mask = train_edge_mask
+        data_object.val_edge_mask   = val_edge_mask
+        data_object.test_edge_mask  = test_edge_mask
 
         return data_object
