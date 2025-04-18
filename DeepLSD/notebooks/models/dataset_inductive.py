@@ -12,15 +12,15 @@ def get_line_feature(image_id, coordinates):
     return np.ones(10)
 
 class GraphDatasetInductive(Dataset):
-    def __init__(self, json_dir, struct_thresh=0.6, textural_thresh=0.4):
+    def __init__(self, json_dir):
         super().__init__()
         self.json_files = [
             os.path.join(json_dir, f)
             for f in os.listdir(json_dir)
             if f.endswith('.json')
         ]
-        self.struct_thresh = struct_thresh
-        self.textural_thresh = textural_thresh
+        #self.json_files = self.json_files[:100]  # Limit to 100 files for testing
+
 
     def __len__(self):
         return len(self.json_files)
@@ -59,3 +59,4 @@ class GraphDatasetInductive(Dataset):
         data_object = Data(x=x, y=y, edge_index=edge_index, edge_labels=edge_labels)
 
         return data_object
+    
