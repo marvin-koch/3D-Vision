@@ -23,7 +23,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
         image_dir = os.path.join("data", image_id)
         hypersim_loader = HypersimLoader(image_dir) # Base dir contains scenes
         color_img = hypersim_loader.load_color_image(image_id, frame_str, cam_view_color)
-        depth_map = hypersim_loader.load_depth_map(image_id, frame_str, cam_view_geom)
+        depth_map = hypersim_loader.load_depth_map(image_id, frame_str, cam_view_geom) 
         
         seconds = time.time()
         print("Start :", seconds)	

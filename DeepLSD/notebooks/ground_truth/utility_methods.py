@@ -1,13 +1,16 @@
 import cv2
 import numpy as np
 
+import open3d as o3d
+
+
 def compute_variation_laplace(mapping, k, depth=False):
     """
     Computes the Sobel variation of a mapping (depth or normal) using a kernel size k.
     Normalizes the result by subtracting the mean and dividing by the standard deviation.
     """
    
-    laplacian = cv2.Laplacian(mapping, cv2.CV_64F, ksize=k)
+    laplacian = cv2.Laplacian(mapping, ddepth=-1, ksize=k)
     
     # Take the absolute value to measure the magnitude of variation
     variation = np.abs(laplacian)
@@ -317,7 +320,12 @@ def compute_distance_to_plane(points, normal, d):
     distances = np.abs(np.dot(points, normal) + d)
     return distances
 
-def ransac_plane_fit(points, num_iterations=100, threshold=0.01, min_inliers_ratio=0.5):
+import open3d as o3d
+
+def ransac_plane_fit(points,
+                     num_iterations=50,
+                     threshold=0.03,
+                     min_inliers_ratio=0.8):
     best_inliers = []
     best_model = None
 
