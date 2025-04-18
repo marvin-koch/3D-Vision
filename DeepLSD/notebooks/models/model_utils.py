@@ -1,5 +1,6 @@
 import torch
-
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 #****************************************************************
 #****************************************************************
 #****************************************************************
@@ -22,41 +23,134 @@ def train_inductive(model, loader, optimizer, criterion,
         loss = node_loss_w * loss_node + edge_loss_w * loss_edge
         loss.backward()
         optimizer.step()
-        print(f"Loss for mini-batch {batch_n}: {loss.item()}")
+        # print(f"Loss for mini-batch {batch_n}: {loss.item()}")
         batch_n += 1
         total_loss += loss.item()
 
     return total_loss / len(loader)
 
 
-def test_inductive(model, loader, device='cpu', threshold_structural=0.5, threshold_coplanarity=0.5):
+def validate_inductive(model, criterion, loader, device='cpu'):
     model.eval()
-    correct_nodes = total_nodes = 0
-    correct_edges = total_edges = 0
-    batch_n = 0
+    node_loss_total = 0.0
+    edge_loss_total = 0.0
+    total_nodes = 0
+    total_edges = 0
 
     with torch.no_grad():
         for data in loader:
-
             data = data.to(device)
             node_pred, edge_pred = model(data.x, data.edge_index)
 
-            # node accuracy
+            # Ensure targets are float (for BCE-style losses)
+            target_nodes = data.y.float()
+            target_edges = data.edge_labels.float()
+
+            # Squeeze only if necessary to match dimensions
+            if node_pred.shape != target_nodes.shape:
+                node_pred = node_pred.squeeze()
+            if edge_pred.shape != target_edges.shape:
+                edge_pred = edge_pred.squeeze()
+
+            # Compute loss
+            node_loss = criterion(node_pred, target_nodes)
+            edge_loss = criterion(edge_pred, target_edges)
+
+            # Accumulate weighted loss
+            node_loss_total += node_loss.item() * target_nodes.numel()
+            edge_loss_total += edge_loss.item() * target_edges.numel()
+
+            total_nodes += target_nodes.numel()
+            total_edges += target_edges.numel()
+
+    avg_node_loss = node_loss_total / total_nodes if total_nodes > 0 else 0.0
+    avg_edge_loss = edge_loss_total / total_edges if total_edges > 0 else 0.0
+
+    return avg_node_loss, avg_edge_loss
+
+
+def test_inductive(model, loader, device='cpu', threshold_structural=0.5, threshold_coplanarity=0.5):
+    model.eval()
+
+    correct_nodes = total_nodes = 0
+    correct_edges = total_edges = 0
+
+    tp_nodes = fn_nodes = 0
+    tp_edges = fn_edges = 0
+
+    with torch.no_grad():
+        for data in loader:
+            data = data.to(device)
+            node_pred, edge_pred = model(data.x, data.edge_index)
+
+            # Binary predictions
             pred_n = (node_pred >= threshold_structural).float()
-            correct_nodes += (pred_n == data.y).sum().item()
-            total_nodes   += data.y.numel()
-
-            # edge accuracy
             pred_e = (edge_pred >= threshold_coplanarity).float()
-            correct_edges += (pred_e == data.edge_labels).sum().item()
-            total_edges   += data.edge_labels.numel()
-            print(f"Correct nodes for mini-batch {batch_n}: {correct_nodes}")
-            print(f"Correct edges for mini-batch {batch_n}: {correct_edges}")
-            batch_n += 1
 
-    node_acc = correct_nodes / total_nodes
-    edge_acc = correct_edges / total_edges
-    return node_acc, edge_acc
+            # Accuracy
+            correct_nodes += (pred_n == data.y).sum().item()
+            total_nodes += data.y.numel()
+
+            correct_edges += (pred_e == data.edge_labels).sum().item()
+            total_edges += data.edge_labels.numel()
+
+            # Recall (TP / (TP + FN))
+            tp_nodes += ((pred_n == 1) & (data.y == 1)).sum().item()
+            fn_nodes += ((pred_n == 0) & (data.y == 1)).sum().item()
+
+            tp_edges += ((pred_e == 1) & (data.edge_labels == 1)).sum().item()
+            fn_edges += ((pred_e == 0) & (data.edge_labels == 1)).sum().item()
+
+    node_acc = correct_nodes / total_nodes if total_nodes > 0 else 0.0
+    edge_acc = correct_edges / total_edges if total_edges > 0 else 0.0
+
+    node_recall = tp_nodes / (tp_nodes + fn_nodes) if (tp_nodes + fn_nodes) > 0 else 0.0
+    edge_recall = tp_edges / (tp_edges + fn_edges) if (tp_edges + fn_edges) > 0 else 0.0
+
+    return node_acc, edge_acc, node_recall, edge_recall
+
+
+def test_inductive_with_roc(model, loader, device='cpu'):
+    model.eval()
+
+    all_node_preds = []
+    all_node_labels = []
+    all_edge_preds = []
+    all_edge_labels = []
+
+    with torch.no_grad():
+        for data in loader:
+            data = data.to(device)
+            node_pred, edge_pred = model(data.x, data.edge_index)
+
+            # Flatten and collect
+            all_node_preds.append(node_pred.view(-1).cpu())
+            all_node_labels.append(data.y.view(-1).float().cpu())
+
+            all_edge_preds.append(edge_pred.view(-1).cpu())
+            all_edge_labels.append(data.edge_labels.view(-1).float().cpu())
+
+    # Concatenate all batches
+    all_node_preds = torch.cat(all_node_preds).numpy()
+    all_node_labels = torch.cat(all_node_labels).numpy()
+    all_edge_preds = torch.cat(all_edge_preds).numpy()
+    all_edge_labels = torch.cat(all_edge_labels).numpy()
+
+    return all_node_preds, all_node_labels, all_edge_preds, all_edge_labels
+
+def plot_roc_curve(y_true, y_scores, title='ROC Curve'):
+    fpr, tpr, _ = roc_curve(y_true, y_scores)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure()
+    plt.plot(fpr, tpr, label=f'AUC = {roc_auc:.2f}')
+    plt.plot([0, 1], [0, 1], linestyle='--', color='gray')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc='lower right')
+    plt.grid(True)
+    plt.show()
 
 
 
@@ -174,3 +268,27 @@ def test_combined(model, criterion, loader,
     
     return avg_train_acc_struct, avg_test_acc_struct, avg_train_acc_coplan, avg_test_acc_coplan
 
+
+def run_inference(model, data_loader, model_path='model.pth', 
+                  device='cpu', threshold_structural=0.5, threshold_coplanarity=0.5):
+    # Load model weights
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.to(device)
+    model.eval()
+
+    all_node_preds = []
+    all_edge_preds = []
+
+    with torch.no_grad():
+        for data in data_loader:
+            data = data.to(device)
+            node_pred, edge_pred = model(data.x, data.edge_index)
+
+            # Apply thresholds if you want binary predictions
+            node_labels = (node_pred >= threshold_structural).float()
+            edge_labels = (edge_pred >= threshold_coplanarity).float()
+
+            all_node_preds.append(node_labels.cpu())
+            all_edge_preds.append(edge_labels.cpu())
+
+    return all_node_preds, all_edge_preds
