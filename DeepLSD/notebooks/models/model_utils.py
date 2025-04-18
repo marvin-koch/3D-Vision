@@ -9,7 +9,9 @@ def train_inductive(model, loader, optimizer, criterion,
                 node_loss_w=1.0, edge_loss_w=1.0, device='cpu'):
     model.train()
     total_loss = 0
+    batch_n = 0
     for data in loader:
+
         data = data.to(device)
         optimizer.zero_grad()
 
@@ -20,6 +22,8 @@ def train_inductive(model, loader, optimizer, criterion,
         loss = node_loss_w * loss_node + edge_loss_w * loss_edge
         loss.backward()
         optimizer.step()
+        print(f"Loss for mini-batch {batch_n}: {loss.item()}")
+        batch_n += 1
         total_loss += loss.item()
 
     return total_loss / len(loader)
@@ -29,9 +33,11 @@ def test_inductive(model, loader, device='cpu', threshold_structural=0.5, thresh
     model.eval()
     correct_nodes = total_nodes = 0
     correct_edges = total_edges = 0
+    batch_n = 0
 
     with torch.no_grad():
         for data in loader:
+
             data = data.to(device)
             node_pred, edge_pred = model(data.x, data.edge_index)
 
@@ -44,6 +50,9 @@ def test_inductive(model, loader, device='cpu', threshold_structural=0.5, thresh
             pred_e = (edge_pred >= threshold_coplanarity).float()
             correct_edges += (pred_e == data.edge_labels).sum().item()
             total_edges   += data.edge_labels.numel()
+            print(f"Correct nodes for mini-batch {batch_n}: {correct_nodes}")
+            print(f"Correct edges for mini-batch {batch_n}: {correct_edges}")
+            batch_n += 1
 
     node_acc = correct_nodes / total_nodes
     edge_acc = correct_edges / total_edges
