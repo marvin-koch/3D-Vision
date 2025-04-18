@@ -47,7 +47,8 @@ if __name__ == "__main__":
             composite_after, pred_lines, img, normals, world_coordinates, valid_mask, line_info, scores, isstruct, original_lines = process_image(
                 image_dir, image_id, frame_str, net, device,
                 depth_thresh=50, normal_thresh=1.5 * 1e7,
-                dataset="hypersim"
-                #moge_model = moge
+                dataset="hypersim",
+                #moge_model = moge,
+                file_path = required_file,
             )
             

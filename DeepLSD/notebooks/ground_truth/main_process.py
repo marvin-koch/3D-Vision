@@ -10,7 +10,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
             depth_thresh=125, normal_thresh=1.25 * 1e7, thickness=1, structural_thresh=0.6,
             method="neighborhood", normal_func=np.max, depthfunc=np.max,
             depth_normal_func_str="Max", norm_agg_func=np.linalg.norm,
-            struct_color=(0, 0, 255), text_color=(255, 0, 0), normal_k_size=11, dataset="hypersim", moge_model= None):
+            struct_color=(0, 0, 255), text_color=(255, 0, 0), normal_k_size=11, dataset="hypersim", moge_model= None, file_path = None):
 
     # Load image data using helper functions.
     cam_view_color = "scene_cam_00_final_preview"
@@ -436,7 +436,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
 
 
         #save to json
-        save_lines_to_json(image_id, frame_str, line_info, coplanarity_matrix)
+        save_lines_to_json(image_id, frame_str, line_info, coplanarity_matrix, file_path_str = file_path)
         
         # Display all results using matplotlib.
         # plt.figure(figsize=(15, 10))
