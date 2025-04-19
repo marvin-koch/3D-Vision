@@ -19,7 +19,7 @@ class GraphDatasetInductive(Dataset):
             for f in os.listdir(json_dir)
             if f.endswith('.json')
         ]
-        self.json_files = self.json_files[:20]  # Limit to 100 files for testing
+        #self.json_files = self.json_files[:20]  # Limit to 100 files for testing
 
     def __len__(self):
         return len(self.json_files)
