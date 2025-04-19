@@ -11,17 +11,17 @@ if __name__ == "__main__":
     frames = [f"{i:04d}" for i in range(1, 100)]
     
     desired_images = [
-        "ai_001_001",
-        "ai_001_002",
-        "ai_001_003",
-        "ai_001_004",
+    #     "ai_001_001",
+    #     "ai_001_002",
+    #     "ai_001_003",
+    #     "ai_001_004",
         "ai_001_005",
         "ai_001_006",
         "ai_001_007",
-        "ai_001_008",
-        "ai_001_009",
-        "ai_001_010",
-        "ai_002_001",
+        # "ai_001_008",
+        # "ai_001_009",
+        # "ai_001_010",
+        # "ai_002_001",
     ]
     
     print("Generate Images")
@@ -52,3 +52,4 @@ if __name__ == "__main__":
                 file_path = required_file,
             )
             
+    print("Finished processing.")

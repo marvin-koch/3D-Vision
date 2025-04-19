@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-import open3d as o3d
+# import open3d as o3d
 
 
 def compute_variation_laplace(mapping, k, depth=False):
@@ -320,8 +320,6 @@ def compute_distance_to_plane(points, normal, d):
     distances = np.abs(np.dot(points, normal) + d)
     return distances
 
-import open3d as o3d
-
 def ransac_plane_fit(points,
                      num_iterations=50,
                      threshold=0.03,
@@ -357,7 +355,6 @@ def find_line_planes(lines, segmentation_map, get_line_pixels_func):
     """
     For each line, determine the most common plane label by sampling pixels from the segmentation map.
     """
-    
 
     
     line_labels = []
