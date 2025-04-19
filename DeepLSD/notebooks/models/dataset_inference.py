@@ -24,11 +24,11 @@ class GraphDatasetInference(Dataset):
         x = torch.tensor(np.vstack(feats), dtype=torch.float)
         N = x.size(0)
 
-        # fully connected graph + coplanarity labels
+        # fully connected graph
         edge_list = []
         for i in range(N):
             for j in range(N):
-                if i == j: continue
+                #if i == j: continue
                 edge_list.append([i, j])
 
         edge_index  = torch.tensor(edge_list,  dtype=torch.long).t().contiguous()

@@ -19,8 +19,7 @@ class GraphDatasetInductive(Dataset):
             for f in os.listdir(json_dir)
             if f.endswith('.json')
         ]
-        #self.json_files = self.json_files[:100]  # Limit to 100 files for testing
-
+        self.json_files = self.json_files[:20]  # Limit to 100 files for testing
 
     def __len__(self):
         return len(self.json_files)
@@ -49,9 +48,9 @@ class GraphDatasetInductive(Dataset):
         edge_list, edge_labels = [], []
         for i in range(N):
             for j in range(N):
-                if i == j: continue
-                edge_list.append([i, j])
                 edge_labels.append(coplanarity_matrix[i][j])
+                # if i == j: continue
+                edge_list.append([i, j])
 
         edge_index  = torch.tensor(edge_list,  dtype=torch.long).t().contiguous()
         edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)

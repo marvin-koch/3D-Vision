@@ -17,6 +17,7 @@ def train_inductive(model, loader, optimizer, criterion,
         optimizer.zero_grad()
 
         node_pred, edge_pred = model(data.x, data.edge_index)
+
         loss_node = criterion(node_pred, data.y)
         loss_edge = criterion(edge_pred, data.edge_labels)
 
