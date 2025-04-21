@@ -1,0 +1,29 @@
+[rank: 0] Seed set to 42
+/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/lightning_fabric/plugins/environments/slurm.py:204: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python train.py ...
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.9
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250421_210753-mos362dx
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run GAT_Structural_Textural
+wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/mos362dx
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name                    | Type              | Params | Mode 
+----------------------------------------------------------------------
+0 | gat_roi                 | GAT               | 259 K  | train
+1 | gat_DeepLSD             | GAT               | 390 K  | train
+2 | conv_roi_embedding      | Sequential        | 75     | train
+3 | mlp_textural_structural | Sequential        | 2.1 K  | train
+4 | criterion               | BCEWithLogitsLoss | 0      | train
+----------------------------------------------------------------------
+651 K     Trainable params
+0         Non-trainable params
+651 K     Total params
+2.608     Total estimated model params size (MB)
+72        Modules in train mode
+0         Modules in eval mode

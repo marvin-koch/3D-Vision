@@ -20,7 +20,7 @@ def process_image(image_dir, image_id, frame_str, net, device,
    
 
     if dataset == "hypersim":
-        image_dir = os.path.join("data", image_id)
+        # image_dir = os.path.join(image_dir, image_id)
         hypersim_loader = HypersimLoader(image_dir) # Base dir contains scenes
         color_img = hypersim_loader.load_color_image(image_id, frame_str, cam_view_color)
         depth_map = hypersim_loader.load_depth_map(image_id, frame_str, cam_view_geom) 
