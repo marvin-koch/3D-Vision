@@ -2,7 +2,7 @@
 import os
 import torch
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
+from lightning.pytorch.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 import yaml
 import argparse
@@ -77,9 +77,17 @@ def main(config_path: str):
     )
 
     # --- Logging and Checkpointing ---
-    logger = TensorBoardLogger(
-        save_dir=cfg_train.get('log_dir', "lightning_logs"),
-        name=cfg_train.get('experiment_name', "gat_yaml_config")
+    log_dir = cfg_train.get('log_dir', "lightning_logs")
+    os.makedirs(log_dir, exist_ok=True)
+
+    # Use WandbLogger
+    logger = WandbLogger(
+        name=cfg_train.get('experiment_name', "gat_yaml_config"), # Run name
+        save_dir=log_dir,                                         # Local directory for wandb files
+        project=cfg_train.get('wandb_project', "lightning_project"), # W&B project name (REQUIRED)
+        entity=cfg_train.get('wandb_entity', None),               # Optional: W&B username or team
+        log_model=True,                                           # Optional: Log model checkpoints to W&B
+        # offline=False # Set to True to log locally without syncing to W&B servers
     )
     monitor_metric = cfg_train.get('monitor_metric', 'val_auc')
     monitor_mode = cfg_train.get('monitor_mode', 'max')
@@ -134,7 +142,8 @@ def main(config_path: str):
         accelerator=actual_accelerator, # Use resolved accelerator
         devices=actual_devices,       # Use resolved devices
         log_every_n_steps=10,
-        deterministic=cfg_train.get('seed', 42) is not None # Enable deterministic if seed is set
+        deterministic=cfg_train.get('seed', 42) is not None, # Enable deterministic if seed is set
+        accumulate_grad_batches=cfg_train.get('accum_grads', 2)
     )
 
     # --- Training ---

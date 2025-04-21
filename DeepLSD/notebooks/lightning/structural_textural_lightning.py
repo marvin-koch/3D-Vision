@@ -60,8 +60,18 @@ class LitGATTexturalStructural(pl.LightningModule):
         self.save_hyperparameters()
 
         # --- Model Architecture ---
-        self.gat = pyg_nn.GAT(
+        self.gat_roi = pyg_nn.GAT(
             in_channels=self.hparams.in_channels,
+            hidden_channels=self.hparams.hidden_channels,
+            out_channels=self.hparams.out_channels,
+            v2=self.hparams.v2,
+            num_layers=self.hparams.num_layers,
+            dropout=self.hparams.dropout,
+            act=self.hparams.act,
+            jk=self.hparams.jk_layer
+        )
+        self.gat_DeepLSD = pyg_nn.GAT(
+            in_channels=self.hparams.in_channels_DeepLSD,
             hidden_channels=self.hparams.hidden_channels,
             out_channels=self.hparams.out_channels,
             v2=self.hparams.v2,
@@ -86,14 +96,14 @@ class LitGATTexturalStructural(pl.LightningModule):
             nn.Flatten(start_dim=1) # Output shape: (B, 1 * 32 * 32) = (B, 1024) for 64x64 input
         )
 
-        self.merge_features = nn.Sequential(
-            nn.Linear(self.hparams.in_channels_DeepLSD + channels_conv_roi_embedding, self.hparams.in_channels),
-            nn.Dropout(p=mlp_dropout),
-            nn.GELU(),
-        )
+        # self.merge_features = nn.Sequential(
+        #     nn.Linear(self.hparams.in_channels_DeepLSD + channels_conv_roi_embedding, self.hparams.in_channels),
+        #     nn.Dropout(p=mlp_dropout),
+        #     nn.GELU(),
+        # )
 
         self.mlp_textural_structural = nn.Sequential(
-            nn.Linear(self.hparams.out_channels, self.hparams.out_channels),
+            nn.Linear(2 * self.hparams.out_channels, self.hparams.out_channels),
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1) # Output single logit per node
         )
@@ -106,7 +116,8 @@ class LitGATTexturalStructural(pl.LightningModule):
         self.criterion = nn.BCEWithLogitsLoss() # Recommended
 
         # Initialize lists to store outputs for epoch-level metrics
-        self.training_step_outputs = []
+        # dont have enough memory for this
+        # self.training_step_outputs = []
         self.validation_step_outputs = []
         self.test_step_outputs = []
 
@@ -120,13 +131,15 @@ class LitGATTexturalStructural(pl.LightningModule):
         roi_features = batch.roi_features
         edge_index = batch.edge_index
 
+        
         roi_conv_output = self.conv_roi_embedding(roi_features)
-        combined_features = torch.cat([x, roi_conv_output], dim=1)
-        h_in = self.merge_features(combined_features)
-        h_out = self.gat(h_in, edge_index)
+        h_out_roi = self.gat_roi(roi_conv_output, edge_index)
+        
+        h_out_DeepLSD = self.gat_DeepLSD(x, edge_index)
+        combined_features = torch.cat([h_out_roi, h_out_DeepLSD], dim=1)
 
         # Node-level predictions (logits)
-        node_logits = self.mlp_textural_structural(h_out)
+        node_logits = self.mlp_textural_structural(combined_features)
 
         return node_logits # Return logits directly
 
@@ -135,47 +148,38 @@ class LitGATTexturalStructural(pl.LightningModule):
         node_logits = self(batch)
         target_nodes = batch.y.float() # Ensure labels are float
 
-        # Ensure shapes match for loss calculation
-        # Target might be (N,) while logits are (N, 1), need to align
-        if node_logits.shape != target_nodes.shape:
-             # If target_nodes is (N,) and node_logits is (N, 1)
-            if len(target_nodes.shape) == 1 and len(node_logits.shape) == 2 and node_logits.shape[1] == 1:
-                 target_nodes = target_nodes.unsqueeze(1) # Make target (N, 1)
-            else:
-                # Handle other potential shape mismatches or raise an error
-                try:
-                    node_logits = node_logits.view_as(target_nodes)
-                except RuntimeError as e:
-                    raise RuntimeError(f"Shape mismatch: Logits {node_logits.shape}, Targets {target_nodes.shape}. Error: {e}")
-
 
         loss = self.criterion(node_logits, target_nodes)
 
         # Calculate predictions (probabilities) after loss calc using logits
         node_preds = torch.sigmoid(node_logits)
-
-        return loss, node_preds, target_nodes
+        # Log validation loss
+        pred_binary = (node_preds >= self.hparams.threshold_structural).to(torch.int)
+        acc = accuracy_score(target_nodes.cpu(), pred_binary.cpu())
+        return loss, node_preds, target_nodes, acc
 
     def training_step(self, batch: Batch, batch_idx: int):
-        loss, _, _ = self._common_step(batch, batch_idx)
+        loss, _, _, train_acc = self._common_step(batch, batch_idx)
 
         # Log training loss
         self.log('train_loss_step', loss, on_step=True, on_epoch=False, prog_bar=True, logger=True)
-        self.training_step_outputs.append({'loss': loss}) # Store loss for epoch average
+        self.log('train_acc', train_acc, on_step=True, on_epoch=False, prog_bar=True, logger=True)
+        #self.training_step_outputs.append({'loss': loss}) # Store loss for epoch average
         return loss
 
-    def on_train_epoch_end(self):
-        # Calculate and log average training loss for the epoch
-        avg_loss = torch.stack([x['loss'] for x in self.training_step_outputs]).mean()
-        self.log('train_loss_epoch', avg_loss, on_epoch=True, prog_bar=True, logger=True)
-        self.training_step_outputs.clear() # Free memory
+    # def on_train_epoch_end(self):
+    #     # Calculate and log average training loss for the epoch
+    #     avg_loss = torch.stack([x['loss'] for x in self.training_step_outputs]).mean()
+    #     self.log('train_loss_epoch', avg_loss, on_epoch=True, prog_bar=True, logger=True)
+    #     self.training_step_outputs.clear() # Free memory
 
 
     def validation_step(self, batch: Batch, batch_idx: int):
-        loss, node_preds, target_nodes = self._common_step(batch, batch_idx)
+        loss, node_preds, target_nodes, val_acc = self._common_step(batch, batch_idx)
 
-        # Log validation loss
+
         self.log('val_loss_step', loss, on_step=True, on_epoch=False, prog_bar=False, logger=True) # Log step loss if desired
+        self.log('val_acc', val_acc, on_step=True, on_epoch=False, prog_bar=False, logger=True) # Log step loss if desired
 
         # Store predictions and targets for epoch-end metrics
         self.validation_step_outputs.append({
@@ -228,7 +232,7 @@ class LitGATTexturalStructural(pl.LightningModule):
         self.validation_step_outputs.clear() # Free memory
 
     def test_step(self, batch: Batch, batch_idx: int):
-        loss, node_preds, target_nodes = self._common_step(batch, batch_idx)
+        loss, node_preds, target_nodes,_= self._common_step(batch, batch_idx)
 
         # Store results for aggregation
         self.test_step_outputs.append({
