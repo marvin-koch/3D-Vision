@@ -71,4 +71,8 @@ cython_debug/
 # Ignore DeepLSD data directory
 /DeepLSD/notebooks/data/
 /DeepLSD/notebooks/json_output/
-
+/DeepLSD/notebooks/lightning/lightning_logs
+/DeepLSD/notebooks/lightning/data/
+/DeepLSD/notebooks/lightning/json_output/
+.DS_Store
+DeepLSD/.DS_Store
