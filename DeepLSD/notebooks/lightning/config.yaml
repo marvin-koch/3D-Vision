@@ -7,7 +7,7 @@ data:
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 1                 # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
   accum_grads: 16                # Gradient accumulation
-  method: 'sample'
+  method: 'roi'
 
 model:
   # Input dimensions

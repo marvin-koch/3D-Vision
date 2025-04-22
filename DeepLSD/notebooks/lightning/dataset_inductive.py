@@ -34,7 +34,7 @@ def get_line_feature(image_path, line_coordinates, output_size = (64,64), method
     if method == "roi":
         return extract_line_feature_ROIAlign(img=img,lines=line_coordinates,output_size=output_size,plot_results=True)
     elif method == "sample":
-        return sample_lines_grid(img=img,line=line_coordinates,num_samples=output_size[0],width=output_size[1],)
+        return sample_lines_grid(img=torch.from_numpy(img),lines=line_coordinates,num_samples=output_size[0],width=output_size[1],)
     logging.error(f"Method not found: {method}. Returning None.")
     return None
 
@@ -81,7 +81,8 @@ class GraphDatasetInductive(Dataset):
         N = x_emb.size(0)
 
         # Extract ROI Align features
-        line_coords_np = np.array(line_coords)
+        # line_coords_np = np.array(line_coords)
+        line_coords_np = torch.tensor(line_coords)
         img = _load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
         # roi_features shape: (N, C, H, W)
         roi_features = get_line_feature(

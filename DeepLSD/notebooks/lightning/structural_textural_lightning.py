@@ -94,7 +94,7 @@ class LitGATTexturalStructural(pl.LightningModule):
             nn.MaxPool2d(kernel_size=2, stride=2),
 
             # Layer 2: 8 -> 12 channels, k=3, s=1, p=1 (preserves H/2, W/2 before pooling)
-            nn.Conv2d(in_channels=8, out_channels=8, kernel_size=6, stride=1, padding=1),
+            nn.Conv2d(in_channels=6, out_channels=8, kernel_size=6, stride=1, padding=1),
             nn.ReLU(),
             # Second reduction: H/2 x W/2 -> H/4 x W/4
             nn.MaxPool2d(kernel_size=2, stride=2),
