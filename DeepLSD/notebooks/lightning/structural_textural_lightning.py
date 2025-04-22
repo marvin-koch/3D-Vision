@@ -84,16 +84,24 @@ class LitGATTexturalStructural(pl.LightningModule):
         # Calculate output size of the CNN embedding
         # Assuming input (B, 3, H, W), after Conv(3,2,k=3,s=1,p=1), ReLU, MaxPool(k=2,s=2), Conv(2,1,k=3,s=1,p=1), ReLU, Flatten
         # Output size: (B, 1 * (H/2) * (W/2))
-        # Note: Ensure integer division if H or W are odd, although 64x64 works cleanly.
-        channels_conv_roi_embedding = (self.hparams.roi_align_embedding_shape[0] // 2) * (self.hparams.roi_align_embedding_shape[1] // 2)
-
+        # Commented out for now, too few parameters
+        channels_conv_roi_embedding = (self.hparams.roi_align_embedding_shape[0] // 4) * (self.hparams.roi_align_embedding_shape[1] // 4) * 8
         self.conv_roi_embedding = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=3, stride=1, padding=1),
+            # Layer 1: 3 -> 8 channels, k=3, s=1, p=1 (preserves H, W before pooling)
+            nn.Conv2d(in_channels=3, out_channels=6, kernel_size=8, stride=1, padding=1),
             nn.ReLU(),
+            # First reduction: HxW -> H/2 x W/2
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=2, out_channels=1, kernel_size=3, stride=1, padding=1),
+
+            # Layer 2: 8 -> 12 channels, k=3, s=1, p=1 (preserves H/2, W/2 before pooling)
+            nn.Conv2d(in_channels=8, out_channels=8, kernel_size=6, stride=1, padding=1),
             nn.ReLU(),
-            nn.Flatten(start_dim=1) # Output shape: (B, 1 * 32 * 32) = (B, 1024) for 64x64 input
+            # Second reduction: H/2 x W/2 -> H/4 x W/4
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            # Flatten
+            # Output shape: (B, 12 * (H/4) * (W/4))
+            nn.Flatten(start_dim=1)
         )
 
         # self.merge_features = nn.Sequential(

@@ -43,7 +43,7 @@ def main(config_path: str):
     if not torch.cuda.is_available() and num_workers > 0:
         print(f"Warning: CUDA not available, setting num_workers to 0 (was {num_workers})")
         num_workers = 0
-
+    print("Using following method to extract features: {}".format(cfg_data.get('method', 'roi')))
     data_module = GraphDataModuleInductive(
         json_dir=cfg_data.get('json_dir', './json_output/'),
         roi_output_size=roi_output_size_tuple,
@@ -51,6 +51,7 @@ def main(config_path: str):
         train_split=cfg_data.get('train_split', 0.8),
         val_split=cfg_data.get('val_split', 0.1),
         num_workers=num_workers,
+        method = cfg_data.get('method', 'roi')
     )
 
     # --- Model ---

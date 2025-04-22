@@ -3,6 +3,156 @@ import cv2
 import torch
 from torchvision.ops import roi_align
 import matplotlib.pyplot as plt
+import torch
+import torch.nn.functional as F
+from typing import Union, List, Tuple
+
+def sample_lines_grid(
+    img: torch.Tensor,
+    lines: Union[torch.Tensor, List[Tuple[Tuple[float,float], Tuple[float,float]]]],
+    num_samples: int = 100,
+    width: float = 1.0,
+    num_width_samples: int = None,
+    align_corners: bool = True
+) -> torch.Tensor:
+    """
+    Samples (num_samples x num_width_samples) strips around multiple lines
+    defined by start and end points in `img`, using bilinear interpolation
+    via grid_sample.
+
+    Args:
+        img:           (C,H,W) or (B,C,H,W) image tensor.
+        lines:         A list of N ((x0,y0),(x1,y1)) tuples, or a tensor
+                       of shape (N, 2, 2) where lines[i,0,:] is the start
+                       and lines[i,1,:] is the end of the i-th line in
+                       pixel coordinates.
+        width:         Total thickness (pixels) orthogonal to the lines.
+        num_samples:   # points along each line.
+        num_width_samples: # points across the width for each line.
+        align_corners: Forwarded to grid_sample.
+
+    Returns:
+        If input img was (C,H,W), returns (N, C, num_samples, num_width_samples).
+        If input img was (B,C,H,W), returns (B, N, C, num_samples, num_width_samples).
+        Where N is the number of lines.
+    """
+    if num_width_samples is None:
+        num_width_samples = width
+    # ensure batch‐dim for image
+    batched_input = True
+    if img.dim() == 3:
+        img = img.unsqueeze(0)
+        batched_input = False
+    B, C, H, W = img.shape
+    device = img.device
+
+    # --- Input Line Processing ---
+    if isinstance(lines, list):
+        if not lines:
+            # Handle empty list case if necessary, e.g., return empty tensor
+            out_shape = (B, 0, C, num_samples, num_width_samples) if batched_input else (0, C, num_samples, num_width_samples)
+            return torch.empty(out_shape, dtype=img.dtype, device=device)
+        # Convert list of tuples to tensor (N, 2, 2)
+        lines_tensor = torch.tensor(lines, dtype=torch.float32, device=device)
+    elif isinstance(lines, torch.Tensor):
+        lines_tensor = lines.to(dtype=torch.float32, device=device)
+        if lines_tensor.shape[1:] != (2, 2):
+             raise ValueError(f"lines tensor must have shape (N, 2, 2), but got {lines_tensor.shape}")
+    else:
+        raise TypeError("lines must be a list of line tuples or a tensor(N, 2, 2)")
+
+    if lines_tensor.numel() == 0:
+        # Handle empty tensor case
+        out_shape = (B, 0, C, num_samples, num_width_samples) if batched_input else (0, C, num_samples, num_width_samples)
+        return torch.empty(out_shape, dtype=img.dtype, device=device)
+
+    N = lines_tensor.shape[0] # Number of lines
+
+    # --- Vectorized Line Parameter Calculation ---
+    # Extract start (x0, y0) and end (x1, y1) points for all N lines
+    starts = lines_tensor[:, 0, :]  # Shape: (N, 2)
+    ends = lines_tensor[:, 1, :]    # Shape: (N, 2)
+
+    x0 = starts[:, 0]  # Shape: (N,)
+    y0 = starts[:, 1]  # Shape: (N,)
+    x1 = ends[:, 0]    # Shape: (N,)
+    y1 = ends[:, 1]    # Shape: (N,)
+
+    dx = x1 - x0       # Shape: (N,)
+    dy = y1 - y0       # Shape: (N,)
+
+    # Add epsilon to prevent division by zero for zero-length lines
+    length = torch.sqrt(dx*dx + dy*dy).clamp(min=1e-6) # Shape: (N,)
+    ux = dx / length   # unit direction x, Shape: (N,)
+    uy = dy / length   # unit direction y, Shape: (N,)
+
+    # Perpendicular unit vector
+    px = -uy           # Shape: (N,)
+    py = ux            # Shape: (N,)
+
+    # --- Create Sampling Grid Parameters ---
+    # These are the same for all lines
+    t = torch.linspace(0, 1, steps=num_samples, device=device)         # Shape: (num_samples,)
+    s = torch.linspace(-width/2, width/2, steps=num_width_samples, device=device) # Shape: (num_width_samples,)
+
+    # Create meshgrid for sampling points relative to each line
+    # tt: varies along the line, ss: varies across the width
+    tt, ss = torch.meshgrid(t, s, indexing='ij') # Shape: (num_samples, num_width_samples)
+
+    # --- Vectorized Absolute Coordinate Calculation ---
+    # Use broadcasting to calculate coordinates for all N lines simultaneously
+    # Reshape line parameters to (N, 1, 1) for broadcasting with tt and ss (S, Ws)
+    # Resulting X, Y shape: (N, num_samples, num_width_samples)
+    X = x0.view(N, 1, 1) + dx.view(N, 1, 1) * tt + px.view(N, 1, 1) * ss
+    Y = y0.view(N, 1, 1) + dy.view(N, 1, 1) * tt + py.view(N, 1, 1) * ss
+
+    # --- Normalize Coordinates to [-1, +1] ---
+    # W-1 and H-1 for pixel center alignment if align_corners=False (common use)
+    # If align_corners=True, use W and H? grid_sample doc is key here.
+    # grid_sample normalizes based on input spatial size (W, H).
+    # Normalized = 2 * pixel_coord / (size - 1) - 1 seems correct for both cases.
+    # Let's stick to the original formula.
+    Xn = 2 * X / (W - 1) - 1  # Shape: (N, num_samples, num_width_samples)
+    Yn = 2 * Y / (H - 1) - 1  # Shape: (N, num_samples, num_width_samples)
+
+    # Stack to create the grid for grid_sample
+    # Shape: (N, num_samples, num_width_samples, 2)
+    grid = torch.stack([Xn, Yn], dim=-1)
+
+    # --- Prepare for grid_sample ---
+    # grid_sample expects input (B, C, H, W) and grid (B, H_out, W_out, 2)
+    # Here, H_out = num_samples, W_out = num_width_samples
+    # Our grid is (N, S, Ws, 2) and img is (B, C, H, W)
+    # We want to sample N lines from B images -> output (B, N, C, S, Ws)
+
+    # Repeat grid B times: (B*N, S, Ws, 2)
+    grid = grid.repeat(B, 1, 1, 1)
+
+    # Repeat image N times: (B*N, C, H, W)
+    # Use repeat_interleave to group results by image: [img0_line0, img0_line1, ..., img1_line0, ...]
+    img_rep = img.repeat_interleave(N, dim=0)
+
+    # --- Perform Sampling ---
+    # out shape: (B*N, C, num_samples, num_width_samples)
+    out = F.grid_sample(
+        img_rep, grid,
+        mode='bilinear',
+        padding_mode='zeros',
+        align_corners=align_corners
+    )
+
+    # --- Reshape Output ---
+    # Reshape to (B, N, C, num_samples, num_width_samples)
+    out = out.view(B, N, C, num_samples, num_width_samples)
+
+    if not batched_input:
+        # Remove the original batch dim if input was single image
+        out = out.squeeze(0)  # Shape: (N, C, num_samples, num_width_samples)
+
+    return out
+
+
+
 
 def extract_line_feature_ROIAlign(img: np.ndarray, 
                                 lines: np.ndarray, 

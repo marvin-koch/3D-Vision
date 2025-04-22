@@ -1,19 +1,19 @@
 data:
   json_dir: './json_output/'      # Path to the directory containing graph JSON files
-  roi_output_size: [32, 32]       # Output size (height, width) for ROI Align features
+  roi_output_size: [64, 16]       # Output size (height, width) for ROI Align features
   batch_size: 1                   # Number of graphs per batch
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 1                 # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
   accum_grads: 16                # Gradient accumulation
-  
+  method: 'sample'
 
 model:
   # Input dimensions
   in_channels_DeepLSD: 1280       # Dimension of the initial DeepLSD embedding feature per node
   # CNN output channels_conv_roi_embedding = (roi_output_size[0]//2 * roi_output_size[1]//2) -> calculated internally
-  in_channels: 256               # Dimension expected by the roi_GAT
+  in_channels: 512               # Dimension expected by the roi_GAT
 
   # GAT layer parameters
   
@@ -23,7 +23,7 @@ model:
   dropout: 0.1                    # Dropout rate within GAT layers
   act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
   v2: true                        # Use GATv2 formulation (set to false for GATv1)
-  jk_layer: 'lstm'                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
+  jk_layer: null                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
 
   # MLP Drop-outs
   mlp_dropout: 0.1

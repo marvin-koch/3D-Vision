@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import cv2
 from torch_geometric.data import Data, Dataset
-from notebooks.models.dataset_utils import extract_line_feature_ROIAlign
+from notebooks.models.dataset_utils import extract_line_feature_ROIAlign,sample_lines_grid
 from typing import Optional
 import logging
 
@@ -25,13 +25,18 @@ def _load_image(filepath: str, color_conversion: Optional[int] = None) -> Option
         logging.error(f"Error loading image {filepath}: {e}")
         return None
     
-def get_line_feature(image_path, line_coordinates, output_size = (64,64)):
+def get_line_feature(image_path, line_coordinates, output_size = (64,64), method="roi"):
     """
-    ADD MATINE'S FEATURE EXTRACTION
+    method is roi or sample
+    output size for sample is interpreted as num_samples = output_size[0], width = output_size[1]
     """
     img = _load_image(filepath = image_path, color_conversion=cv2.COLOR_BGR2RGB)
-    roi_results = extract_line_feature_ROIAlign(img=img,lines=line_coordinates,output_size=output_size,plot_results=True)
-    return roi_results
+    if method == "roi":
+        return extract_line_feature_ROIAlign(img=img,lines=line_coordinates,output_size=output_size,plot_results=True)
+    elif method == "sample":
+        return sample_lines_grid(img=img,line=line_coordinates,num_samples=output_size[0],width=output_size[1],)
+    logging.error(f"Method not found: {method}. Returning None.")
+    return None
 
 class GraphDatasetInductive(Dataset):
     def __init__(self, json_dir, roi_output_size=(64, 64)):
