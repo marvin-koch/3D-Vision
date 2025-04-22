@@ -10,10 +10,13 @@ from dataset_inductive import GraphDatasetInductive
 class GraphDataModuleInductive(pl.LightningDataModule):
     def __init__(self, json_dir: str, roi_output_size: tuple = (64, 64),
                  batch_size: int = 32, train_split: float = 0.8,
-                 val_split: float = 0.1, num_workers: int = 0):
+                 val_split: float = 0.1, num_workers: int = 0,
+                 method = 'roi'):
         super().__init__()
         self.json_dir = json_dir
         self.roi_output_size = roi_output_size
+        self.method = method
+
         self.batch_size = batch_size
         self.train_split = train_split
         self.val_split = val_split
@@ -40,7 +43,8 @@ class GraphDataModuleInductive(pl.LightningDataModule):
             try:
                  self.full_dataset = GraphDatasetInductive(
                      json_dir=self.json_dir,
-                     roi_output_size=self.roi_output_size
+                     roi_output_size=self.roi_output_size,
+                     method = self.method
                  )
             except Exception as e:
                  print(f"Error loading dataset from {self.json_dir}: {e}")
