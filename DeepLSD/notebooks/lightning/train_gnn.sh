@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=12:00:00 # total time allocated
+#SBATCH --time=24:00:00 # total time allocated
 #SBATCH --mem-per-cpu=16000 # memory per CPU core in MB
 #SBATCH --output=gnn_job.out # specify a file to direct standard output stream,
 
