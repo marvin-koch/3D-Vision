@@ -6,24 +6,156 @@ HPU available: False, using: 0 HPUs
 wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
 wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
 wandb: Tracking run with wandb version 0.19.9
-wandb: Run data is saved locally in lightning_logs/wandb/run-20250421_210753-mos362dx
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250422_155046-411u5tr7
 wandb: Run `wandb offline` to turn off syncing.
 wandb: Syncing run GAT_Structural_Textural
 wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
-wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/mos362dx
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/411u5tr7
 LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 
   | Name                    | Type              | Params | Mode 
 ----------------------------------------------------------------------
-0 | gat_roi                 | GAT               | 259 K  | train
-1 | gat_DeepLSD             | GAT               | 390 K  | train
-2 | conv_roi_embedding      | Sequential        | 75     | train
+0 | gat_roi                 | GAT               | 86.9 K | train
+1 | gat_DeepLSD             | GAT               | 185 K  | train
+2 | conv_roi_embedding      | Sequential        | 2.9 K  | train
 3 | mlp_textural_structural | Sequential        | 2.1 K  | train
 4 | criterion               | BCEWithLogitsLoss | 0      | train
 ----------------------------------------------------------------------
-651 K     Trainable params
+277 K     Trainable params
 0         Non-trainable params
-651 K     Total params
-2.608     Total estimated model params size (MB)
-72        Modules in train mode
+277 K     Total params
+1.109     Total estimated model params size (MB)
+65        Modules in train mode
 0         Modules in eval mode
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [5.71875..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [5.449707..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [2.7905273..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [17.421152..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [1.1445312..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [54.74292..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [6.2231445..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [27.066406..255.0].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [30.378906..255.0].
+/home/maurdu/3D-Vision/DeepLSD/notebooks/models/dataset_utils.py:286: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [21.543701..155.34888].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [31.554688..173.83789].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [1.9867388..120.17104].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [1.9649293..127.66593].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [22.03125..242.14844].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [24.515625..152.01562].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [2.4091797..106.873146].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [30.898438..194.84113].
+Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [6.527542..137.58916].
+Traceback (most recent call last):
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 188, in <module>
+    main(config_path=args.config)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 152, in main
+    trainer.fit(model, datamodule=data_module)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
+    call._call_and_handle_interrupt(
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1012, in _run
+    results = self._run_stage()
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1054, in _run_stage
+    self._run_sanity_check()
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1083, in _run_sanity_check
+    val_loop.run()
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/utilities.py", line 179, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 145, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 437, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 328, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/strategies/strategy.py", line 412, in validation_step
+    return self.lightning_module.validation_step(*args, **kwargs)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 186, in validation_step
+    loss, node_preds, target_nodes, val_acc = self._common_step(batch, batch_idx)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 156, in _common_step
+    node_logits = self(batch)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 144, in forward
+    h_out_roi = self.gat_roi(roi_conv_output, edge_index)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/models/basic_gnn.py", line 254, in forward
+    x = conv(x, edge_index, edge_attr=edge_attr)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/gatv2_conv.py", line 286, in forward
+    x_l = self.lin_l(x).view(-1, H, C)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/dense/linear.py", line 147, in forward
+    return F.linear(x, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (371x104 and 512x64)
+Traceback (most recent call last):
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 188, in <module>
+    main(config_path=args.config)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 152, in main
+    trainer.fit(model, datamodule=data_module)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
+    call._call_and_handle_interrupt(
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1012, in _run
+    results = self._run_stage()
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1054, in _run_stage
+    self._run_sanity_check()
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1083, in _run_sanity_check
+    val_loop.run()
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/utilities.py", line 179, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 145, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 437, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 328, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/strategies/strategy.py", line 412, in validation_step
+    return self.lightning_module.validation_step(*args, **kwargs)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 186, in validation_step
+    loss, node_preds, target_nodes, val_acc = self._common_step(batch, batch_idx)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 156, in _common_step
+    node_logits = self(batch)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 144, in forward
+    h_out_roi = self.gat_roi(roi_conv_output, edge_index)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/models/basic_gnn.py", line 254, in forward
+    x = conv(x, edge_index, edge_attr=edge_attr)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/gatv2_conv.py", line 286, in forward
+    x_l = self.lin_l(x).view(-1, H, C)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/dense/linear.py", line 147, in forward
+    return F.linear(x, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (371x104 and 512x64)

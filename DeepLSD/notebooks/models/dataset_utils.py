@@ -51,11 +51,11 @@ def sample_lines_grid(
         if not lines:
             # Handle empty list case if necessary, e.g., return empty tensor
             out_shape = (B, 0, C, num_samples, num_width_samples) if batched_input else (0, C, num_samples, num_width_samples)
-            return torch.empty(out_shape, dtype=img.dtype, device=device)
+            return torch.empty(out_shape, dtype=img.dtype)
         # Convert list of tuples to tensor (N, 2, 2)
-        lines_tensor = torch.tensor(lines, dtype=torch.float32, device=device)
+        lines_tensor = torch.tensor(lines, dtype=torch.float32)
     elif isinstance(lines, torch.Tensor):
-        lines_tensor = lines.to(dtype=torch.float32, device=device)
+        lines_tensor = lines.to(dtype=torch.float32)
         if lines_tensor.shape[1:] != (2, 2):
              raise ValueError(f"lines tensor must have shape (N, 2, 2), but got {lines_tensor.shape}")
     else:

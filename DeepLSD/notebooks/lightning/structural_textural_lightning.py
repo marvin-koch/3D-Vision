@@ -59,33 +59,12 @@ class LitGATTexturalStructural(pl.LightningModule):
         # Store hyperparameters using save_hyperparameters
         self.save_hyperparameters()
 
-        # --- Model Architecture ---
-        self.gat_roi = pyg_nn.GAT(
-            in_channels=self.hparams.in_channels,
-            hidden_channels=self.hparams.hidden_channels,
-            out_channels=self.hparams.out_channels,
-            v2=self.hparams.v2,
-            num_layers=self.hparams.num_layers,
-            dropout=self.hparams.dropout,
-            act=self.hparams.act,
-            jk=self.hparams.jk_layer
-        )
-        self.gat_DeepLSD = pyg_nn.GAT(
-            in_channels=self.hparams.in_channels_DeepLSD,
-            hidden_channels=self.hparams.hidden_channels,
-            out_channels=self.hparams.out_channels,
-            v2=self.hparams.v2,
-            num_layers=self.hparams.num_layers,
-            dropout=self.hparams.dropout,
-            act=self.hparams.act,
-            jk=self.hparams.jk_layer
-        )
 
         # Calculate output size of the CNN embedding
         # Assuming input (B, 3, H, W), after Conv(3,2,k=3,s=1,p=1), ReLU, MaxPool(k=2,s=2), Conv(2,1,k=3,s=1,p=1), ReLU, Flatten
         # Output size: (B, 1 * (H/2) * (W/2))
         # Commented out for now, too few parameters
-        channels_conv_roi_embedding = (self.hparams.roi_align_embedding_shape[0] // 4) * (self.hparams.roi_align_embedding_shape[1] // 4) * 8
+        # self.hparams.channels_conv_roi_embedding = (self.hparams.roi_align_embedding_shape[0] // 4) * (self.hparams.roi_align_embedding_shape[1] // 4) * 8
         self.conv_roi_embedding = nn.Sequential(
             # Layer 1: 3 -> 8 channels, k=3, s=1, p=1 (preserves H, W before pooling)
             nn.Conv2d(in_channels=3, out_channels=6, kernel_size=8, stride=1, padding=1),
@@ -104,6 +83,32 @@ class LitGATTexturalStructural(pl.LightningModule):
             nn.Flatten(start_dim=1)
         )
 
+        with torch.no_grad():
+            # make a dummy batch of size 1
+            x = torch.randn(1, 3, *self.hparams.roi_align_embedding_shape)
+            self.hparams.channels_conv_roi_embedding = self.conv_roi_embedding(x).shape[1]
+        
+        # --- Model Architecture ---
+        self.gat_roi = pyg_nn.GAT(
+            in_channels=self.hparams.channels_conv_roi_embedding,
+            hidden_channels=self.hparams.hidden_channels,
+            out_channels=self.hparams.out_channels,
+            v2=self.hparams.v2,
+            num_layers=self.hparams.num_layers,
+            dropout=self.hparams.dropout,
+            act=self.hparams.act,
+            jk=self.hparams.jk_layer
+        )
+        self.gat_DeepLSD = pyg_nn.GAT(
+            in_channels=self.hparams.in_channels_DeepLSD,
+            hidden_channels=self.hparams.hidden_channels,
+            out_channels=self.hparams.out_channels,
+            v2=self.hparams.v2,
+            num_layers=self.hparams.num_layers,
+            dropout=self.hparams.dropout,
+            act=self.hparams.act,
+            jk=self.hparams.jk_layer
+        )
         # self.merge_features = nn.Sequential(
         #     nn.Linear(self.hparams.in_channels_DeepLSD + channels_conv_roi_embedding, self.hparams.in_channels),
         #     nn.Dropout(p=mlp_dropout),
