@@ -56,6 +56,8 @@ coverage.xml
 # VS Code
 .vscode/
 
+.DS_Store
+
 # MyPy
 .mypy_cache/
 .dmypy.json
@@ -71,4 +73,5 @@ cython_debug/
 # Ignore DeepLSD data directory
 /DeepLSD/notebooks/data/
 /DeepLSD/notebooks/json_output/
+/DeepLSD/.DS_Store
 
