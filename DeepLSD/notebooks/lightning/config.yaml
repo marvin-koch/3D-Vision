@@ -19,7 +19,7 @@ model:
   
   hidden_channels: 64           # Number of hidden units in GAT layers
   out_channels: 32                # Output dimension of the GAT layers (input to the final MLP)
-  num_layers: 5                   # Number of GAT layers
+  num_layers: 6                   # Number of GAT layers
   dropout: 0.1                    # Dropout rate within GAT layers
   act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
   v2: true                        # Use GATv2 formulation (set to false for GATv1)
@@ -30,7 +30,7 @@ model:
   # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
 
 training:
-  learning_rate: 0.0005            # Optimizer learning rate
+  learning_rate: 0.001            # Optimizer learning rate
   node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
   threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
   epochs: 200                      # Maximum number of training epochs
