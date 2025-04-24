@@ -6,176 +6,26 @@ HPU available: False, using: 0 HPUs
 wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
 wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
 wandb: Tracking run with wandb version 0.19.9
-wandb: Run data is saved locally in lightning_logs/wandb/run-20250423_134511-zfu46ta8
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250424_115636-dkizsfmy
 wandb: Run `wandb offline` to turn off syncing.
 wandb: Syncing run GAT_Structural_Textural
 wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
-wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/zfu46ta8
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/dkizsfmy
 LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 
   | Name                    | Type              | Params | Mode 
 ----------------------------------------------------------------------
 0 | conv_roi_embedding      | Sequential        | 2.9 K  | train
-1 | gat_roi                 | GAT               | 347 K  | train
-2 | gat_DeepLSD             | GAT               | 489 K  | train
+1 | gat_roi                 | GAT               | 462 K  | train
+2 | gat_DeepLSD             | GAT               | 605 K  | train
 3 | mlp_textural_structural | Sequential        | 2.1 K  | train
 4 | criterion               | BCEWithLogitsLoss | 0      | train
 ----------------------------------------------------------------------
-841 K     Trainable params
+1.1 M     Trainable params
 0         Non-trainable params
-841 K     Total params
-3.367     Total estimated model params size (MB)
-83        Modules in train mode
+1.1 M     Total params
+4.291     Total estimated model params size (MB)
+93        Modules in train mode
 0         Modules in eval mode
-Metric val_auc improved. New best score: 0.581
-Epoch 0, global step 197: 'val_auc' reached 0.58077 (best 0.58077), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=00-val_auc=0.5808.ckpt' as top 1
-Metric val_auc improved by 0.111 >= min_delta = 0.0. New best score: 0.692
-Epoch 1, global step 394: 'val_auc' reached 0.69191 (best 0.69191), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=01-val_auc=0.6919.ckpt' as top 1
-Metric val_auc improved by 0.026 >= min_delta = 0.0. New best score: 0.717
-Epoch 2, global step 591: 'val_auc' reached 0.71742 (best 0.71742), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=02-val_auc=0.7174.ckpt' as top 1
-Metric val_auc improved by 0.015 >= min_delta = 0.0. New best score: 0.732
-Epoch 3, global step 788: 'val_auc' reached 0.73211 (best 0.73211), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=03-val_auc=0.7321.ckpt' as top 1
-Metric val_auc improved by 0.012 >= min_delta = 0.0. New best score: 0.744
-Epoch 4, global step 985: 'val_auc' reached 0.74379 (best 0.74379), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=04-val_auc=0.7438.ckpt' as top 1
-Metric val_auc improved by 0.008 >= min_delta = 0.0. New best score: 0.752
-Epoch 5, global step 1182: 'val_auc' reached 0.75169 (best 0.75169), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=05-val_auc=0.7517.ckpt' as top 1
-Metric val_auc improved by 0.013 >= min_delta = 0.0. New best score: 0.765
-Epoch 6, global step 1379: 'val_auc' reached 0.76453 (best 0.76453), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=06-val_auc=0.7645.ckpt' as top 1
-Metric val_auc improved by 0.009 >= min_delta = 0.0. New best score: 0.773
-Epoch 7, global step 1576: 'val_auc' reached 0.77348 (best 0.77348), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=07-val_auc=0.7735.ckpt' as top 1
-Metric val_auc improved by 0.007 >= min_delta = 0.0. New best score: 0.780
-Epoch 8, global step 1773: 'val_auc' reached 0.78025 (best 0.78025), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=08-val_auc=0.7803.ckpt' as top 1
-Metric val_auc improved by 0.009 >= min_delta = 0.0. New best score: 0.789
-Epoch 9, global step 1970: 'val_auc' reached 0.78879 (best 0.78879), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=09-val_auc=0.7888.ckpt' as top 1
-Metric val_auc improved by 0.011 >= min_delta = 0.0. New best score: 0.800
-Epoch 10, global step 2167: 'val_auc' reached 0.79980 (best 0.79980), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=10-val_auc=0.7998.ckpt' as top 1
-Epoch 11, global step 2364: 'val_auc' was not in top 1
-Metric val_auc improved by 0.002 >= min_delta = 0.0. New best score: 0.801
-Epoch 12, global step 2561: 'val_auc' reached 0.80137 (best 0.80137), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=12-val_auc=0.8014.ckpt' as top 1
-Metric val_auc improved by 0.005 >= min_delta = 0.0. New best score: 0.806
-Epoch 13, global step 2758: 'val_auc' reached 0.80592 (best 0.80592), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=13-val_auc=0.8059.ckpt' as top 1
-Epoch 14, global step 2955: 'val_auc' was not in top 1
-Epoch 15, global step 3152: 'val_auc' was not in top 1
-Metric val_auc improved by 0.002 >= min_delta = 0.0. New best score: 0.808
-Epoch 16, global step 3349: 'val_auc' reached 0.80781 (best 0.80781), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=16-val_auc=0.8078.ckpt' as top 1
-Metric val_auc improved by 0.005 >= min_delta = 0.0. New best score: 0.813
-Epoch 17, global step 3546: 'val_auc' reached 0.81329 (best 0.81329), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=17-val_auc=0.8133.ckpt' as top 1
-Epoch 18, global step 3743: 'val_auc' was not in top 1
-Metric val_auc improved by 0.004 >= min_delta = 0.0. New best score: 0.817
-Epoch 19, global step 3940: 'val_auc' reached 0.81724 (best 0.81724), saving model to 'lightning_logs/lightning_project/zfu46ta8/checkpoints/best-model-epoch=19-val_auc=0.8172.ckpt' as top 1
-Epoch 20, global step 4137: 'val_auc' was not in top 1
-Epoch 21, global step 4334: 'val_auc' was not in top 1
-Epoch 22, global step 4531: 'val_auc' was not in top 1
-Epoch 23, global step 4728: 'val_auc' was not in top 1
-Epoch 24, global step 4925: 'val_auc' was not in top 1
-ERROR:root:Image file not found: /work/scratch/maurdu/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0012.color.jpg
-Traceback (most recent call last):
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 188, in <module>
-    main(config_path=args.config)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 152, in main
-    trainer.fit(model, datamodule=data_module)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
-    call._call_and_handle_interrupt(
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
-    self._run(model, ckpt_path=ckpt_path)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1012, in _run
-    results = self._run_stage()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1056, in _run_stage
-    self.fit_loop.run()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fit_loop.py", line 216, in run
-    self.advance()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fit_loop.py", line 455, in advance
-    self.epoch_loop.run(self._data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/training_epoch_loop.py", line 150, in run
-    self.advance(data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/training_epoch_loop.py", line 282, in advance
-    batch, _, __ = next(data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 134, in __next__
-    batch = super().__next__()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 61, in __next__
-    batch = next(self.iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 341, in __next__
-    out = next(self._iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 78, in __next__
-    out[i] = next(self.iterators[i])
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 708, in __next__
-    data = self._next_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1480, in _next_data
-    return self._process_data(data)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1505, in _process_data
-    data.reraise()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/_utils.py", line 733, in reraise
-    raise exception
-RuntimeError: Caught RuntimeError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/_utils/worker.py", line 349, in _worker_loop
-    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/_utils/fetch.py", line 50, in fetch
-    data = self.dataset.__getitems__(possibly_batched_index)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataset.py", line 420, in __getitems__
-    return [self.dataset[self.indices[idx]] for idx in indices]
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataset.py", line 420, in <listcomp>
-    return [self.dataset[self.indices[idx]] for idx in indices]
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py", line 90, in __getitem__
-    roi_features = get_line_feature(
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py", line 37, in get_line_feature
-    img = torch.tensor(img).div(255.0).permute(2, 0, 1)
-RuntimeError: Could not infer dtype of NoneType
-
-Traceback (most recent call last):
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 188, in <module>
-    main(config_path=args.config)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 152, in main
-    trainer.fit(model, datamodule=data_module)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
-    call._call_and_handle_interrupt(
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
-    self._run(model, ckpt_path=ckpt_path)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1012, in _run
-    results = self._run_stage()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1056, in _run_stage
-    self.fit_loop.run()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fit_loop.py", line 216, in run
-    self.advance()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fit_loop.py", line 455, in advance
-    self.epoch_loop.run(self._data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/training_epoch_loop.py", line 150, in run
-    self.advance(data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/training_epoch_loop.py", line 282, in advance
-    batch, _, __ = next(data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 134, in __next__
-    batch = super().__next__()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 61, in __next__
-    batch = next(self.iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 341, in __next__
-    out = next(self._iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 78, in __next__
-    out[i] = next(self.iterators[i])
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 708, in __next__
-    data = self._next_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1480, in _next_data
-    return self._process_data(data)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1505, in _process_data
-    data.reraise()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/_utils.py", line 733, in reraise
-    raise exception
-RuntimeError: Caught RuntimeError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/_utils/worker.py", line 349, in _worker_loop
-    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/_utils/fetch.py", line 50, in fetch
-    data = self.dataset.__getitems__(possibly_batched_index)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataset.py", line 420, in __getitems__
-    return [self.dataset[self.indices[idx]] for idx in indices]
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataset.py", line 420, in <listcomp>
-    return [self.dataset[self.indices[idx]] for idx in indices]
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py", line 90, in __getitem__
-    roi_features = get_line_feature(
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py", line 37, in get_line_feature
-    img = torch.tensor(img).div(255.0).permute(2, 0, 1)
-RuntimeError: Could not infer dtype of NoneType
-
+Metric val_auc improved. New best score: 0.623
+Epoch 0, global step 236: 'val_auc' reached 0.62310 (best 0.62310), saving model to 'lightning_logs/lightning_project/dkizsfmy/checkpoints/best-model-epoch=00-val_auc=0.6231.ckpt' as top 1

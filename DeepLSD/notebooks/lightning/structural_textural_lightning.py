@@ -239,8 +239,8 @@ class LitGATTexturalStructural(pl.LightningModule):
         else:
             val_recall = 0.0 # Or NaN, depending on desired behavior
 
-        self.log('val_acc_epoch', val_acc_epoch, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_recall', val_recall, on_epoch=True, prog_bar=True, logger=True)
+        self.log('val_acc_epoch', val_acc_epoch, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_recall', val_recall, on_epoch=True, prog_bar=False, logger=True)
 
         self.validation_step_outputs.clear() # Free memory
 
