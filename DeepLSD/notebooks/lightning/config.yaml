@@ -6,7 +6,7 @@ data:
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 1                 # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 8                # Gradient accumulation
+  accum_grads: 32                # Gradient accumulation
   method: 'sample'
 
 model:
@@ -30,16 +30,15 @@ model:
   # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
 
 training:
-  learning_rate: 0.003            # Optimizer learning rate
+  learning_rate: 0.0005            # Optimizer learning rate
   node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
   threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
   epochs: 200                      # Maximum number of training epochs
   accelerator: 'auto'             # Hardware accelerator ('cpu', 'gpu', 'tpu', 'mps', 'auto')
   devices: 'auto'                 # Devices to use ('auto', 1 for 1 GPU, [0, 1] for GPUs 0 and 1, etc.)
   log_dir: "lightning_logs"       # Base directory for saving logs and checkpoints
-  experiment_name: "gat_yaml_config" # Subdirectory name for this specific run
-  early_stopping_patience: 50      # Number of epochs with no improvement in monitored metric before stopping
+  experiment_name: "GAT_Structural_Textural" # Subdirectory name for this specific run
+  early_stopping_patience: 25      # Number of epochs with no improvement in monitored metric before stopping
   monitor_metric: 'val_auc'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
   monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
   seed: 42                        # Random seed for reproducibility
-  experiment_name: "GAT_Structural_Textural"

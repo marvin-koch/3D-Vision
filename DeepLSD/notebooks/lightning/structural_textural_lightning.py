@@ -232,14 +232,14 @@ class LitGATTexturalStructural(pl.LightningModule):
 
         # Calculate and log Accuracy and Recall at the specified threshold
         pred_binary = (all_preds >= self.hparams.threshold_structural).astype(int)
-        val_acc = accuracy_score(all_labels, pred_binary)
+        val_acc_epoch = accuracy_score(all_labels, pred_binary)
         # Handle potential division by zero in recall if no positive labels exist
         if np.sum(all_labels) > 0:
             val_recall = recall_score(all_labels, pred_binary, zero_division=0)
         else:
             val_recall = 0.0 # Or NaN, depending on desired behavior
 
-        self.log('val_acc', val_acc, on_epoch=True, prog_bar=True, logger=True)
+        self.log('val_acc_epoch', val_acc_epoch, on_epoch=True, prog_bar=True, logger=True)
         self.log('val_recall', val_recall, on_epoch=True, prog_bar=True, logger=True)
 
         self.validation_step_outputs.clear() # Free memory
