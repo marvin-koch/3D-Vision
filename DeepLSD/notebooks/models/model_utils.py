@@ -293,3 +293,5 @@ def run_inference(model, data_loader, model_path='model.pth',
             all_edge_preds.append(edge_labels.cpu())
 
     return all_node_preds, all_edge_preds
+
+

@@ -1,0 +1,46 @@
+data:
+  json_dir: '../json_output/'      # Path to the directory containing graph JSON files
+  roi_output_size: [96, 16]       # Output size (height, width) for ROI Align features
+  batch_size: 1                   # Number of graphs per batch
+  train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
+  val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
+  # test_split is implicitly 1.0 - train_split - val_split
+  num_workers: 1                 # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
+  accum_grads: 8                # Gradient accumulation
+  method: 'sample'
+
+model:
+  # Input dimensions
+  in_channels_DeepLSD: 1280       # Dimension of the initial DeepLSD embedding feature per node
+  # CNN output channels_conv_roi_embedding = (roi_output_size[0]//2 * roi_output_size[1]//2) -> calculated internally
+  in_channels: null               # Dimension expected by the roi_GAT
+
+  # GAT layer parameters
+  
+  hidden_channels: 64           # Number of hidden units in GAT layers
+  out_channels: 32                # Output dimension of the GAT layers (input to the final MLP)
+  num_layers: 5                   # Number of GAT layers
+  dropout: 0.1                    # Dropout rate within GAT layers
+  act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
+  v2: true                        # Use GATv2 formulation (set to false for GATv1)
+  jk_layer: 'lstm'                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
+
+  # MLP Drop-outs
+  mlp_dropout: 0.1
+  # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
+
+training:
+  learning_rate: 0.003            # Optimizer learning rate
+  node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
+
+  threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
+  epochs: 200                      # Maximum number of training epochs
+  accelerator: 'auto'             # Hardware accelerator ('cpu', 'gpu', 'tpu', 'mps', 'auto')
+  devices: 'auto'                 # Devices to use ('auto', 1 for 1 GPU, [0, 1] for GPUs 0 and 1, etc.)
+  log_dir: "lightning_logs"       # Base directory for saving logs and checkpoints
+  experiment_name: "gat_yaml_config" # Subdirectory name for this specific run
+  early_stopping_patience: 50      # Number of epochs with no improvement in monitored metric before stopping
+  monitor_metric: 'val_auc'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
+  monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
+  seed: 42                        # Random seed for reproducibility
+  experiment_name: "GAT_Structural_Textural"

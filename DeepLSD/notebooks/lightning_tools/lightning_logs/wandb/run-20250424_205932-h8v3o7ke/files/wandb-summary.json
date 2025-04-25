@@ -1,0 +1,1 @@
+{"_runtime":62.395762,"_wandb":{"runtime":64},"_step":12,"test_node_loss":0.35845252871513367,"test_edge_loss":0.2488739937543869,"test_loss":0.6073265075683594,"trainer/global_step":12,"_timestamp":1.7455212351592572e+09}
