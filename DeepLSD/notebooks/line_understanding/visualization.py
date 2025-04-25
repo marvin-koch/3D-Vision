@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import random
+import numpy as np
+
 def plot_images(images, titles, cmaps=None):
     num = len(images)
     plt.figure(figsize=(15, 5))
@@ -61,3 +63,36 @@ def plot_coplanar_lines(ax, lines, labels, image):
 
     ax.set_title("Coplanar Lines")
     ax.axis('off')
+    
+    
+def visualize_plane_clusters(labels_2d, title):
+    """
+    Visualize plane cluster labels as a color-coded image.
+    labels_2d: (H, W) integer labels.
+    """
+    plt.figure()
+    unique_labels = np.unique(labels_2d)
+    num_labels = len(unique_labels)
+
+    # Generate random colors for each cluster
+    # shape (num_labels, 3)
+    colors = np.random.rand(num_labels, 3)
+
+    # Build color image
+    H, W = labels_2d.shape
+    color_img = np.zeros((H, W, 3), dtype=np.float32)
+    for i, label in enumerate(unique_labels):
+        color_img[labels_2d == label] = colors[i]
+
+    plt.imshow(color_img)
+    plt.title(f"Plane Clusters  {title}")
+    plt.axis("off")
+    plt.show()
+    
+def color_map(label_map, num_labels):
+    cols = np.random.randint(0,255,(num_labels,3),np.uint8)
+    im = cols[label_map]
+    im[label_map==0] = 0
+    return im
+
+ 

@@ -28,7 +28,7 @@ class GATClassifierCombined(torch.nn.Module):
             nn.Linear(out_channels, 1)
         )
         
-        self.sigmoid = nn.Sigmoid()
+
 
     def forward(self, x, edge_index):
 

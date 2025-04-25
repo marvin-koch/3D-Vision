@@ -3,7 +3,7 @@ import os
 import torch
 from deeplsd.models.deeplsd_inference import DeepLSD
 
-from ground_truth.main_process import process_image
+from line_understanding.pipeline import process_image
 
 if __name__ == "__main__":
 
@@ -11,18 +11,20 @@ if __name__ == "__main__":
     frames = [f"{i:04d}" for i in range(1, 100)]
     
     desired_images = [
-        #  "ai_001_001",
-        #  "ai_001_002",
-        #  "ai_001_003",
-        #  "ai_001_004",
-        #  "ai_001_005",
-         "ai_001_006",
-         "ai_001_007",
+        "ai_001_001",
+    #     "ai_001_002",
+    #     "ai_001_003",
+    #     "ai_001_004",
+        "ai_001_005",
+        "ai_001_006",
+        "ai_001_007",
         # "ai_001_008",
         # "ai_001_009",
         # "ai_001_010",
         # "ai_002_001",
     ]
+    
+    base_dir = "data"
     
     print("Generate Images")
     
@@ -44,12 +46,10 @@ if __name__ == "__main__":
             if not os.path.isfile(required_file):
                 print(f"Skipping: {os.path.join(required_file, )} does not exist.")
                 continue
-            composite_after, pred_lines, img, normals, world_coordinates, valid_mask, line_info, scores, isstruct, original_lines = process_image(
-                image_dir, image_id, frame_str, net, device,
-                depth_thresh=50, normal_thresh=1.5 * 1e7,
-                dataset="hypersim",
-                #moge_model = moge,
-                file_path = required_file,
+            process_image(
+                base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                thresh_normal=8.2e13, thresh_depth=0.2, dataset="hypersim", plot=True, file_path = required_file,
             )
+          
             
     print("Finished processing.")
