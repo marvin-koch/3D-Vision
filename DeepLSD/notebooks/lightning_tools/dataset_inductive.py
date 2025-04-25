@@ -8,6 +8,7 @@ import cv2
 from torch_geometric.data import Data, Dataset
 # from notebooks.models.dataset_utils import extract_line_feature_ROIAlign,sample_lines_grid
 from sklearn.neighbors import NearestNeighbors
+import torch.nn.functional as F
 
 from typing import Optional
 import logging
@@ -29,7 +30,21 @@ def _load_image(filepath: str, color_conversion: Optional[int] = None) -> Option
         logging.error(f"Error loading image {filepath}: {e}")
         return None
 
-
+ # -------------------------------------------
+    # utils/geo_features.py
+    # -------------------------------------------
+def line_geometry(line_pts: torch.Tensor):
+    """
+    line_pts : [N, 2, 2]  (x1,y1,x2,y2 per line)
+    returns   :  ϕ_node   [N, 5]
+    [mid_x, mid_y, dir_x, dir_y, length]
+    """
+    p1, p2   = line_pts[:, 0], line_pts[:, 1]           # [N,2]  [N,2]
+    mid      = 0.5 * (p1 + p2)                          # [N,2]
+    vec      = p2 - p1
+    length   = vec.norm(dim=1, keepdim=True)            # [N,1]
+    dir_norm = F.normalize(vec, dim=1)                  # [N,2]
+    return torch.cat([mid, dir_norm, length], dim=1)    # [N,5]
 
 import os, json, logging
 import numpy as np
@@ -72,7 +87,7 @@ class GraphDatasetInductive(Dataset):
             self.sampler = LineSampler(
                 num_samples=num_samples,
                 width=width
-            ).to(self.device)
+            )
 
     def __len__(self):
         return len(self.filter_json_files)
@@ -97,6 +112,7 @@ class GraphDatasetInductive(Dataset):
             labels.append(ln.get('struct_score', 0.5))
             line_coords.append(ln.get('coordinates'))
         x_emb = torch.tensor(np.vstack(feats), dtype=torch.float)
+        coords = torch.tensor(line_coords, dtype=torch.float)
         y     = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
         N     = x_emb.size(0)
 
@@ -174,6 +190,8 @@ class GraphDatasetInductive(Dataset):
         return Data(
             x=x_emb,
             y=y,
+            coordinates=coords,
+            geo=line_geometry(coords),
             edge_index=edge_index,
             edge_labels=edge_labels,
             full_edge_index=full_edge_index,

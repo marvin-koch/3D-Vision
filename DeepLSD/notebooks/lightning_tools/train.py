@@ -60,11 +60,12 @@ def main(config_path: str):
     if isinstance(jk_layer_val, str) and jk_layer_val.lower() == 'null':
         jk_layer_val = None
 
-    model = AttentionBoth(
+    model = AttentionBothCoplanar(
         in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
         in_channels=cfg_model.get('in_channels', 1024),
         hidden_channels=cfg_model.get('hidden_channels', 128),
         out_channels=cfg_model.get('out_channels', 64),
+        geom_channels=cfg_model.get('geom_channels', 5),
         roi_align_embedding_shape=roi_output_size_tuple,
         num_layers=cfg_model.get('num_layers', 3),
         dropout=cfg_model.get('dropout', 0.2),
@@ -151,7 +152,7 @@ def main(config_path: str):
 
     # --- Training ---
     print("\n--- Starting Training ---")
-    trainer.fit(model, datamodule=data_module, ckpt_path="lightning_logs/lightning_project/typolhi0/checkpoints/best-model-epoch=19-val_loss_epoch=0.6761.ckpt")
+    trainer.fit(model, datamodule=data_module, ckpt_path="lightning_logs/lightning_project/euvl4yo4/checkpoints/best-model-epoch=19-val_loss_epoch=0.8419.ckpt")
     print("--- Training Finished ---")
     print(f"Best model saved at: {checkpoint_callback.best_model_path}")
 
