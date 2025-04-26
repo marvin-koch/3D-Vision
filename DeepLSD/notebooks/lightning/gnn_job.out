@@ -1,0 +1,12 @@
+Loading configuration from: config.yaml
+Configuration loaded successfully:
+Setting up DataModule...
+Using following method to extract features: sample
+Initializing Model...
+Info: Accelerator resolved to gpu. Using devices='auto'.
+Initializing Trainer...
+
+--- Starting Training ---
+Dataset split: Train=472, Val=59, Test=60
+Sanity Checking: |          | 0/? [00:00<?, ?it/s]Sanity Checking:   0%|          | 0/2 [00:00<?, ?it/s]Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00<?, ?it/s][1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mGAT_Structural_Textural[0m at: [34mhttps://wandb.ai/sup-res-dl/lightning_project/runs/cey5vdxu[0m

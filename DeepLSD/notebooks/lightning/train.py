@@ -51,7 +51,8 @@ def main(config_path: str):
         train_split=cfg_data.get('train_split', 0.8),
         val_split=cfg_data.get('val_split', 0.1),
         num_workers=num_workers,
-        method = cfg_data.get('method', 'roi')
+        method = cfg_data.get('method', 'roi'),
+        edge_output_size= cfg_data.get('edge_output_size', (32,8)),
     )
 
     # --- Model ---

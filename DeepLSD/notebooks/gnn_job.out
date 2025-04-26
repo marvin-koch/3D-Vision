@@ -1,0 +1,1102 @@
+Will download and process 100 images
+Starting to Download Images.
+Finished Dowloading Images. Starting the ground truth generation.
+['ai_001_001', 'ai_001_002']
+Processing scene 1 out of 2
+Processing image 1 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0000.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0000.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0000.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0000.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 424 lines; 155 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 2 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0001.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0001.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0001.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0001.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 413 lines; 157 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 3 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0002.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0002.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0002.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0002.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 164 lines; 58 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 4 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0003.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0003.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0003.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0003.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 314 lines; 130 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 5 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0004.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0004.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0004.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0004.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 287 lines; 105 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 6 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0005.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0005.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0005.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0005.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 171 lines; 23 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 7 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0006.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0006.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0006.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0006.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 233 lines; 119 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 8 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0007.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0007.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0007.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0007.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 180 lines; 73 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 9 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0008.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0008.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0008.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0008.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 380 lines; 158 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 10 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0009.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0009.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0009.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0009.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 391 lines; 173 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 11 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0010.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0010.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0010.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0010.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 365 lines; 161 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 12 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0011.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0011.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0011.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0011.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 341 lines; 134 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 13 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0012.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0012.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0012.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0012.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 336 lines; 141 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 14 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0013.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0013.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0013.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0013.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 248 lines; 101 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 15 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0014.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0014.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0014.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0014.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 288 lines; 120 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 16 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0015.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0015.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0015.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0015.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 288 lines; 123 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 17 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0016.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0016.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0016.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0016.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 326 lines; 99 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 18 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0017.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0017.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0017.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0017.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 396 lines; 148 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 19 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0018.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0018.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0018.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0018.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 451 lines; 172 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 20 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0019.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0019.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0019.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0019.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 342 lines; 116 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 21 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0020.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0020.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0020.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0020.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 327 lines; 110 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 22 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0021.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0021.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0021.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0021.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 273 lines; 89 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 23 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0022.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0022.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0022.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0022.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 197 lines; 55 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 24 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0023.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0023.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0023.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0023.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 230 lines; 106 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 25 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0024.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0024.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0024.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0024.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 149 lines; 45 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 26 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0025.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0025.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0025.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0025.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 306 lines; 166 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 27 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0026.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0026.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0026.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0026.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 320 lines; 90 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 28 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0027.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0027.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0027.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0027.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 425 lines; 182 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 29 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0028.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0028.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0028.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0028.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 323 lines; 104 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 30 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0029.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0029.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0029.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0029.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 410 lines; 156 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 31 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0030.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0030.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0030.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0030.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 274 lines; 147 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 32 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0031.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0031.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0031.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0031.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 346 lines; 147 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 33 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0032.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0032.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0032.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0032.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 358 lines; 166 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 34 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0033.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0033.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0033.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0033.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 245 lines; 114 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 35 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0034.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0034.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0034.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0034.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 263 lines; 94 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 36 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0035.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0035.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0035.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0035.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 170 lines; 44 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 37 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0036.color.jpg
+Color image not found in /work/scratch/maurdu/data/ai_001_001 with camera view scene_cam_00_final_preview
+Loaded image is None.
+Skipping image ai_001_001 due to missing data.
+Image 0036 is None. Skipping.
+Processing image 38 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0037.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0037.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0037.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0037.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 309 lines; 109 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 39 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0038.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0038.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0038.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0038.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 261 lines; 101 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 40 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0039.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0039.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0039.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0039.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 413 lines; 169 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 41 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0040.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0040.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0040.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0040.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 103 lines; 47 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 42 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0041.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0041.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0041.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0041.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 134 lines; 72 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 43 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0042.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0042.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0042.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0042.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 254 lines; 99 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 44 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0043.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0043.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0043.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0043.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 283 lines; 107 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 45 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0044.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0044.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0044.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0044.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 229 lines; 124 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 46 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0045.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0045.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0045.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0045.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 273 lines; 102 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 47 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0046.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0046.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0046.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0046.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 404 lines; 151 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 48 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0047.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0047.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0047.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0047.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 318 lines; 100 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 49 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0048.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0048.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0048.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0048.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 160 lines; 68 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 50 out of 50 of scene 1/2
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_final_preview/frame.0049.color.jpg
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0049.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0049.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_001/ai_001_001/images/scene_cam_00_geometry_hdf5/frame.0049.position.hdf5
+[Neighborhood Method] ai_001_001: Detected 222 lines; 115 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing scene 2 out of 2
+Processing image 1 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0000.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0000.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0000.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0000.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 241 lines; 139 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 2 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0001.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0001.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0001.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0001.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 152 lines; 106 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 3 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0002.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0002.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0002.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0002.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 185 lines; 121 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 4 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0003.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0003.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0003.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0003.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 212 lines; 123 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 5 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0004.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0004.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0004.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0004.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 117 lines; 58 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 6 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0005.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0005.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0005.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0005.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 160 lines; 109 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 7 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0006.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0006.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0006.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0006.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 104 lines; 68 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 8 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0007.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0007.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0007.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0007.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 249 lines; 124 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 9 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0008.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0008.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0008.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0008.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 139 lines; 83 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 10 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0009.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0009.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0009.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0009.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 136 lines; 101 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 11 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0010.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0010.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0010.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0010.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 182 lines; 122 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 12 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0011.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0011.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0011.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0011.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 42 lines; 31 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 13 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0012.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0012.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0012.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0012.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 83 lines; 54 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 14 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0013.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0013.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0013.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0013.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 78 lines; 47 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 15 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0014.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0014.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0014.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0014.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 26 lines; 17 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 16 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0015.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0015.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0015.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0015.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 70 lines; 55 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 17 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0016.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0016.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0016.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0016.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 120 lines; 67 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 18 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0017.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0017.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0017.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0017.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 149 lines; 117 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 19 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0018.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0018.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0018.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0018.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 240 lines; 112 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 20 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0019.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0019.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0019.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0019.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 126 lines; 89 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 21 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0020.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0020.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0020.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0020.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 135 lines; 109 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 22 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0021.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0021.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0021.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0021.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 190 lines; 121 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 23 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0022.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0022.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0022.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0022.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 195 lines; 132 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 24 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0023.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0023.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0023.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0023.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 82 lines; 54 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 25 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0024.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0024.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0024.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0024.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 90 lines; 65 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 26 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0025.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0025.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0025.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0025.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 105 lines; 76 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 27 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0026.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0026.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0026.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0026.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 107 lines; 78 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 28 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0027.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0027.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0027.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0027.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 129 lines; 79 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 29 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0028.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0028.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0028.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0028.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 152 lines; 49 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 30 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0029.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0029.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0029.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0029.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 112 lines; 75 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 31 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0030.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0030.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0030.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0030.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 168 lines; 88 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 32 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0031.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0031.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0031.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0031.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 274 lines; 125 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 33 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0032.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0032.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0032.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0032.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 232 lines; 137 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 34 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0033.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0033.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0033.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0033.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 218 lines; 138 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 35 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0034.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0034.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0034.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0034.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 189 lines; 121 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 36 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0035.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0035.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0035.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0035.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 195 lines; 125 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 37 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0036.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0036.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0036.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0036.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 185 lines; 122 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 38 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0037.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0037.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0037.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0037.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 135 lines; 98 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 39 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0038.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0038.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0038.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0038.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 205 lines; 139 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 40 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0039.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0039.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0039.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0039.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 169 lines; 115 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 41 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0040.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0040.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0040.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0040.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 178 lines; 116 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 42 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0041.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0041.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0041.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0041.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 116 lines; 83 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 43 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0042.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0042.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0042.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0042.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 208 lines; 125 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 44 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0043.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0043.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0043.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0043.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 144 lines; 117 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 45 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0044.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0044.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0044.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0044.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 52 lines; 39 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 46 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0045.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0045.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0045.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0045.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 145 lines; 107 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 47 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0046.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0046.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0046.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0046.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 111 lines; 90 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 48 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0047.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0047.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0047.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0047.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 117 lines; 90 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 49 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0048.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0048.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0048.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0048.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 141 lines; 90 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Processing image 50 out of 50 of scene 2/2
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_final_preview/frame.0049.color.jpg
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0049.normal_world.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0049.depth_meters.hdf5
+/work/scratch/maurdu/data/ai_001_002/ai_001_002/images/scene_cam_00_geometry_hdf5/frame.0049.position.hdf5
+[Neighborhood Method] ai_001_002: Detected 33 lines; 23 structural.
+World_coordinates 768 1024
+start hdbscan
+start dilation
+Extracting Features from images:   0%|          | 0/99 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/424 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/413 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/164 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/314 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/287 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/171 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/233 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/180 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/380 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/391 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/365 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/341 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/336 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/248 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/288 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/288 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/326 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/396 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/451 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/342 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/327 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/273 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/197 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/230 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/149 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/306 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/320 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/425 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/323 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/410 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/274 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/346 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/358 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/245 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/263 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/170 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/309 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/261 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/413 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/103 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/134 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/254 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/283 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/229 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/273 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/404 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/318 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/160 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/222 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/241 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/152 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/185 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/212 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/117 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/160 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/104 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/249 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/139 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/136 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/182 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/42 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/83 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/78 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/26 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/70 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/120 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/149 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/240 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/126 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/135 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/190 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/195 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/82 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/90 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/105 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/107 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/129 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/152 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/112 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/168 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/274 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/232 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/218 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/189 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/195 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/185 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/135 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/205 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/169 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/178 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/116 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/208 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/144 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/52 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/145 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/111 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/117 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/141 [00:00<?, ?it/s]
+
+Applying ROI_Align for line:   0%|          | 0/33 [00:00<?, ?it/s]

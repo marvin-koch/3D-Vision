@@ -1,6 +1,7 @@
 data:
   json_dir: './json_output/'      # Path to the directory containing graph JSON files
   roi_output_size: [96, 16]       # Output size (height, width) for ROI Align features
+  edge_output_size: [32,8]
   batch_size: 1                   # Number of graphs per batch
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
@@ -19,7 +20,7 @@ model:
   
   hidden_channels: 64           # Number of hidden units in GAT layers
   out_channels: 32                # Output dimension of the GAT layers (input to the final MLP)
-  num_layers: 6                   # Number of GAT layers
+  num_layers: 4                   # Number of GAT layers
   dropout: 0.1                    # Dropout rate within GAT layers
   act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
   v2: true                        # Use GATv2 formulation (set to false for GATv1)

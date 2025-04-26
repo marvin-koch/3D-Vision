@@ -143,12 +143,12 @@ class LitGATTexturalStructural(pl.LightningModule):
         x = batch.x
         roi_features = batch.roi_features
         edge_index = batch.edge_index
-
-        
+        edge_index_full = batch.edge_index_full
+        edge_attr = batch.edge_attr
         roi_conv_output = self.conv_roi_embedding(roi_features)
-        h_out_roi = self.gat_roi(roi_conv_output, edge_index)
+        h_out_roi = self.gat_roi(roi_conv_output, edge_index_full, edge_attr=edge_attr)
         
-        h_out_DeepLSD = self.gat_DeepLSD(x, edge_index)
+        h_out_DeepLSD = self.gat_DeepLSD(x, edge_index, edge_attr=edge_attr)
         combined_features = torch.cat([h_out_roi, h_out_DeepLSD], dim=1)
 
         # Node-level predictions (logits)
