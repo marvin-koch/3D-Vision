@@ -152,7 +152,7 @@ def main(config_path: str):
 
     # --- Training ---
     print("\n--- Starting Training ---")
-    trainer.fit(model, datamodule=data_module, ckpt_path="lightning_logs/lightning_project/euvl4yo4/checkpoints/best-model-epoch=19-val_loss_epoch=0.8419.ckpt")
+    trainer.fit(model, datamodule=data_module)
     print("--- Training Finished ---")
     print(f"Best model saved at: {checkpoint_callback.best_model_path}")
 

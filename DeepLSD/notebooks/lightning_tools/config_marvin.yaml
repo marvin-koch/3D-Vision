@@ -41,11 +41,11 @@ training:
   devices: 'auto'                 # Devices to use ('auto', 1 for 1 GPU, [0, 1] for GPUs 0 and 1, etc.)
   log_dir: "lightning_logs"       # Base directory for saving logs and checkpoints
   experiment_name: "gat_yaml_config" # Subdirectory name for this specific run
-  early_stopping_patience: 50      # Number of epochs with no improvement in monitored metric before stopping
-  monitor_metric: 'val_edge_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
+  early_stopping_patience: 20      # Number of epochs with no improvement in monitored metric before stopping
+  monitor_metric: 'val_combined_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
   monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
   seed: 42                        # Random seed for reproducibility
-  experiment_name: "Attention_Both_coplanar"
+  experiment_name: "Attention_Both_coplanar_reg"
 
 
 

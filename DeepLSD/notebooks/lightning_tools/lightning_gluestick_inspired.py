@@ -557,6 +557,10 @@ class AttentionBoth(pl.LightningModule):
         # Containers for metrics
         self.validation_step_outputs = []
         self.test_step_outputs = []
+        
+        self.log_sigma_node = nn.Parameter(torch.zeros(()))
+        self.log_sigma_edge = nn.Parameter(torch.zeros(()))
+
 
     def forward(self, batch):
         x, edge_index, batch_idx = batch.x, batch.edge_index, batch.batch
@@ -848,7 +852,9 @@ class AttentionBothCoplanar(pl.LightningModule):
         # Containers for metrics
         self.validation_step_outputs = []
         self.test_step_outputs = []
-   
+        
+        self.log_sigma_node = nn.Parameter(torch.zeros(()))
+        self.log_sigma_edge = nn.Parameter(torch.zeros(()))
 
     def forward(self, batch):
         
@@ -876,6 +882,8 @@ class AttentionBothCoplanar(pl.LightningModule):
 
         # Collapse to node features
         features = desc.transpose(1,2)[mask]
+        
+        features = F.dropout(features, p=self.hparams.mlp_dropout, training=self.training)
 
         # Node logits
         node_logits = self.mlp_textural_structural(features)
@@ -929,7 +937,14 @@ class AttentionBothCoplanar(pl.LightningModule):
         sampled_edge_labels = edge_labels_flat[keep_e]
         edge_loss = self.criterion(sampled_edge_logits, sampled_edge_labels)
         # combined
-        loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
+        
+      
+        loss = (node_loss * torch.exp(-2*self.log_sigma_node) +
+                edge_loss * torch.exp(-2*self.log_sigma_edge) +
+                self.log_sigma_node + self.log_sigma_edge) * 0.5
+
+        # loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
+        
         # metrics
         with torch.no_grad():
             n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int()
@@ -1003,7 +1018,8 @@ class AttentionBothCoplanar(pl.LightningModule):
         self.log('val_edge_acc_epoch', edge_acc, on_epoch=True, prog_bar=False, logger=True)
         self.log('val_edge_recall_epoch', edge_recall, on_epoch=True, prog_bar=False, logger=True)
         self.log('val_edge_auc_epoch', edge_auc, on_epoch=True, prog_bar=False, logger=True)
-
+        combined_auc = 0.5 * (edge_auc + node_auc)
+        self.log('val_combined_auc_epoch', combined_auc, on_epoch=True, prog_bar=False, logger=True)
         self.validation_step_outputs.clear()
 
     def test_step(self, batch: Batch, batch_idx: int):
