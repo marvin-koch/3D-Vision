@@ -89,19 +89,19 @@ class GraphDatasetInductive(Dataset):
         edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
         edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)
 
-        # # fully connected graph + coplanarity labels
-        # edge_list, edge_labels = [], []
-        # for i in range(N):
-        #     for j in range(N):
-        #         edge_labels.append(coplanarity_matrix[i][j])
-        #         # if i == j: continue
-        #         edge_list.append([i, j])
+        # fully connected graph  + edge attributes
+        edge_list_full, edge_attr = [], [], []
+        for i in range(N):
+            for j in range(N):
+                if i == j: continue
+                edge_list_full.append([i, j])
+                edge_attr
 
-        # edge_index  = torch.tensor(edge_list,  dtype=torch.long).t().contiguous()
-        # edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)
+        edge_index  = torch.tensor(edge_list,  dtype=torch.long).t().contiguous()
+        edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)
 
         # Create Data object, storing roi_features as a separate attribute
-        data_object = Data(x=x_emb, y=y, edge_index=edge_index, edge_labels=edge_labels, roi_features=roi_features)
+        data_object = Data(x=x_emb, y=y, edge_index=edge_index, edge_labels=edge_labels, roi_features=roi_features, edge_list_full=edge_list_full)
 
         return data_object
     

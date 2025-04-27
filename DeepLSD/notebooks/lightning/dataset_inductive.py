@@ -125,11 +125,11 @@ import cv2
 import torch
 from torch.utils.data import Dataset
 from torch_geometric.data import Data
-from line_sampler import LineSampler  # <-- your LightningModule
-from line_sampler import extract_line_feature_ROIAlign
-
+from line_edge_sampler import LineSampler  # <-- your LightningModule
+from line_edge_sampler import extract_line_feature_ROIAlign
+from line_edge_sampler import EdgeSampler
 class GraphDatasetInductive(Dataset):
-    def __init__(self, json_dir, roi_output_size=(64, 64), method="roi", device=None):
+    def __init__(self, json_dir, roi_output_size=(64, 64), method="roi", device=None, edge_sample_size = (32,8),):
         super().__init__()
         self.json_files = [
             os.path.join(json_dir, f)
@@ -139,6 +139,7 @@ class GraphDatasetInductive(Dataset):
         self.roi_output_size = roi_output_size
         self.method = method
         self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.edge_sample_size = edge_sample_size
 
         # Only instantiate the sampler if we're going to use it
         if self.method == "sample":
@@ -208,20 +209,34 @@ class GraphDatasetInductive(Dataset):
                 f"got {None if roi_features is None else roi_features.shape}, expected ({N}, …)."
             )
             raise ValueError('ROI feature extraction failed.')
+                # Use line coordinates to determine k-NN (e.g., 7 nearest neighbors)
+        line_coords_np = np.array(line_coords)
+        from sklearn.neighbors import NearestNeighbors
+        coords_center = np.mean(line_coords_np, axis=1)  # shape: (N, 2)
+        nbrs = NearestNeighbors(n_neighbors=7, algorithm='auto').fit(coords_center)
+        distances, indices = nbrs.kneighbors(coords_center)
 
-        # === build graph ===
         edge_list, edge_labels = [], []
+
         for i in range(N):
-            for j in range(N):
+            for j in indices[i]:  
                 edge_list.append([i, j])
                 edge_labels.append(coplanarity_matrix[i][j])
-        edge_index  = torch.tensor(edge_list,  dtype=torch.long).t().contiguous()
+
+        edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
         edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)
 
-        return Data(
-            x=x_emb,
-            y=y,
-            edge_index=edge_index,
-            edge_labels=edge_labels,
-            roi_features=roi_features
-        )
+
+        # fully connected graph  + edge attributes
+        edge_sampler = EdgeSampler()
+        num_samples_edge,width_edge = self.edge_sample_size
+        edge_index_full, edge_attr = [], []
+        edge_attr = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
+        for i in range(N):
+            for j in range(N):
+                if i == j: continue
+                edge_index_full.append([i, j])
+        
+
+
+        return Data(x=x_emb, y=y, edge_index=edge_index, edge_labels=edge_labels, roi_features=roi_features, edge_index_full=edge_index_full, edge_attr = edge_attr)

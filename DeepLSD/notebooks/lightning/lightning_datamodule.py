@@ -11,7 +11,8 @@ class GraphDataModuleInductive(pl.LightningDataModule):
     def __init__(self, json_dir: str, roi_output_size: tuple = (64, 64),
                  batch_size: int = 32, train_split: float = 0.8,
                  val_split: float = 0.1, num_workers: int = 0,
-                 method = 'roi'):
+                 method = 'roi',
+                 edge_output_size = (32,8)):
         super().__init__()
         self.json_dir = json_dir
         self.roi_output_size = roi_output_size
@@ -21,7 +22,7 @@ class GraphDataModuleInductive(pl.LightningDataModule):
         self.train_split = train_split
         self.val_split = val_split
         self.num_workers = num_workers # For DataLoader
-
+        self.edge_output_size = edge_output_size
         # Ensure splits are valid
         if not (0 < train_split < 1) or not (0 < val_split < 1) or (train_split + val_split >= 1):
              raise ValueError("Invalid train/val split percentages.")
@@ -44,7 +45,8 @@ class GraphDataModuleInductive(pl.LightningDataModule):
                  self.full_dataset = GraphDatasetInductive(
                      json_dir=self.json_dir,
                      roi_output_size=self.roi_output_size,
-                     method = self.method
+                     method = self.method,
+                     edge_sample_size=self.edge_output_size
                  )
             except Exception as e:
                  print(f"Error loading dataset from {self.json_dir}: {e}")
