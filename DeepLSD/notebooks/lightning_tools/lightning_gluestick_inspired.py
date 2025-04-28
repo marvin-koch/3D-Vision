@@ -66,7 +66,7 @@ def edge_geometry(node_geo: torch.Tensor,
 
     return torch.cat([d_mid, cos_th, sin_th, len_i, len_j], dim=1) # [E,5]
 
-@torch.cuda.amp.custom_fwd(cast_inputs=torch.float32)
+@torch.amp.custom_fwd(cast_inputs=torch.float32)
 def attention(query, key, value):
     dim = query.shape[1]
     scores = torch.einsum('bdhn,bdhm->bhnm', query, key) / dim ** .5
@@ -853,6 +853,7 @@ class AttentionBothCoplanar(pl.LightningModule):
         self.validation_step_outputs = []
         self.test_step_outputs = []
         
+        #Learned weights for loss
         self.log_sigma_node = nn.Parameter(torch.zeros(()))
         self.log_sigma_edge = nn.Parameter(torch.zeros(()))
 

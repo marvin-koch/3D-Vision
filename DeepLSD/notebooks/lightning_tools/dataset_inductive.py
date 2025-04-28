@@ -29,10 +29,7 @@ def _load_image(filepath: str, color_conversion: Optional[int] = None) -> Option
     except Exception as e:
         logging.error(f"Error loading image {filepath}: {e}")
         return None
-
- # -------------------------------------------
-    # utils/geo_features.py
-    # -------------------------------------------
+    
 def line_geometry(line_pts: torch.Tensor):
     """
     line_pts : [N, 2, 2]  (x1,y1,x2,y2 per line)

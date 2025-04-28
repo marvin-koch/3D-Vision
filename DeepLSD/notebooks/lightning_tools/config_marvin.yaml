@@ -47,5 +47,14 @@ training:
   seed: 42                        # Random seed for reproducibility
   experiment_name: "Attention_Both_coplanar_reg"
 
+#   ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+# │    test_edge_acc_epoch    │    0.9162049889564514     │
+# │    test_edge_auc_epoch    │    0.9705333113670349     │
+# │  test_edge_recall_epoch   │    0.8966559171676636     │
+# │      test_loss_epoch      │     0.747603714466095     │
+# │    test_node_acc_epoch    │     0.857654869556427     │
+# │    test_node_auc_epoch    │     0.935197114944458     │
+# │  test_node_recall_epoch   │     0.921532928943634  
+
 
 
