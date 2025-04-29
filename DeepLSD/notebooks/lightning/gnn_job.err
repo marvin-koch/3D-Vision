@@ -1,4 +1,6 @@
 [rank: 0] Seed set to 42
+/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/conv.py:549: UserWarning: Using padding='same' with even kernel lengths and odd dilation may require a zero-padded copy of the input be created (Triggered internally at /pytorch/aten/src/ATen/native/Convolution.cpp:1036.)
+  return F.conv2d(
 /home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/lightning_fabric/plugins/environments/slurm.py:204: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python train.py ...
 GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
@@ -6,27 +8,31 @@ HPU available: False, using: 0 HPUs
 wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
 wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
 wandb: Tracking run with wandb version 0.19.9
-wandb: Run data is saved locally in lightning_logs/wandb/run-20250426_113732-cey5vdxu
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250429_090136-ks28pvkq
 wandb: Run `wandb offline` to turn off syncing.
 wandb: Syncing run GAT_Structural_Textural
 wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
-wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/cey5vdxu
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/ks28pvkq
 LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 
   | Name                    | Type              | Params | Mode 
 ----------------------------------------------------------------------
 0 | conv_roi_embedding      | Sequential        | 2.9 K  | train
-1 | gat_roi                 | GAT               | 248 K  | train
-2 | gat_DeepLSD             | GAT               | 390 K  | train
-3 | mlp_textural_structural | Sequential        | 2.1 K  | train
-4 | criterion               | BCEWithLogitsLoss | 0      | train
+1 | conv_edge_embedding     | Sequential        | 2.1 K  | train
+2 | gat_roi                 | GAT               | 232 K  | train
+3 | gat_DeepLSD             | GAT               | 303 K  | train
+4 | mlp_textural_structural | Sequential        | 545    | train
+5 | criterion               | BCEWithLogitsLoss | 0      | train
 ----------------------------------------------------------------------
-643 K     Trainable params
+540 K     Trainable params
 0         Non-trainable params
-643 K     Total params
-2.574     Total estimated model params size (MB)
-73        Modules in train mode
+540 K     Total params
+2.163     Total estimated model params size (MB)
+87        Modules in train mode
 0         Modules in eval mode
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py:240: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py:240: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/dataset_inductive.py:240: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
 Traceback (most recent call last):
   File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 189, in <module>
     main(config_path=args.config)
@@ -54,15 +60,15 @@ Traceback (most recent call last):
     output = fn(*args, **kwargs)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/strategies/strategy.py", line 412, in validation_step
     return self.lightning_module.validation_step(*args, **kwargs)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 191, in validation_step
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 206, in validation_step
     loss, node_preds, target_nodes, val_acc = self._common_step(batch, batch_idx)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 161, in _common_step
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 176, in _common_step
     node_logits = self(batch)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
     return forward_call(*args, **kwargs)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 149, in forward
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 164, in forward
     h_out_roi = self.gat_roi(roi_conv_output, edge_index_full, edge_attr=edge_attr)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
@@ -74,13 +80,11 @@ Traceback (most recent call last):
     return self._call_impl(*args, **kwargs)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
     return forward_call(*args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/gatv2_conv.py", line 325, in forward
-    alpha = self.edge_updater(edge_index, x=(x_l, x_r),
-  File "/tmp/torch_geometric.nn.conv.gatv2_conv_GATv2Conv_edge_updater_3ig1cbh5.py", line 143, in edge_updater
-    mutable_size = self._check_input(edge_index, size)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/message_passing.py", line 244, in _check_input
-    raise ValueError(
-ValueError: `MessagePassing.propagate` only supports integer tensors of shape `[2, num_messages]`, `torch_sparse.SparseTensor` or `torch.sparse.Tensor` for argument `edge_index`.
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/gatv2_conv.py", line 310, in forward
+    edge_index, edge_attr = remove_self_loops(
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/utils/loop.py", line 131, in remove_self_loops
+    return edge_index, edge_attr[mask]
+IndexError: The shape of the mask [2] at index 0 does not match the shape of the indexed tensor [21462, 1280] at index 0
 Traceback (most recent call last):
   File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/train.py", line 189, in <module>
     main(config_path=args.config)
@@ -108,15 +112,15 @@ Traceback (most recent call last):
     output = fn(*args, **kwargs)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/strategies/strategy.py", line 412, in validation_step
     return self.lightning_module.validation_step(*args, **kwargs)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 191, in validation_step
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 206, in validation_step
     loss, node_preds, target_nodes, val_acc = self._common_step(batch, batch_idx)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 161, in _common_step
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 176, in _common_step
     node_logits = self(batch)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
     return forward_call(*args, **kwargs)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 149, in forward
+  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning/structural_textural_lightning.py", line 164, in forward
     h_out_roi = self.gat_roi(roi_conv_output, edge_index_full, edge_attr=edge_attr)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
@@ -128,10 +132,8 @@ Traceback (most recent call last):
     return self._call_impl(*args, **kwargs)
   File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
     return forward_call(*args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/gatv2_conv.py", line 325, in forward
-    alpha = self.edge_updater(edge_index, x=(x_l, x_r),
-  File "/tmp/torch_geometric.nn.conv.gatv2_conv_GATv2Conv_edge_updater_3ig1cbh5.py", line 143, in edge_updater
-    mutable_size = self._check_input(edge_index, size)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/message_passing.py", line 244, in _check_input
-    raise ValueError(
-ValueError: `MessagePassing.propagate` only supports integer tensors of shape `[2, num_messages]`, `torch_sparse.SparseTensor` or `torch.sparse.Tensor` for argument `edge_index`.
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/nn/conv/gatv2_conv.py", line 310, in forward
+    edge_index, edge_attr = remove_self_loops(
+  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch_geometric/utils/loop.py", line 131, in remove_self_loops
+    return edge_index, edge_attr[mask]
+IndexError: The shape of the mask [2] at index 0 does not match the shape of the indexed tensor [21462, 1280] at index 0

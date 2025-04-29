@@ -18,8 +18,8 @@ model:
 
   # GAT layer parameters
   
-  hidden_channels: 64           # Number of hidden units in GAT layers
-  out_channels: 32                # Output dimension of the GAT layers (input to the final MLP)
+  hidden_channels: 32           # Number of hidden units in GAT layers
+  out_channels: 16                # Output dimension of the GAT layers (input to the final MLP)
   num_layers: 4                   # Number of GAT layers
   dropout: 0.1                    # Dropout rate within GAT layers
   act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
@@ -34,12 +34,12 @@ training:
   learning_rate: 0.001            # Optimizer learning rate
   node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
   threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
-  epochs: 200                      # Maximum number of training epochs
+  epochs: 50                      # Maximum number of training epochs
   accelerator: 'auto'             # Hardware accelerator ('cpu', 'gpu', 'tpu', 'mps', 'auto')
   devices: 'auto'                 # Devices to use ('auto', 1 for 1 GPU, [0, 1] for GPUs 0 and 1, etc.)
   log_dir: "lightning_logs"       # Base directory for saving logs and checkpoints
   experiment_name: "GAT_Structural_Textural" # Subdirectory name for this specific run
-  early_stopping_patience: 25      # Number of epochs with no improvement in monitored metric before stopping
+  early_stopping_patience: 20      # Number of epochs with no improvement in monitored metric before stopping
   monitor_metric: 'val_auc'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
   monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
   seed: 42                        # Random seed for reproducibility

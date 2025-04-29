@@ -228,14 +228,16 @@ class GraphDatasetInductive(Dataset):
 
 
         # fully connected graph  + edge attributes
-        edge_sampler = EdgeSampler()
         num_samples_edge,width_edge = self.edge_sample_size
-        edge_index_full, edge_attr = [], []
-        edge_attr = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
-        for i in range(N):
-            for j in range(N):
-                if i == j: continue
-                edge_index_full.append([i, j])
+        edge_sampler = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
+        
+        edge_index_full, edge_attr = None, None
+        edge_attr,edge_index_full = edge_sampler.sample_edges(img=img_t,lines=lines_t)
+        # for i in range(N):
+        #     for j in range(N):
+        #         if i == j: continue
+        #         edge_index_full.append([i, j])
+        edge_index_full = torch.tensor(edge_index_full, dtype=torch.long).t().contiguous()
         
 
 

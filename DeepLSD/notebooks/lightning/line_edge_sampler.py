@@ -180,7 +180,7 @@ class EdgeSampler(pl.LightningModule):
         self.register_buffer('uu', uu)
         self.register_buffer('vv', vv)
 
-    def forward(
+    def sample_edges(
         self,
         img: torch.Tensor,
         lines: torch.Tensor,
@@ -208,7 +208,7 @@ class EdgeSampler(pl.LightningModule):
               corresponding to each sampled patch, shape (2, M) (PyG format).
               On the same device as input.
         """
-        # --- Input Validation and Preparation ---
+        
         if img.dim() != 3:
             raise ValueError(f"Input image must be a 3D tensor (C, H, W), but got shape {img.shape}")
         if not isinstance(lines, torch.Tensor):

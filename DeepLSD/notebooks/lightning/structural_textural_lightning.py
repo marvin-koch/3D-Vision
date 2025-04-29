@@ -54,6 +54,7 @@ class LitGATTexturalStructural(pl.LightningModule):
         node_loss_w: float = 1.0, # Weight for node loss
         threshold_structural: float = 0.5, # Threshold for accuracy/recall calc
         mlp_dropout: float = 0.0, # drop out for merge features
+        edge_output_size = (32,8)
     ):
         super().__init__()
         # Store hyperparameters using save_hyperparameters
@@ -82,11 +83,22 @@ class LitGATTexturalStructural(pl.LightningModule):
             # Output shape: (B, 12 * (H/4) * (W/4))
             nn.Flatten(start_dim=1)
         )
+        self.conv_edge_embedding = nn.Sequential( 
+            nn.Conv2d(in_channels=3, out_channels=4, kernel_size=8, stride=1, padding="same"),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=4, out_channels=5, kernel_size=8, stride=1, padding="same"),
+            nn.ReLU(),    
+            # Flatten
+            # Output shape: (B, 12 * (H/4) * (W/4))
+            nn.Flatten(start_dim=1)
+        )
 
         with torch.no_grad():
             # make a dummy batch of size 1
             x = torch.randn(1, 3, *self.hparams.roi_align_embedding_shape)
             self.hparams.channels_conv_roi_embedding = self.conv_roi_embedding(x).shape[1]
+            x = torch.randn(1, 3, *self.hparams.edge_output_size)
+            self.hparams.channels_conv_edge_embedding = self.conv_edge_embedding(x).shape[1]
         
         # --- Model Architecture ---
         self.gat_roi = pyg_nn.GAT(
@@ -97,7 +109,8 @@ class LitGATTexturalStructural(pl.LightningModule):
             num_layers=self.hparams.num_layers,
             dropout=self.hparams.dropout,
             act=self.hparams.act,
-            jk=self.hparams.jk_layer
+            jk=self.hparams.jk_layer,
+            edge_dim=self.hparams.channels_conv_edge_embedding
         )
         self.gat_DeepLSD = pyg_nn.GAT(
             in_channels=self.hparams.in_channels_DeepLSD,
@@ -107,7 +120,8 @@ class LitGATTexturalStructural(pl.LightningModule):
             num_layers=self.hparams.num_layers,
             dropout=self.hparams.dropout,
             act=self.hparams.act,
-            jk=self.hparams.jk_layer
+            jk=self.hparams.jk_layer,
+            edge_dim=self.hparams.channels_conv_edge_embedding
         )
         # self.merge_features = nn.Sequential(
         #     nn.Linear(self.hparams.in_channels_DeepLSD + channels_conv_roi_embedding, self.hparams.in_channels),
@@ -146,6 +160,7 @@ class LitGATTexturalStructural(pl.LightningModule):
         edge_index_full = batch.edge_index_full
         edge_attr = batch.edge_attr
         roi_conv_output = self.conv_roi_embedding(roi_features)
+        edge_attr = self.conv_edge_embedding(edge_attr)
         h_out_roi = self.gat_roi(roi_conv_output, edge_index_full, edge_attr=edge_attr)
         
         h_out_DeepLSD = self.gat_DeepLSD(x, edge_index, edge_attr=edge_attr)

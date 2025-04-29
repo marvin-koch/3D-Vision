@@ -6,7 +6,9 @@
 #SBATCH --account=3dv # mandatory course tag
 #SBATCH --error=gnn_job.err # specify a file to direct standard error stream
 #SBATCH --open-mode=truncate # truncate overwrites output and error files, append just appends
+#SBATCH --mail-user=maurdu@ethz.ch
 #SBATCH --mail-type=START,END,FAIL
+
 # ./etc/profile.d/modules.sh
 # start using module command, for example:
 module add cuda/12.6
