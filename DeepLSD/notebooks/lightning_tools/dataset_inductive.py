@@ -49,11 +49,11 @@ import cv2
 import torch
 from torch.utils.data import Dataset
 from torch_geometric.data import Data
-from line_sampler import LineSampler  # <-- your LightningModule
+from line_sampler import LineSampler, EdgeSampler  # <-- your LightningModule
 from line_sampler import extract_line_feature_ROIAlign
 
 class GraphDatasetInductive(Dataset):
-    def __init__(self, json_dir, roi_output_size=(64, 64), method="sample", device=None):
+    def __init__(self, json_dir, roi_output_size=(64, 64), method="sample", device=None, edge_sample_size = (7,3)):
         super().__init__()
         json_files = [
             os.path.join(json_dir, f)
@@ -77,6 +77,10 @@ class GraphDatasetInductive(Dataset):
         self.roi_output_size = roi_output_size
         self.method = method
         self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.edge_sample_size = edge_sample_size
+        num_samples_edge,width_edge = self.edge_sample_size
+
+        self.edge_sampler = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
 
         # Only instantiate the sampler if we're going to use it
         if self.method == "sample":
@@ -113,17 +117,19 @@ class GraphDatasetInductive(Dataset):
         y     = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
         N     = x_emb.size(0)
 
+
+        img =_load_image(filepath="../" + file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
         # === Feature extraction ===
         if self.method == "roi":
             roi_features = extract_line_feature_ROIAlign(
-                img=_load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB),
+                img=img,
                 lines=line_coords,
                 output_size=self.roi_output_size,
                 plot_results=True
             )
         else:  # self.method == "sample"
             # 1) load & prep image tensor
-            img_np = _load_image(filepath="../" + file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
+            img_np = img
             img_t  = (
                 torch.tensor(img_np, dtype=torch.float32, device=self.device)
                      .div(255.0)
@@ -176,6 +182,10 @@ class GraphDatasetInductive(Dataset):
         full_edge_index = torch.tensor(full_edge_index, dtype=torch.long).t().contiguous()
         full_edge_labels = torch.tensor(full_edge_labels, dtype=torch.float).unsqueeze(1)
         
+        
+        
+
+
         # edge_list, edge_labels = [], []
         # for i in range(N):
         #     for j in range(N):
@@ -193,5 +203,10 @@ class GraphDatasetInductive(Dataset):
             edge_labels=edge_labels,
             full_edge_index=full_edge_index,
             full_edge_labels=full_edge_labels,
-            roi_features=roi_features
+            roi_features=roi_features,
+            edge_attr = self.edge_sampler((
+                torch.tensor(img_np, dtype=torch.float32, device=self.device)
+                     .div(255.0)
+                     .permute(2, 0, 1)  # C,H,W
+            ), coords)[0]
         )

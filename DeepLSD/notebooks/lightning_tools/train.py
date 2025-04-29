@@ -60,7 +60,7 @@ def main(config_path: str):
     if isinstance(jk_layer_val, str) and jk_layer_val.lower() == 'null':
         jk_layer_val = None
 
-    model = AttentionBothCoplanar(
+    model = AttentionEdgeSample(
         in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
         in_channels=cfg_model.get('in_channels', 1024),
         hidden_channels=cfg_model.get('hidden_channels', 128),
