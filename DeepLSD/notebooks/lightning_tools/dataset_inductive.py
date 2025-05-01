@@ -4,6 +4,8 @@ import orjson
 
 import numpy as np
 import torch
+import torch.nn as nn
+
 import cv2
 from torch_geometric.data import Data, Dataset
 # from notebooks.models.dataset_utils import extract_line_feature_ROIAlign,sample_lines_grid
@@ -82,6 +84,18 @@ class GraphDatasetInductive(Dataset):
 
         self.edge_sampler = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
 
+
+        self.edge_patch_enc = nn.Sequential(
+                    nn.Conv2d(in_channels=3, out_channels=4, kernel_size=3, padding=1),
+                    nn.ReLU(),
+                    nn.MaxPool2d((2, 1)),         # 50×5 → 25×5
+                    nn.Conv2d(4, 8, kernel_size=3, padding=1),
+                    nn.ReLU(),
+                    nn.AdaptiveAvgPool2d(1),      # → 16×1×1
+                    nn.Flatten(),                 # → [E, 16]
+                )
+        self.patch_dim      = 8          # ← output of edge_patch_enc
+
         # Only instantiate the sampler if we're going to use it
         if self.method == "sample":
             num_samples, width = self.roi_output_size
@@ -158,10 +172,57 @@ class GraphDatasetInductive(Dataset):
         # === build graph ===
         
 
-        # Use line coordinates to determine k-NN (e.g., 7 nearest neighbors)
-        coords_center = np.mean(line_coords, axis=1)  # shape: (N, 2)
-        nbrs = NearestNeighbors(n_neighbors=7, algorithm='auto').fit(coords_center)
-        distances, indices = nbrs.kneighbors(coords_center)
+        # # Use line coordinates to determine k-NN (e.g., 7 nearest neighbors)
+        # coords_center = np.mean(line_coords, axis=1)  # shape: (N, 2)
+        # nbrs = NearestNeighbors(n_neighbors=7, algorithm='auto').fit(coords_center)
+        # distances, indices = nbrs.kneighbors(coords_center)
+
+
+
+        # reuse your line_geometry to get [mid_x,mid_y,dir_x,dir_y,length]
+        geo = line_geometry(coords)       # (N,5)
+        dirs   = geo[:, 2:4]              # (N,2)
+        lengths = geo[:, 4]               # (N,)
+
+        # 2) helper to compute segment‐to‐segment distances
+        def seg_seg_dist(p1, p2, q1, q2, eps=1e-8):
+            # p1,p2: (N,2); q1,q2: (N,2) – here we compute N×N all-pairs
+            # expand dims for broadcasting
+            P1 = p1[:,None]  # (N,1,2)
+            P2 = p2[:,None]  # (N,1,2)
+            Q1 = q1[None,:]  # (1,N,2)
+            Q2 = q2[None,:]  # (1,N,2)
+            def proj(X, A, B):
+                t = torch.clamp(((X-A)*(B-A)).sum(-1,keepdim=True) /
+                                (((B-A)**2).sum(-1,keepdim=True)+eps), 0,1)
+                return A + t*(B-A)
+            # four point‐to‐segment cases
+            d1 = ((Q1 - proj(Q1, P1, P2))**2).sum(-1)
+            d2 = ((Q2 - proj(Q2, P1, P2))**2).sum(-1)
+            d3 = ((P1 - proj(P1, Q1, Q2))**2).sum(-1)
+            d4 = ((P2 - proj(P2, Q1, Q2))**2).sum(-1)
+            return torch.sqrt(torch.min(torch.min(d1,d2), torch.min(d3,d4)))  # (N,N)
+
+        # endpoints for seg‐seg
+        p1, p2 = coords[:,0], coords[:,1]  # each (N,2)
+        delta_p = seg_seg_dist(p1,p2, p1,p2)    # (N,N)
+
+        # 3) angle difference Δθ
+        # |cos θ| = |dir_i·dir_j|
+        cos_theta = torch.clamp(torch.abs(dirs @ dirs.t()), 0, 1)
+        acos_theta = torch.acos(cos_theta)               # (N,N)
+
+        # 4) log‐length ratio
+        log_r = torch.log(lengths[:,None] / (lengths[None,:] + 1e-8))  # (N,N)
+
+        # 5) combine
+        alpha, beta = 5.0, 1.0
+        D = torch.sqrt( delta_p**2 + alpha*(acos_theta**2) + beta*(log_r**2) )  # (N,N)
+
+        # 6) build k‐NN graph from D
+        k = 7  # number of neighbors
+        # topk returns self in position 0, so grab 1:k+1
+        knn = D.topk(k+1, largest=False).indices[:,1:]  # (N,k)
 
         edge_list, edge_labels = [], []
         full_edge_index, full_edge_labels = [], []
@@ -171,7 +232,7 @@ class GraphDatasetInductive(Dataset):
                 full_edge_index.append([i, j])
                 full_edge_labels.append(coplanarity_matrix[i][j])
                 
-            for j in indices[i]:  
+            for j in knn[i]:  
                 edge_list.append([i, j])
                 edge_labels.append(coplanarity_matrix[i][j])
                 
@@ -184,29 +245,40 @@ class GraphDatasetInductive(Dataset):
         
         
         
+        # edge_attr = self.edge_sampler((
+        #         torch.tensor(img_np, dtype=torch.float32, device=self.device)
+        #              .div(255.0)
+        #              .permute(2, 0, 1)  # C,H,W
+        #     ), coords)[0]
+        
+        # edge_patch = self.edge_patch_enc(edge_attr)   # [E, 16]
+        
+        # # 3) pick out only the k-NN edges for sparse message passing
+        # src, dst = edge_index                         # shape [2, E_local]
+        # flat_idx = src * N + dst                      # vectorized i*N + j
+        # local_edge_patch = edge_patch[flat_idx]  # [E_local, 8]
 
 
-        # edge_list, edge_labels = [], []
-        # for i in range(N):
-        #     for j in range(N):
-        #         edge_list.append([i, j])
-        #         edge_labels.append(coplanarity_matrix[i][j])
-        # edge_index  = torch.tensor(edge_list,  dtype=torch.long).t().contiguous()
-        # edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)
+        E_full = full_edge_index.size(1)
+        E_local = edge_index.size(1)
+        patch_dim = self.patch_dim
+        edge_attr = torch.zeros(E_full, 3, *self.roi_output_size, device=self.device)
+        edge_patch = torch.zeros(E_full, patch_dim, device=self.device)
+        local_edge_patch = torch.zeros(E_local, patch_dim, device=self.device)
+
 
         return Data(
             x=x_emb,
             y=y,
             coordinates=coords,
-            geo=line_geometry(coords),
+            geo=geo,
             edge_index=edge_index,
             edge_labels=edge_labels,
             full_edge_index=full_edge_index,
             full_edge_labels=full_edge_labels,
             roi_features=roi_features,
-            edge_attr = self.edge_sampler((
-                torch.tensor(img_np, dtype=torch.float32, device=self.device)
-                     .div(255.0)
-                     .permute(2, 0, 1)  # C,H,W
-            ), coords)[0]
+            edge_attr = edge_attr,
+            edge_patch = edge_patch,
+            local_edge_patch = local_edge_patch,
+            img=img
         )

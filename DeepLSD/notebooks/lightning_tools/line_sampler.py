@@ -220,8 +220,8 @@ class EdgeSampler(pl.LightningModule):
         # Use cartesian_prod and filter self-loops
         all_pairs = torch.cartesian_prod(idx, idx) # Shape (N*N, 2)
         
-        #mask = all_pairs[:, 0] != all_pairs[:, 1]
-        #edge_indices = all_pairs[mask] # Shape (M, 2), M = N * (N-1). Inherits device from idx.
+        # mask = all_pairs[:, 0] != all_pairs[:, 1]
+        # edge_indices = all_pairs[mask] # Shape (M, 2), M = N * (N-1). Inherits device from idx.
         
         edge_indices = all_pairs
         idx_i = edge_indices[:, 0] # Shape (M,)

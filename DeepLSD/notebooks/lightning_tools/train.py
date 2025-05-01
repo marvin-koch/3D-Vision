@@ -60,7 +60,7 @@ def main(config_path: str):
     if isinstance(jk_layer_val, str) and jk_layer_val.lower() == 'null':
         jk_layer_val = None
 
-    model = AttentionEdgeSample(
+    model = AttentionEdgeSampleFull(
         in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
         in_channels=cfg_model.get('in_channels', 1024),
         hidden_channels=cfg_model.get('hidden_channels', 128),
@@ -188,4 +188,7 @@ if __name__ == '__main__':
         help='Path to the YAML configuration file (default: config.yaml)'
     )
     args = parser.parse_args()
+    import multiprocessing as mp
+    mp.set_start_method("spawn", force=True)
+
     main(config_path=args.config)
