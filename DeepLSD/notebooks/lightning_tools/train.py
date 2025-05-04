@@ -190,5 +190,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     import multiprocessing as mp
     mp.set_start_method("spawn", force=True)
-
+    torch.multiprocessing.set_sharing_strategy('file_system')
     main(config_path=args.config)

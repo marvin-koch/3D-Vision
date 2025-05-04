@@ -57,9 +57,9 @@ class LineSampler(pl.LightningModule):
 
         # Convert lines to tensor on correct device/dtype
         if isinstance(lines, list):
-            lines = torch.tensor(lines, dtype=img.dtype, device=img.device)
+            lines = torch.tensor(lines, dtype=img.dtype)
         else:
-            lines = lines.to(device=img.device, dtype=img.dtype)
+            lines = lines.to(dtype=img.dtype)
         N = lines.shape[0]
 
         # Compute direction and perpendicular vectors
@@ -73,9 +73,8 @@ class LineSampler(pl.LightningModule):
         px, py = -uy, ux
 
         # Use cached (t,s) grid
-        tt = self.tt                # shape: (num_samples, n_width)
-        ss = self.ss.to(img.dtype)  # match dtype
-
+        tt = self.tt
+        ss = self.ss.to(dtype=img.dtype)
         # Map (t,s) → absolute coords (N, num_samples, n_width)
         X = x0.view(N,1,1) + dx.view(N,1,1) * tt + px.view(N,1,1) * ss
         Y = y0.view(N,1,1) + dy.view(N,1,1) * tt + py.view(N,1,1) * ss
@@ -197,6 +196,8 @@ class EdgeSampler(pl.LightningModule):
              # If lines are integer coordinates, cast them for interpolation
              lines = lines.float()
              # Consider raising a warning or error if precision loss is critical
+        # After your input‐validation, before any math:
+        lines = lines.to(dtype=lines.dtype)
 
         C, H, W = img.shape
         N = lines.shape[0] # Number of lines
@@ -209,14 +210,14 @@ class EdgeSampler(pl.LightningModule):
              out_shape = (M, C, self.num_samples_u, self.num_samples_v)
              # Create edge_indices on the same device as lines implicitly via device=lines.device
              # Although lines might be empty tensor if N=0, check N=1 case first
-             edge_indices = torch.empty((M, 2), dtype=torch.long, device=lines.device)
+             edge_indices = torch.empty((M, 2), dtype=torch.long)
              # Create empty tensor on the same device as img
-             sampled_patches = torch.empty(out_shape, dtype=img_dtype, device=img.device)
+             sampled_patches = torch.empty(out_shape, dtype=img_dtype)
              return sampled_patches, edge_indices.t() # Return (2, M) format
 
         # --- Generate Pairs of Line Indices ---
         # Create index tensor on the same device as the input 'lines' tensor
-        idx = torch.arange(N, device=lines.device)
+        idx = torch.arange(N)
         # Use cartesian_prod and filter self-loops
         all_pairs = torch.cartesian_prod(idx, idx) # Shape (N*N, 2)
         
@@ -243,8 +244,9 @@ class EdgeSampler(pl.LightningModule):
         # --- Bilinear Interpolation for Sampling Grid ---
         # Buffers self.uu and self.vv are automatically on the correct device.
         # Cast them to the computation dtype (float type of lines) for coordinate math.
-        uu = self.uu.to(dtype=computation_dtype) # (Nu, Nv)
-        vv = self.vv.to(dtype=computation_dtype) # (Nu, Nv)
+  
+        uu = self.uu.to(dtype=computation_dtype)
+        vv = self.vv.to(dtype=computation_dtype)
 
         # Reshape points and grid for broadcasting:
         # Points: (M, 1, 1, 2)
@@ -272,8 +274,8 @@ class EdgeSampler(pl.LightningModule):
         # Normalize to the range [-1, +1] for grid_sample
         # Handle cases where W or H might be 1
         # Use float division
-        W_eff = torch.tensor(max(1, W - 1), dtype=computation_dtype, device=lines.device)
-        H_eff = torch.tensor(max(1, H - 1), dtype=computation_dtype, device=lines.device)
+        W_eff = torch.tensor(max(1, W - 1), dtype=computation_dtype)
+        H_eff = torch.tensor(max(1, H - 1), dtype=computation_dtype)
         Xn = 2 * X / W_eff - 1
         Yn = 2 * Y / H_eff - 1
 

@@ -14,7 +14,89 @@ from torch_geometric.utils import to_dense_batch
 from torch_geometric.nn import MessagePassing
 import torch.nn.functional as F
 from typing import Optional
+import logging
+import cv2
+import os 
+import matplotlib.pyplot as plt
+import random
+def plot_images(images, titles, cmaps=None):
+    num = len(images)
+    plt.figure(figsize=(15, 5))
+    for i, img in enumerate(images):
+        plt.subplot(1, num, i + 1)
+        if cmaps is not None:
+            cmap = cmaps if isinstance(cmaps, str) else cmaps[i]
+            plt.imshow(img, cmap=cmap)
+        else:
+            plt.imshow(img)
+        plt.title(titles[i])
+        plt.axis('off')
+    plt.show()
+    
 
+def plot_coplanar_lines(ax, lines, labels, image):
+    """
+    Visualize lines on an image with colors corresponding to their plane labels.
+    Outliers (label -1) are drawn in grey. Designed to be used with a subplot axis.
+    """
+    unique_labels = sorted(set(labels))
+    num_clusters = len(unique_labels)
+
+    # Generate random colors for clusters (excluding -1 if present)
+    random.seed(42)
+    colors = [tuple(random.random() for _ in range(3)) for _ in range(num_clusters)]
+    random.shuffle(colors)
+    label_to_color = {label: colors[idx] for idx, label in enumerate(unique_labels)}
+
+    ax.imshow(image)
+    for idx, line in enumerate(lines):
+        label = labels[idx]
+        color = 'grey' if label == -1 or label == 0 else label_to_color.get(label, (0, 0, 0))
+        ax.plot(
+            [line[0, 0], line[1, 0]],
+            [line[0, 1], line[1, 1]],
+            color=color,
+            linewidth=2
+        )
+
+    ax.set_title("Coplanar Lines")
+    ax.axis('off')
+    
+
+def plot_lines_bool(ax, img, lines, is_correct, alpha=1):
+    colors = ['red' if not c else 'blue' for c in is_correct]
+
+    for i, l in enumerate(lines):
+        arr = np.array(l)     # shape (2,2)
+        line = plt.Line2D(
+            (arr[0, 0], arr[1, 0]),
+            (arr[0, 1], arr[1, 1]),
+            linewidth=2,
+            color=colors[i],
+            alpha=alpha
+        )
+        ax.add_line(line)
+
+    ax.imshow(img, cmap='gray')
+    ax.set_axis_off()
+
+
+def _load_image(filepath: str, color_conversion: Optional[int] = None) -> Optional[np.ndarray]:
+    """Loads an image using OpenCV."""
+    if not os.path.exists(filepath):
+        logging.error(f"Image file not found: {filepath}")
+        return None
+    try:
+        img = cv2.imread(filepath, cv2.IMREAD_UNCHANGED) # Load as is (handles color, grayscale, alpha)
+        if img is None:
+            logging.error(f"Failed to load image (cv2.imread returned None): {filepath}")
+            return None
+        if color_conversion is not None:
+            img = cv2.cvtColor(img, color_conversion)
+        return img
+    except Exception as e:
+        logging.error(f"Error loading image {filepath}: {e}")
+        return None
 # Keep plot_roc_curve as a utility function outside the LightningModule
 # It can be called after testing if needed.
 def plot_roc_curve(y_true, y_scores, title='ROC Curve', save_path=None):
@@ -333,11 +415,11 @@ class AttentionBothCoplanar(pl.LightningModule):
         pos_n = (node_labels==1).nonzero(as_tuple=True)[0]
         neg_n = (node_labels==0).nonzero(as_tuple=True)[0]
         if pos_n.numel()>0:
-            perm = torch.randperm(neg_n.size(0), device=neg_n.device)
+            perm = torch.randperm(neg_n.size(0))
             sampled_neg_n = neg_n[perm[:pos_n.size(0)]]
             keep_n = torch.cat([pos_n, sampled_neg_n])
         else:
-            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0),device=neg_n.device)
+            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0))
             keep_n=neg_n[perm[:k]]
         sampled_node_logits = node_logits[keep_n]
         sampled_node_labels = node_labels[keep_n]
@@ -347,11 +429,11 @@ class AttentionBothCoplanar(pl.LightningModule):
         pos_e = (edge_labels_flat==1).nonzero(as_tuple=True)[0]
         neg_e = (edge_labels_flat==0).nonzero(as_tuple=True)[0]
         if pos_e.numel()>0:
-            perm_e = torch.randperm(neg_e.size(0),device=neg_e.device)
+            perm_e = torch.randperm(neg_e.size(0))
             sampled_neg_e = neg_e[perm_e[:pos_e.size(0)]]
             keep_e = torch.cat([pos_e, sampled_neg_e])
         else:
-            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0),device=neg_e.device)
+            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0))
             keep_e=neg_e[perm_e[:k_e]]
         sampled_edge_logits = edge_logits[keep_e]
         sampled_edge_labels = edge_labels_flat[keep_e]
@@ -368,9 +450,9 @@ class AttentionBothCoplanar(pl.LightningModule):
         # metrics
         with torch.no_grad():
             n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int()
-            node_acc=accuracy_score(sampled_node_labels.int().cpu(),n_preds.cpu())
+            node_acc=accuracy_score(sampled_node_labels.int(),n_preds)
             e_probs=torch.sigmoid(sampled_edge_logits); e_preds=(e_probs>=self.hparams.threshold_structural).int()
-            edge_acc=accuracy_score(sampled_edge_labels.int().cpu(), e_preds.cpu())
+            edge_acc=accuracy_score(sampled_edge_labels.int(), e_preds)
             
             
         self.log('train_loss',loss,on_step=True,on_epoch=False, prog_bar=True, logger=True)
@@ -625,7 +707,7 @@ class AttentionEdgeSample(pl.LightningModule):
                 desc = layer(desc)
             else:
                 flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, edge_patch)
+                delta = layer(flat, edge_index)
                 delta_dense, _ = to_dense_batch(delta, batch_idx)
                 desc = desc + delta_dense.transpose(1,2)
 
@@ -663,11 +745,11 @@ class AttentionEdgeSample(pl.LightningModule):
         pos_n = (node_labels==1).nonzero(as_tuple=True)[0]
         neg_n = (node_labels==0).nonzero(as_tuple=True)[0]
         if pos_n.numel()>0:
-            perm = torch.randperm(neg_n.size(0), device=neg_n.device)
+            perm = torch.randperm(neg_n.size(0))
             sampled_neg_n = neg_n[perm[:pos_n.size(0)]]
             keep_n = torch.cat([pos_n, sampled_neg_n])
         else:
-            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0),device=neg_n.device)
+            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0))
             keep_n=neg_n[perm[:k]]
         sampled_node_logits = node_logits[keep_n]
         sampled_node_labels = node_labels[keep_n]
@@ -677,11 +759,11 @@ class AttentionEdgeSample(pl.LightningModule):
         pos_e = (edge_labels_flat==1).nonzero(as_tuple=True)[0]
         neg_e = (edge_labels_flat==0).nonzero(as_tuple=True)[0]
         if pos_e.numel()>0:
-            perm_e = torch.randperm(neg_e.size(0),device=neg_e.device)
+            perm_e = torch.randperm(neg_e.size(0))
             sampled_neg_e = neg_e[perm_e[:pos_e.size(0)]]
             keep_e = torch.cat([pos_e, sampled_neg_e])
         else:
-            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0),device=neg_e.device)
+            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0))
             keep_e=neg_e[perm_e[:k_e]]
         sampled_edge_logits = edge_logits[keep_e]
         sampled_edge_labels = edge_labels_flat[keep_e]
@@ -867,6 +949,16 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
 
+
+        self.edge_patch_enc = nn.Sequential(
+                    nn.Conv2d(in_channels=3, out_channels=4, kernel_size=3, padding=1),
+                    nn.ReLU(),
+                    nn.MaxPool2d((2, 1)),         # 50×5 → 25×5
+                    nn.Conv2d(4, 8, kernel_size=3, padding=1),
+                    nn.ReLU(),
+                    nn.AdaptiveAvgPool2d(1),      # → 16×1×1
+                    nn.Flatten(),                 # → [E, 16]
+                )
         self.patch_dim      = 8          # ← output of edge_patch_enc
 
         # Convolutional ROI embedding
@@ -910,6 +1002,8 @@ class AttentionEdgeSampleFull(pl.LightningModule):
                 layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
                 edge_attr_dim=self.patch_dim,
                 hidden_dim=self.hparams.out_channels))
+                # layers.append(LocalEdgeLayer(self.hparams.out_channels))
+
         self.layers = nn.ModuleList(layers)
 
         # Node prediction head
@@ -929,8 +1023,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         #Learned weights for loss
         self.log_sigma_node = nn.Parameter(torch.zeros(()))
         self.log_sigma_edge = nn.Parameter(torch.zeros(()))
-        self._viz_image = None  # H×W×3 float
-        self._viz_lines = None       # list of [(x1,y1),(x2,y2)]
+       
                     
     def forward(self, batch):
         
@@ -947,7 +1040,12 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         desc = roi_dense.transpose(1, 2)
         
         
+     
         
+        edge_patch = self.edge_patch_enc(batch.edge_attr)   # [E, 16]
+
+
+        local_edge_patch = edge_patch[batch.flat_idx_local]  # [E_local, 8]
 
         # Alternate layers
         for layer in self.layers:
@@ -955,7 +1053,8 @@ class AttentionEdgeSampleFull(pl.LightningModule):
                 desc = layer(desc)
             else:
                 flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, batch.local_edge_patch)
+                delta = layer(flat, edge_index, local_edge_patch)
+
                 delta_dense, _ = to_dense_batch(delta, batch_idx)
                 desc = desc + delta_dense.transpose(1,2)
 
@@ -978,12 +1077,13 @@ class AttentionEdgeSampleFull(pl.LightningModule):
             0.5 * (h_src + h_dst),        # symmetric mean      [E, D]
             (h_src - h_dst).abs(),        # symmetric distance  [E, D]
             edge_geo, # geometric extras    [E, 5]
-            batch.edge_patch
+            edge_patch
         ], dim=1)  
                 
         edge_logits = self.edge_predictor(edge_in)
 
         return node_logits, edge_logits
+
 
     def training_step(self, batch, batch_idx):
         node_logits, edge_logits = self(batch)
@@ -993,11 +1093,11 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         pos_n = (node_labels==1).nonzero(as_tuple=True)[0]
         neg_n = (node_labels==0).nonzero(as_tuple=True)[0]
         if pos_n.numel()>0:
-            perm = torch.randperm(neg_n.size(0), device=neg_n.device)
+            perm = torch.randperm(neg_n.size(0))
             sampled_neg_n = neg_n[perm[:pos_n.size(0)]]
             keep_n = torch.cat([pos_n, sampled_neg_n])
         else:
-            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0),device=neg_n.device)
+            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0))
             keep_n=neg_n[perm[:k]]
         sampled_node_logits = node_logits[keep_n]
         sampled_node_labels = node_labels[keep_n]
@@ -1007,11 +1107,11 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         pos_e = (edge_labels_flat==1).nonzero(as_tuple=True)[0]
         neg_e = (edge_labels_flat==0).nonzero(as_tuple=True)[0]
         if pos_e.numel()>0:
-            perm_e = torch.randperm(neg_e.size(0),device=neg_e.device)
+            perm_e = torch.randperm(neg_e.size(0))
             sampled_neg_e = neg_e[perm_e[:pos_e.size(0)]]
             keep_e = torch.cat([pos_e, sampled_neg_e])
         else:
-            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0),device=neg_e.device)
+            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0))
             keep_e=neg_e[perm_e[:k_e]]
         sampled_edge_logits = edge_logits[keep_e]
         sampled_edge_labels = edge_labels_flat[keep_e]
@@ -1027,10 +1127,10 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         
         # metrics
         with torch.no_grad():
-            n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int()
-            node_acc=accuracy_score(sampled_node_labels.int().cpu(),n_preds.cpu())
-            e_probs=torch.sigmoid(sampled_edge_logits); e_preds=(e_probs>=self.hparams.threshold_structural).int()
-            edge_acc=accuracy_score(sampled_edge_labels.int().cpu(), e_preds.cpu())
+            n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
+            node_acc=accuracy_score(sampled_node_labels.int().detach().cpu().numpy().ravel(),n_preds)
+            e_probs=torch.sigmoid(sampled_edge_logits); e_preds=(e_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
+            edge_acc=accuracy_score(sampled_edge_labels.int().detach().cpu().numpy().ravel(), e_preds)
             
             
         self.log('train_loss',loss,on_step=True,on_epoch=False, prog_bar=True, logger=True)
@@ -1054,22 +1154,14 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         self.log('val_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=True, logger=True)
         self.log('val_edge_loss', edge_loss,  on_step=True,on_epoch=False, prog_bar=True, logger=True)
         self.log('val_loss',      total_loss, on_step=True,on_epoch=False, prog_bar=True,  logger=True)
-        if batch_idx == 0 and self._viz_batch is None:
-            # (you may want to .detach() or move to cpu if you’re worried
-            #  about GPU memory)
-            img_tensor = batch.image[0]                     # [3,H,W]
-            coords_t   = batch.coordinates[0]               # [N,2,2]
-            # move to CPU, convert to simple types
-            self._viz_image = img_tensor.permute(1,2,0).cpu().numpy()  # H×W×3 float
-            self._viz_lines = coords_t.cpu().numpy().tolist()         # list of [(x1,y1),(x2,y2)]
-                    
+
         # store for epoch-end
         self.validation_step_outputs.append({
             'node_preds': node_logits.sigmoid().detach(),
             'node_labels': node_labels.detach(),
             'edge_preds': edge_logits.sigmoid().detach(),
             'edge_labels': full_edge_labels.detach(),
-            'loss': total_loss,
+            'loss': total_loss
         })
         return {'loss': total_loss,  
             'node_preds': node_logits.sigmoid(),
@@ -1077,94 +1169,90 @@ class AttentionEdgeSampleFull(pl.LightningModule):
             'edge_preds': edge_logits.sigmoid(),
             'edge_labels': full_edge_labels}
 
-    def on_validation_epoch_end(self):
-        import matplotlib.pyplot as plt
-        import wandb
-        import torch
-        import numpy as np
-        from sklearn.metrics import accuracy_score, recall_score, roc_curve, auc
-        from ground_truth.visualization import plot_images, plot_coplanar_lines, plot_lines_bool
 
-        # 1) Do nothing if no outputs
+    def on_validation_epoch_end(self):
         if not self.validation_step_outputs:
             return
+        
+        
 
-        # 2) Aggregate losses & preds
+
         losses = torch.stack([x['loss'] for x in self.validation_step_outputs]).mean()
         all_node_preds = torch.cat([x['node_preds'] for x in self.validation_step_outputs]).cpu().numpy()
         all_node_labels = torch.cat([x['node_labels'] for x in self.validation_step_outputs]).cpu().numpy()
         all_edge_preds = torch.cat([x['edge_preds'] for x in self.validation_step_outputs]).cpu().numpy()
         all_edge_labels = torch.cat([x['edge_labels'] for x in self.validation_step_outputs]).cpu().numpy()
 
-        # 3) Compute epoch‐level metrics
+        # Node metrics
         node_binary = (all_node_preds >= self.hparams.threshold_structural).astype(int)
-        node_acc    = accuracy_score(all_node_labels, node_binary)
+        node_acc = accuracy_score(all_node_labels, node_binary)
         node_recall = recall_score(all_node_labels, node_binary, zero_division=0)
-        node_auc    = auc(*roc_curve(all_node_labels, all_node_preds)[:2]) if len(np.unique(all_node_labels))>1 else 0.0
+        node_auc = auc(*roc_curve(all_node_labels, all_node_preds)[:2]) if len(np.unique(all_node_labels))>1 else 0.0
 
+        # Edge metrics
         edge_binary = (all_edge_preds >= self.hparams.threshold_structural).astype(int)
-        edge_acc    = accuracy_score(all_edge_labels, edge_binary)
+        edge_acc = accuracy_score(all_edge_labels, edge_binary)
         edge_recall = recall_score(all_edge_labels, edge_binary, zero_division=0)
-        edge_auc    = auc(*roc_curve(all_edge_labels, all_edge_preds)[:2]) if len(np.unique(all_edge_labels))>1 else 0.0
+        edge_auc = auc(*roc_curve(all_edge_labels, all_edge_preds)[:2]) if len(np.unique(all_edge_labels))>1 else 0.0
 
-        combined_auc = 0.5 * (node_auc + edge_auc)
+        self.log('val_loss_epoch', losses, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_node_acc_epoch', node_acc, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_node_recall_epoch', node_recall, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_node_auc_epoch', node_auc, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_edge_acc_epoch', edge_acc, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_edge_recall_epoch', edge_recall, on_epoch=True, prog_bar=False, logger=True)
+        self.log('val_edge_auc_epoch', edge_auc, on_epoch=True, prog_bar=False, logger=True)
+        combined_auc = 0.5 * (edge_auc + node_auc)
+        self.log('val_combined_auc_epoch', combined_auc, on_epoch=True, prog_bar=False, logger=True)
+        self.validation_step_outputs.clear()
 
-        # 4) Log scalars
-        self.log('val_loss_epoch',      losses,    on_epoch=True)
-        self.log('val_node_acc_epoch',  node_acc,  on_epoch=True)
-        self.log('val_node_recall_epoch', node_recall, on_epoch=True)
-        self.log('val_node_auc_epoch',  node_auc,  on_epoch=True)
-        self.log('val_edge_acc_epoch',  edge_acc,  on_epoch=True)
-        self.log('val_edge_recall_epoch', edge_recall, on_epoch=True)
-        self.log('val_edge_auc_epoch',  edge_auc,  on_epoch=True)
-        self.log('val_combined_auc_epoch', combined_auc, on_epoch=True)
 
         # 5) —— Visualization —— 
         # Pull one batch so we have the raw image + coordinates
     
      
-        color_img   = self._viz_image      # H×W×3 numpy
-        pred_lines = self._viz_lines      # list of [(x1,y1),(x2,y2)]
+        # color_img   = self._viz_image      # H×W×3 numpy
+        # pred_lines = self._viz_lines      # list of [(x1,y1),(x2,y2)]
 
-        node_preds_viz = self.validation_step_outputs[0]['node_preds'][0].cpu().flatten().tolist()
-        edge_preds_viz  = self.validation_step_outputs[0]['edge_preds'][0].cpu().numpy()
+        # color_img =_load_image(filepath="../" + color_img, color_conversion=cv2.COLOR_BGR2RGB)
 
-        # 5a) Structural plots
-        figs_struct = []
-        flat_node_scores = node_preds_viz
-        for i in range(min(4, len(pred_lines))):
-            fig, ax = plt.subplots(figsize=(4,4))
-            plot_lines_bool(ax, color_img, pred_lines, flat_node_scores)
-            figs_struct.append(fig)
+        # node_preds_viz = self.validation_step_outputs[0]['node_preds'].flatten().tolist()
+        # edge_preds_viz  = self.validation_step_outputs[0]['edge_preds'].numpy()
 
-        # 5b) Coplanarity plots
-        num_lines = len(pred_lines)
-        edge_array = edge_preds_viz.reshape((num_lines, -1))
-        figs_copl = []
-        for i in range(min(4, num_lines)):
-            fig, ax = plt.subplots(figsize=(4,4))
-            plot_coplanar_lines(ax, pred_lines, edge_array[i], color_img)
-            figs_copl.append(fig)
+        # # 5a) Structural plots
+        # figs_struct = []
+        # flat_node_scores = node_preds_viz
+        # for i in range(min(4, len(pred_lines))):
+        #     fig, ax = plt.subplots(figsize=(4,4))
+        #     plot_lines_bool(ax, color_img, pred_lines, flat_node_scores)
+        #     figs_struct.append(fig)
 
-        # 6) Log all to W&B
-        self.logger.experiment.log({
-            "Validation/Structural": [
-                wandb.Image(fig, caption=f"Line {i} structural")
-                for i, fig in enumerate(figs_struct)
-            ],
-            "Validation/Coplanarity": [
-                wandb.Image(fig, caption=f"Line {i} coplanarity")
-                for i, fig in enumerate(figs_copl)
-            ],
-            "epoch": self.current_epoch
-        })
+        # # 5b) Coplanarity plots
+        # num_lines = len(pred_lines)
+        # edge_array = edge_preds_viz.reshape((num_lines, -1))
+        # figs_copl = []
+        # for i in range(min(4, num_lines)):
+        #     fig, ax = plt.subplots(figsize=(4,4))
+        #     plot_coplanar_lines(ax, pred_lines, edge_array[i], color_img)
+        #     figs_copl.append(fig)
 
-        # 7) Clean up
-        for fig in figs_struct + figs_copl:
-            plt.close(fig)
-        self._viz_batch = None
+        # # 6) Log all to W&B
+        # self.logger.experiment.log({
+        #     "Validation/Structural": [
+        #         wandb.Image(fig, caption=f"Line {i} structural")
+        #         for i, fig in enumerate(figs_struct)
+        #     ],
+        #     "Validation/Coplanarity": [
+        #         wandb.Image(fig, caption=f"Line {i} coplanarity")
+        #         for i, fig in enumerate(figs_copl)
+        #     ],
+        #     "epoch": self.current_epoch
+        # })
 
-        self.validation_step_outputs.clear()
+        # # 7) Clean up
+        # for fig in figs_struct + figs_copl:
+        #     plt.close(fig)
+
 
     def test_step(self, batch: Batch, batch_idx: int):
         # forward

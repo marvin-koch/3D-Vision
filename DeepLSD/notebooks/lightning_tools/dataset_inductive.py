@@ -67,6 +67,7 @@ class GraphDatasetInductive(Dataset):
             with open(jf, 'r') as f:
                 data = orjson.loads(f.read())
 
+          
             img_path = "../" + data.get('file_path')
             # try to load once
                     # == FAST EXISTENCE CHECK ==
@@ -85,16 +86,7 @@ class GraphDatasetInductive(Dataset):
         self.edge_sampler = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
 
 
-        self.edge_patch_enc = nn.Sequential(
-                    nn.Conv2d(in_channels=3, out_channels=4, kernel_size=3, padding=1),
-                    nn.ReLU(),
-                    nn.MaxPool2d((2, 1)),         # 50×5 → 25×5
-                    nn.Conv2d(4, 8, kernel_size=3, padding=1),
-                    nn.ReLU(),
-                    nn.AdaptiveAvgPool2d(1),      # → 16×1×1
-                    nn.Flatten(),                 # → [E, 16]
-                )
-        self.patch_dim      = 8          # ← output of edge_patch_enc
+        self.edge_sampler    = self.edge_sampler
 
         # Only instantiate the sampler if we're going to use it
         if self.method == "sample":
@@ -145,13 +137,13 @@ class GraphDatasetInductive(Dataset):
             # 1) load & prep image tensor
             img_np = img
             img_t  = (
-                torch.tensor(img_np, dtype=torch.float32, device=self.device)
-                     .div(255.0)
-                     .permute(2, 0, 1)  # C,H,W
+                torch.tensor(img_np, dtype=torch.float32)
+                    .div(255.0)
+                    .permute(2, 0, 1)  # C,H,W
             )
 
             # 2) prep lines tensor
-            lines_t = torch.tensor(line_coords, dtype=torch.float32, device=self.device)
+            lines_t = torch.tensor(line_coords, dtype=torch.float32)
 
             # 3) sample
             #    returns (N, C, num_samples, width)
@@ -172,14 +164,14 @@ class GraphDatasetInductive(Dataset):
         # === build graph ===
         
 
-        # # Use line coordinates to determine k-NN (e.g., 7 nearest neighbors)
+        # Use line coordinates to determine k-NN (e.g., 7 nearest neighbors)
         # coords_center = np.mean(line_coords, axis=1)  # shape: (N, 2)
         # nbrs = NearestNeighbors(n_neighbors=7, algorithm='auto').fit(coords_center)
         # distances, indices = nbrs.kneighbors(coords_center)
 
 
 
-        # reuse your line_geometry to get [mid_x,mid_y,dir_x,dir_y,length]
+        # # reuse your line_geometry to get [mid_x,mid_y,dir_x,dir_y,length]
         geo = line_geometry(coords)       # (N,5)
         dirs   = geo[:, 2:4]              # (N,2)
         lengths = geo[:, 4]               # (N,)
@@ -245,27 +237,17 @@ class GraphDatasetInductive(Dataset):
         
         
         
-        # edge_attr = self.edge_sampler((
-        #         torch.tensor(img_np, dtype=torch.float32, device=self.device)
-        #              .div(255.0)
-        #              .permute(2, 0, 1)  # C,H,W
-        #     ), coords)[0]
-        
-        # edge_patch = self.edge_patch_enc(edge_attr)   # [E, 16]
-        
-        # # 3) pick out only the k-NN edges for sparse message passing
-        # src, dst = edge_index                         # shape [2, E_local]
-        # flat_idx = src * N + dst                      # vectorized i*N + j
-        # local_edge_patch = edge_patch[flat_idx]  # [E_local, 8]
+        edge_attr = self.edge_sampler((
+            torch.tensor(img_np, dtype=torch.float32)
+                .div(255.0)
+                .permute(2, 0, 1)  # C,H,W
+        ), coords)[0]
+        edge_attr = edge_attr
+        N = coords.shape[0]
+        src, dst = edge_index              # each is length E_local
+        flat_idx_local = src * N + dst     # vectorized  i*N + j
 
-
-        E_full = full_edge_index.size(1)
-        E_local = edge_index.size(1)
-        patch_dim = self.patch_dim
-        edge_attr = torch.zeros(E_full, 3, *self.roi_output_size, device=self.device)
-        edge_patch = torch.zeros(E_full, patch_dim, device=self.device)
-        local_edge_patch = torch.zeros(E_local, patch_dim, device=self.device)
-
+     
 
         return Data(
             x=x_emb,
@@ -278,7 +260,6 @@ class GraphDatasetInductive(Dataset):
             full_edge_labels=full_edge_labels,
             roi_features=roi_features,
             edge_attr = edge_attr,
-            edge_patch = edge_patch,
-            local_edge_patch = local_edge_patch,
-            img=img
+            flat_idx_local=flat_idx_local,
+            # img_path = file_path_img
         )
