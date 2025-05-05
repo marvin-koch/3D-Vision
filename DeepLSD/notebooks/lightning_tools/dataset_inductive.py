@@ -173,9 +173,7 @@ class GraphDatasetInductive(Dataset):
 
         # # reuse your line_geometry to get [mid_x,mid_y,dir_x,dir_y,length]
         geo = line_geometry(coords)       # (N,5)
-        dirs   = geo[:, 2:4]              # (N,2)
-        lengths = geo[:, 4]               # (N,)
-
+        
         # 2) helper to compute segment‐to‐segment distances
         def seg_seg_dist(p1, p2, q1, q2, eps=1e-8):
             # p1,p2: (N,2); q1,q2: (N,2) – here we compute N×N all-pairs
@@ -197,19 +195,7 @@ class GraphDatasetInductive(Dataset):
 
         # endpoints for seg‐seg
         p1, p2 = coords[:,0], coords[:,1]  # each (N,2)
-        delta_p = seg_seg_dist(p1,p2, p1,p2)    # (N,N)
-
-        # 3) angle difference Δθ
-        # |cos θ| = |dir_i·dir_j|
-        cos_theta = torch.clamp(torch.abs(dirs @ dirs.t()), 0, 1)
-        acos_theta = torch.acos(cos_theta)               # (N,N)
-
-        # 4) log‐length ratio
-        log_r = torch.log(lengths[:,None] / (lengths[None,:] + 1e-8))  # (N,N)
-
-        # 5) combine
-        alpha, beta = 5.0, 1.0
-        D = torch.sqrt( delta_p**2 + alpha*(acos_theta**2) + beta*(log_r**2) )  # (N,N)
+        D = seg_seg_dist(p1,p2, p1,p2)    # (N,N)
 
         # 6) build k‐NN graph from D
         k = 7  # number of neighbors

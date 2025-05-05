@@ -949,17 +949,17 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
 
+        self.patch_dim      = 8          # ← output of edge_patch_enc
 
         self.edge_patch_enc = nn.Sequential(
                     nn.Conv2d(in_channels=3, out_channels=4, kernel_size=3, padding=1),
                     nn.ReLU(),
                     nn.MaxPool2d((2, 1)),         # 50×5 → 25×5
-                    nn.Conv2d(4, 8, kernel_size=3, padding=1),
+                    nn.Conv2d(4, self.patch_dim, kernel_size=3, padding=1),
                     nn.ReLU(),
                     nn.AdaptiveAvgPool2d(1),      # → 16×1×1
                     nn.Flatten(),                 # → [E, 16]
                 )
-        self.patch_dim      = 8          # ← output of edge_patch_enc
 
         # Convolutional ROI embedding
         self.conv_roi_embedding = nn.Sequential(
