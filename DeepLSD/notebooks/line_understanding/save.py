@@ -2,6 +2,8 @@ import json
 import os
 import numpy as np
 
+OUTPUT_DIR = "/work/scratch/maurdu/data/json_output"
+
 def convert_np(o):
     """Recursively convert NumPy types to native Python types."""
     if isinstance(o, np.ndarray):  # Convert NumPy arrays to lists
@@ -15,7 +17,7 @@ def convert_np(o):
     return o  # Return unchanged if already a native Python type
 
 
-def save_lines_to_json(image_id, frame_str, line_info, coplanarity_matrix, output_dir="json_output", save=True, file_path_str = None):
+def save_lines_to_json(image_id, frame_str, line_info, coplanarity_matrix, output_dir=OUTPUT_DIR, save=True, file_path_str = None):
     """
     Save detected lines along with their type and coplanarity labels into a JSON file.
 
