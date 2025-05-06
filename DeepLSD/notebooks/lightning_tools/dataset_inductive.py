@@ -45,6 +45,23 @@ def line_geometry(line_pts: torch.Tensor):
     dir_norm = F.normalize(vec, dim=1)                  # [N,2]
     return torch.cat([mid, dir_norm, length], dim=1)    # [N,5]
 
+
+def _load_array_from_json_or_npy(field, json_dict, desc="array"):
+    """
+    Helper: either reads an inline list from json_dict[field]
+    or loads from json_dict[f"{field}_path"] via np.load.
+    Returns a NumPy array.
+    """
+    if field in json_dict:
+        return np.array(json_dict[field])
+    path_field = f"{field}_path"
+    if path_field in json_dict:
+        arr_path = json_dict[path_field]
+        if not os.path.exists(arr_path):
+            raise FileNotFoundError(f"{desc} file not found: {arr_path}")
+        return np.load(arr_path)
+    raise KeyError(f"Neither '{field}' nor '{path_field}' found in JSON.")
+
 import os, json, logging
 import numpy as np
 import cv2
@@ -100,28 +117,65 @@ class GraphDatasetInductive(Dataset):
         return len(self.filter_json_files)
 
     def __getitem__(self, idx):
-        # load JSON
-        with open(self.filter_json_files[idx], 'r') as f:
+        # # load JSON
+        # with open(self.filter_json_files[idx], 'r') as f:
+        #     graph_data = orjson.loads(f.read())
+
+
+        # lines = graph_data.get('lines', [])
+        # if not lines:
+        #     raise ValueError('lines from the graph_data is empty')
+
+        # coplanarity_matrix = graph_data.get('coplanarity_matrix', [[]])
+        # file_path_img     = graph_data.get('file_path')
+
+        # # build node embeddings + labels
+        # feats, labels, line_coords = [], [], []
+        # for ln in lines:
+        #     feats.append(np.array(ln['embedding_DeepLSD']))
+        #     labels.append(ln.get('struct_score', 0.5))
+        #     line_coords.append(ln.get('coordinates'))
+        # x_emb = torch.tensor(np.vstack(feats), dtype=torch.float)
+        # coords = torch.tensor(line_coords, dtype=torch.float)
+        # y     = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
+        # N     = x_emb.size(0)
+        
+        # --- 1) load JSON ---
+        with open(self.filter_json_files[idx], 'rb') as f:
             graph_data = orjson.loads(f.read())
 
+        # --- 2) load coplanarity matrix ---
+        coplanarity_matrix = _load_array_from_json_or_npy(
+            "coplanarity_matrix", graph_data, desc="Coplanarity matrix"
+        )  # shape: (N,N)
 
-        lines = graph_data.get('lines', [])
+        # --- 3) load file_path & image ---
+        file_path_img = graph_data.get("file_path", None)
+        img = _load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
+
+        # --- 4) load per-line features & coords & labels ---
+        lines = graph_data.get("lines", [])
         if not lines:
-            raise ValueError('lines from the graph_data is empty')
+            raise ValueError("No lines found in JSON.")
 
-        coplanarity_matrix = graph_data.get('coplanarity_matrix', [[]])
-        file_path_img     = graph_data.get('file_path')
-
-        # build node embeddings + labels
         feats, labels, line_coords = [], [], []
         for ln in lines:
-            feats.append(np.array(ln['embedding_DeepLSD']))
-            labels.append(ln.get('struct_score', 0.5))
-            line_coords.append(ln.get('coordinates'))
+            # embedding: either inline or .npy
+            emb = _load_array_from_json_or_npy(
+                "embedding_DeepLSD", ln, desc="Line embedding"
+            )
+            feats.append(emb)
+
+            # struct score
+            labels.append(ln.get("struct_score", 0.0))
+            # coords always inline
+            line_coords.append(ln["coordinates"])
+
         x_emb = torch.tensor(np.vstack(feats), dtype=torch.float)
         coords = torch.tensor(line_coords, dtype=torch.float)
-        y     = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
-        N     = x_emb.size(0)
+        y      = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
+        N      = x_emb.size(0)
+
 
 
         img =_load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
