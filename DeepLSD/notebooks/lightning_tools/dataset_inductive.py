@@ -72,7 +72,7 @@ from line_sampler import LineSampler, EdgeSampler  # <-- your LightningModule
 from line_sampler import extract_line_feature_ROIAlign
 
 class GraphDatasetInductive(Dataset):
-    def __init__(self, json_dir, roi_output_size=(64, 64), method="sample", device=None, edge_sample_size = (7,3)):
+    def __init__(self, json_dir, roi_output_size=(64, 64), method="sample", device=None, edge_sample_size = (32,16)):
         super().__init__()
         json_files = [
             os.path.join(json_dir, f)
