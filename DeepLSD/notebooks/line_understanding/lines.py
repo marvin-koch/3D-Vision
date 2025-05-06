@@ -35,6 +35,10 @@ def detect_lines(
 
     features = torch.cat([ft.df_intermediate_features, ft.angle_intermediate_features], dim=1)
     downsample = color_img.shape[1] / features.shape[3]
+    if device == "cuda":
+        del tensor, out
+        torch.cuda.empty_cache()
+
     return lines, features, downsample
 
 
