@@ -68,7 +68,7 @@ class GraphDatasetInductive(Dataset):
                 data = orjson.loads(f.read())
 
           
-            img_path = "../" + data.get('file_path')
+            img_path = data.get('file_path')
             # try to load once
                     # == FAST EXISTENCE CHECK ==
             if img_path and os.path.exists(img_path):
@@ -124,7 +124,7 @@ class GraphDatasetInductive(Dataset):
         N     = x_emb.size(0)
 
 
-        img =_load_image(filepath="../" + file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
+        img =_load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
         # === Feature extraction ===
         if self.method == "roi":
             roi_features = extract_line_feature_ROIAlign(

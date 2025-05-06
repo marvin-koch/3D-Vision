@@ -1,0 +1,35 @@
+{
+  "os": "Linux-6.8.0-58-generic-x86_64-with-glibc2.39",
+  "python": "CPython 3.9.21",
+  "startedAt": "2025-05-05T12:08:58.436147Z",
+  "args": [
+    "--config",
+    "config_matin.yaml"
+  ],
+  "program": "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/train.py",
+  "codePath": "DeepLSD/notebooks/lightning_tools/train.py",
+  "git": {
+    "remote": "git@github.com:marvin-koch/3D-Vision.git",
+    "commit": "8537367884dba24c5e0a6eed80988d29a5274c15"
+  },
+  "email": "matin@urdu.de.com",
+  "root": "lightning_logs",
+  "host": "student-cluster.inf.ethz.ch",
+  "executable": "/home/maurdu/miniconda3/envs/deeplsd/bin/python",
+  "codePathLocal": "train.py",
+  "cpu_count": 24,
+  "cpu_count_logical": 24,
+  "disk": {
+    "/": {
+      "total": "73861140480",
+      "used": "30794448896"
+    }
+  },
+  "memory": {
+    "total": "270377517056"
+  },
+  "cpu": {
+    "count": 24,
+    "countLogical": 24
+  }
+}

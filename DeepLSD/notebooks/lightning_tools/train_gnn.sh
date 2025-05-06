@@ -12,6 +12,6 @@
 module add cuda/12.6
 eval "$(conda shell.bash hook)"
 conda activate deeplsd
-cd "${HOME}/3D-Vision/DeepLSD/notebooks/lightning" # path to your project folder
+cd "${HOME}/3D-Vision/DeepLSD/notebooks/lightning_tools" # path to your project folder
 # your command
-python train.py
+python train.py --config=config_matin.yaml

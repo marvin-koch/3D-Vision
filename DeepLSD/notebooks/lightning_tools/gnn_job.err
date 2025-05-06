@@ -1,0 +1,49 @@
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_gluestick_inspired.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+[rank: 0] Seed set to 42
+/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/lightning_fabric/plugins/environments/slurm.py:204: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python train.py --config=config_matin.yaml ...
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.9
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250506_070721-5pqf9v9t
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Attention_Edge_Sampler
+wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/5pqf9v9t
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name                    | Type              | Params | Mode 
+----------------------------------------------------------------------
+0 | edge_patch_enc          | Sequential        | 408    | train
+1 | conv_roi_embedding      | Sequential        | 2.9 K  | train
+2 | edge_predictor          | Sequential        | 34.7 K | train
+3 | node_fuse               | Sequential        | 202 K  | train
+4 | layers                  | ModuleList        | 647 K  | train
+5 | mlp_textural_structural | Sequential        | 16.6 K | train
+6 | criterion               | BCEWithLogitsLoss | 0      | train
+  | other params            | n/a               | 2      | n/a  
+----------------------------------------------------------------------
+904 K     Trainable params
+0         Non-trainable params
+904 K     Total params
+3.617     Total estimated model params size (MB)
+87        Modules in train mode
+0         Modules in eval mode
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_gluestick_inspired.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_gluestick_inspired.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_gluestick_inspired.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_gluestick_inspired.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+Metric val_combined_auc_epoch improved. New best score: 0.829
+Epoch 0, global step 1344: 'val_combined_auc_epoch' reached 0.82909 (best 0.82909), saving model to 'lightning_logs/lightning_project/5pqf9v9t/checkpoints/best-model-epoch=00-val_combined_auc_epoch=0.8291.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.037 >= min_delta = 0.0. New best score: 0.866
+Epoch 1, global step 2688: 'val_combined_auc_epoch' reached 0.86647 (best 0.86647), saving model to 'lightning_logs/lightning_project/5pqf9v9t/checkpoints/best-model-epoch=01-val_combined_auc_epoch=0.8665.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.005 >= min_delta = 0.0. New best score: 0.872
+Epoch 2, global step 4032: 'val_combined_auc_epoch' reached 0.87159 (best 0.87159), saving model to 'lightning_logs/lightning_project/5pqf9v9t/checkpoints/best-model-epoch=02-val_combined_auc_epoch=0.8716.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.004 >= min_delta = 0.0. New best score: 0.875
+Epoch 3, global step 5376: 'val_combined_auc_epoch' reached 0.87539 (best 0.87539), saving model to 'lightning_logs/lightning_project/5pqf9v9t/checkpoints/best-model-epoch=03-val_combined_auc_epoch=0.8754.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.010 >= min_delta = 0.0. New best score: 0.886
+Epoch 4, global step 6720: 'val_combined_auc_epoch' reached 0.88559 (best 0.88559), saving model to 'lightning_logs/lightning_project/5pqf9v9t/checkpoints/best-model-epoch=04-val_combined_auc_epoch=0.8856.ckpt' as top 1
+Epoch 5, global step 8064: 'val_combined_auc_epoch' was not in top 1
+slurmstepd: error: *** JOB 22564 ON studgpu-node01 CANCELLED AT 2025-05-06T09:44:47 ***
