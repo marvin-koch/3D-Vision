@@ -14,7 +14,7 @@ class GraphDataModuleInductive(pl.LightningDataModule):
     def __init__(self, json_dir: str, roi_output_size: tuple = (64, 64),
                  batch_size: int = 32, train_split: float = 0.8,
                  val_split: float = 0.1, num_workers: int = 0,
-                 method = 'roi'):
+                 method = 'roi', edge_sample_size = (32,16)):
         super().__init__()
         self.json_dir = json_dir
         self.roi_output_size = roi_output_size
@@ -33,7 +33,7 @@ class GraphDataModuleInductive(pl.LightningDataModule):
         self.train_ds = None
         self.val_ds = None
         self.test_ds = None
-
+        self.edge_sample_size = edge_sample_size
     def prepare_data(self):
         # Optional: Download data, etc. Not needed if data is local.
         # Check if json_dir exists
@@ -47,7 +47,8 @@ class GraphDataModuleInductive(pl.LightningDataModule):
                  self.full_dataset = GraphDatasetInductive(
                      json_dir=self.json_dir,
                      roi_output_size=self.roi_output_size,
-                     method = self.method
+                     method = self.method,
+                     edge_sample_size=self.edge_sample_size
                  )
             except Exception as e:
                  print(f"Error loading dataset from {self.json_dir}: {e}")

@@ -14,4 +14,5 @@ eval "$(conda shell.bash hook)"
 conda activate deeplsd
 cd "${HOME}/3D-Vision/DeepLSD/notebooks/lightning_tools" # path to your project folder
 # your command
-python train.py --config=config_matin.yaml
+export PYTORCH_CUDA_ALLOC_CONF='expandable_segments:True'
+srun python train.py --config=config_matin.yaml

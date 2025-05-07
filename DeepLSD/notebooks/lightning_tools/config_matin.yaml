@@ -6,7 +6,7 @@ data:
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
-  num_workers: 2               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
+  num_workers: 1               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
   accum_grads: 32                # Gradient accumulation
   method: 'sample'
 
@@ -27,7 +27,7 @@ model:
   jk_layer: 'lstm'                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
   skip_init: "False"
   # MLP Drop-outs
-  mlp_dropout: 0.2
+  mlp_dropout: 0.1
   # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
 
 training:

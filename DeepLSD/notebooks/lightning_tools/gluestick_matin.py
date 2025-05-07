@@ -957,7 +957,13 @@ class AttentionEdgeSampleFull(pl.LightningModule):
             nn.Conv2d(in_channels=3, out_channels=4, kernel_size=8, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(in_channels=4, out_channels=5, kernel_size=7, stride=1, padding=1),
-            nn.ReLU(),    
+            nn.ReLU(),
+            nn.Conv2d(in_channels=5, out_channels=4, kernel_size=6, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(in_channels=4, out_channels=3, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),    
             nn.Flatten(start_dim=1)
         )
         
@@ -1043,7 +1049,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         roi_feats = self.conv_roi_embedding(roi_features)
         concat_feat = torch.cat([roi_feats, x, geo], dim=1)
         concat_feat = self.node_fuse(concat_feat)
-
+        
         # Prepare for global attention
         roi_dense, mask = to_dense_batch(concat_feat, batch_idx)
         desc = roi_dense.transpose(1, 2)
