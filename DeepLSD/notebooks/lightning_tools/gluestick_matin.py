@@ -963,6 +963,8 @@ class AttentionEdgeSampleFull(pl.LightningModule):
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(in_channels=4, out_channels=3, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
+            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),    
             nn.Flatten(start_dim=1)
         )
@@ -971,9 +973,11 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         self.conv_roi_embedding = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=6, kernel_size=8, stride=1, padding=1),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=6, out_channels=8, kernel_size=6, stride=1, padding=1),
+            nn.Conv2d(in_channels=6, out_channels=5, kernel_size=6, stride=1, padding=1),
             nn.ReLU(),
+            nn.Conv2d(in_channels=5, out_channels=4, kernel_size=5, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=4, out_channels=3, kernel_size=4, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Flatten(start_dim=1)
         )
