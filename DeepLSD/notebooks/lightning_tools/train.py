@@ -9,7 +9,7 @@ import argparse
 
 from structural_textural_lightning import LitGATTexturalStructural, plot_roc_curve
 from lightning_datamodule import GraphDataModuleInductive
-from lightning_gluestick_inspired import *
+from gluestick_matin import *
 
 def main(config_path: str):
     # --- Load Configuration from YAML ---
@@ -47,11 +47,12 @@ def main(config_path: str):
     data_module = GraphDataModuleInductive(
         json_dir=cfg_data.get('json_dir', './json_output/'),
         roi_output_size=roi_output_size_tuple,
-        batch_size=cfg_data.get('batch_size', 2),
+        batch_size=cfg_data.get('batch_size', 1),
         train_split=cfg_data.get('train_split', 0.8),
         val_split=cfg_data.get('val_split', 0.1),
         num_workers=num_workers,
-        method = cfg_data.get('method', 'roi')
+        method = cfg_data.get('method', 'roi'),
+        edge_sample_size = cfg_data.get('edge_sample_size', (32,8))
     )
 
     # --- Model ---
@@ -77,7 +78,9 @@ def main(config_path: str):
         edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
         threshold_structural=cfg_train.get('threshold_structural', 0.5),
         mlp_dropout=cfg_model.get('mlp_dropout',0.0),
-        skip_init=cfg_model.get('skip_init', False)
+        skip_init=cfg_model.get('skip_init', False),
+        edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
+        edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
     )
 
     # --- Logging and Checkpointing ---
@@ -93,6 +96,7 @@ def main(config_path: str):
         log_model=True,                                           # Optional: Log model checkpoints to W&B
         # offline=False # Set to True to log locally without syncing to W&B servers
     )
+    logger.log_hyperparams(cfg)
     monitor_metric = cfg_train.get('monitor_metric', 'val_auc')
     monitor_mode = cfg_train.get('monitor_mode', 'max')
     checkpoint_callback = ModelCheckpoint(
