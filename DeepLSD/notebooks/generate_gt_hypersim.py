@@ -32,7 +32,7 @@ if __name__ == "__main__":
     net = DeepLSD(conf)
     net.load_state_dict(ckpt['model'])
     net = net.to(device).eval()
-    image_dir = "/work/scratch/maurdu/data"
+    image_dir = "/mnt/c/Users/shan2/Documents/ETH/MA4/3DV/GitHub/3D-Vision/DeepLSD/notebooks/data"
     cam_view_color = "scene_cam_00_final_preview"
     for image_id in desired_images:
         for frame_str in frames:

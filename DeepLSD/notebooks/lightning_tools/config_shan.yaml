@@ -1,12 +1,12 @@
 data:
   json_dir: '../json_output/'      # Path to the directory containing graph JSON files
   roi_output_size: [96, 16]       # Output size (height, width) for ROI Align features
-  batch_size: 8                  # Number of graphs per batch
+  batch_size: 2                  # Number of graphs per batch
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
-  num_workers: 4                # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 1                # Gradient accumulation
+  num_workers: 2                # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
+  accum_grads: 4                # Gradient accumulation
   method: 'sample'
 
 model:
