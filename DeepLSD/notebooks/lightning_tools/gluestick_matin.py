@@ -951,33 +951,24 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
 
-
-        self.patch_dim = self.hparams.edge_downsample_dim
+        self.hparams.patch_dim = edge_downsample_dim
         self.edge_patch_enc = nn.Sequential( 
-            nn.Conv2d(in_channels=3, out_channels=4, kernel_size=8, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=4, out_channels=5, kernel_size=7, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=5, out_channels=4, kernel_size=6, stride=1, padding=1),
+            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=4, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=4, out_channels=3, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=2, out_channels=1, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),    
+            nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Flatten(start_dim=1)
         )
         
         # Convolutional ROI embedding
         self.conv_roi_embedding = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=6, kernel_size=8, stride=1, padding=1),
+            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=6, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(in_channels=6, out_channels=5, kernel_size=6, stride=1, padding=1),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=5, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(in_channels=5, out_channels=4, kernel_size=5, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=4, out_channels=3, kernel_size=4, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Flatten(start_dim=1)
         )
@@ -997,7 +988,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         )
         self.edge_loss_w = edge_loss_w
         self.edge_predictor = nn.Sequential(
-            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels + self.patch_dim, self.hparams.out_channels),
+            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels + self.hparams.patch_dim, self.hparams.out_channels),
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
         )
@@ -1019,7 +1010,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
                 layers.append(SelfAttnLayer(self.hparams.out_channels, self.hparams.skip_init))
             else:
                 layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
-                edge_attr_dim=self.patch_dim,
+                edge_attr_dim=self.hparams.geom_channels,
                 hidden_dim=self.hparams.out_channels))
                 # layers.append(LocalEdgeLayer(self.hparams.out_channels))
 
@@ -1061,18 +1052,20 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         
      
         
-        edge_patch = self.edge_patch_enc(batch.edge_attr)   # [E, 16]
+        edge_patch = self.edge_patch_enc(batch.edge_attr)  
         edge_patch = self.edge_downsampler(edge_patch)     # Downsample
 
-        local_edge_patch = edge_patch[batch.flat_idx_local]  # [E_local, 8]
-
+        
+        src, dst = batch.full_edge_index
+        edge_geo = edge_geometry(geo, src, dst)             # [E,5]
+        local_edge_geo = edge_geo[batch.flat_idx_local] 
         # Alternate layers
         for layer in self.layers:
             if isinstance(layer, SelfAttnLayer):
                 desc = layer(desc)
             else:
                 flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, local_edge_patch)
+                delta = layer(flat, edge_index, local_edge_geo)
 
                 delta_dense, _ = to_dense_batch(delta, batch_idx)
                 desc = desc + delta_dense.transpose(1,2)
@@ -1087,9 +1080,6 @@ class AttentionEdgeSampleFull(pl.LightningModule):
 
         # Edge logits
 
-        src, dst = batch.full_edge_index
-        edge_geo  = edge_geometry(geo, src, dst)             # [E,5]
-
         h_src, h_dst = features[src], features[dst]
        
         edge_in = torch.cat([
@@ -1099,9 +1089,9 @@ class AttentionEdgeSampleFull(pl.LightningModule):
             edge_patch
         ], dim=1)  
                 
-        edge_logits = self.edge_predictor(edge_in)
+        edge_in = self.edge_predictor(edge_in)  # overwrite so save memory these are now logits
 
-        return node_logits, edge_logits
+        return node_logits, edge_in
 
 
     def training_step(self, batch, batch_idx):
@@ -1193,9 +1183,6 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         if not self.validation_step_outputs:
             return
         
-        
-
-
         losses = torch.stack([x['loss'] for x in self.validation_step_outputs]).mean()
         all_node_preds = torch.cat([x['node_preds'] for x in self.validation_step_outputs]).cpu().numpy()
         all_node_labels = torch.cat([x['node_labels'] for x in self.validation_step_outputs]).cpu().numpy()

@@ -1,13 +1,13 @@
 data:
   json_dir: '/work/scratch/maurdu/data/json_output/'      # Path to the directory containing graph JSON files
-  roi_output_size: [96, 16]       # Output size (height, width) for ROI Align features
-  edge_sample_size: [32,16]       # Output size (height, width) for edge sampling
+  roi_output_size: [64, 16]       # Output size (height, width) for ROI Align features
+  edge_sample_size: [32,10]       # Output size (height, width) for edge sampling
   batch_size: 1                  # Number of graphs per batch
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
-  num_workers: 1               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 32                # Gradient accumulation
+  num_workers: 2               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
+  accum_grads: 8                # Gradient accumulation
   method: 'sample'
 
 model:
@@ -15,9 +15,9 @@ model:
   in_channels_DeepLSD: 1280       # Dimension of the initial DeepLSD embedding feature per node
   # CNN output channels_conv_roi_embedding = (roi_output_size[0]//2 * roi_output_size[1]//2) -> calculated internally
   in_channels: null               # Dimension expected by the roi_GAT
-  geom_channels: 5          # ← new
+  geom_channels: 5          # ← new do not change without changing code in gluestick_{...}.py
 
-  edge_downsample_dim: 30 # project embedded edges to this dimension/num_channels
+  edge_downsample_dim: 15 # project embedded edges to this dimension/num_channels
   hidden_channels: 64           # Number of hidden units in GAT layers
   out_channels: 128                # Output dimension of the GAT layers (input to the final MLP)
   num_layers: 6                   # Number of GAT layers

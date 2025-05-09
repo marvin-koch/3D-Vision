@@ -3,11 +3,11 @@
 wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
 wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
 wandb: Tracking run with wandb version 0.19.9
-wandb: Run data is saved locally in lightning_logs/wandb/run-20250507_121004-lmsx8uu9
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250509_120329-30dxuu0f
 wandb: Run `wandb offline` to turn off syncing.
 wandb: Syncing run Attention_Edge_Sampler
 wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
-wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/lmsx8uu9
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/30dxuu0f
 GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 HPU available: False, using: 0 HPUs
@@ -15,137 +15,24 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 
   | Name                    | Type              | Params | Mode 
 ----------------------------------------------------------------------
-0 | edge_patch_enc          | Sequential        | 2.6 K  | train
-1 | conv_roi_embedding      | Sequential        | 2.9 K  | train
-2 | edge_downsampler        | Sequential        | 320    | train
+0 | edge_patch_enc          | Sequential        | 185    | train
+1 | conv_roi_embedding      | Sequential        | 479    | train
+2 | edge_downsampler        | Sequential        | 160    | train
 3 | edge_predictor          | Sequential        | 36.2 K | train
-4 | node_fuse               | Sequential        | 202 K  | train
-5 | layers                  | ModuleList        | 651 K  | train
+4 | node_fuse               | Sequential        | 188 K  | train
+5 | layers                  | ModuleList        | 645 K  | train
 6 | mlp_textural_structural | Sequential        | 16.6 K | train
 7 | criterion               | BCEWithLogitsLoss | 0      | train
   | other params            | n/a               | 2      | n/a  
 ----------------------------------------------------------------------
-912 K     Trainable params
+887 K     Trainable params
 0         Non-trainable params
-912 K     Total params
-3.652     Total estimated model params size (MB)
-94        Modules in train mode
+887 K     Total params
+3.551     Total estimated model params size (MB)
+90        Modules in train mode
 0         Modules in eval mode
 SLURM auto-requeueing enabled. Setting signal handlers.
 /home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
-Traceback (most recent call last):
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1251, in _try_get_data
-    data = self._data_queue.get(timeout=timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/queues.py", line 113, in get
-    if not self._poll(timeout):
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/connection.py", line 257, in poll
-    return self._poll(timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/connection.py", line 424, in _poll
-    r = wait([self], timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/connection.py", line 931, in wait
-    ready = selector.select(timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/selectors.py", line 416, in select
-    fd_event_list = self._selector.poll(timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/_utils/signal_handling.py", line 73, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 41313) is killed by signal: Killed. 
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/train.py", line 198, in <module>
-    main(config_path=args.config)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/train.py", line 159, in main
-    trainer.fit(model, datamodule=data_module)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
-    call._call_and_handle_interrupt(
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
-    self._run(model, ckpt_path=ckpt_path)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1012, in _run
-    results = self._run_stage()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1054, in _run_stage
-    self._run_sanity_check()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1083, in _run_sanity_check
-    val_loop.run()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/utilities.py", line 179, in _decorator
-    return loop_run(self, *args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 138, in run
-    batch, batch_idx, dataloader_idx = next(data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 134, in __next__
-    batch = super().__next__()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 61, in __next__
-    batch = next(self.iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 341, in __next__
-    out = next(self._iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 142, in __next__
-    out = next(self.iterators[0])
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 708, in __next__
-    data = self._next_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1458, in _next_data
-    idx, data = self._get_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1420, in _get_data
-    success, data = self._try_get_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1264, in _try_get_data
-    raise RuntimeError(
-RuntimeError: DataLoader worker (pid(s) 41313) exited unexpectedly
-Traceback (most recent call last):
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1251, in _try_get_data
-    data = self._data_queue.get(timeout=timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/queues.py", line 113, in get
-    if not self._poll(timeout):
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/connection.py", line 257, in poll
-    return self._poll(timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/connection.py", line 424, in _poll
-    r = wait([self], timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/multiprocessing/connection.py", line 931, in wait
-    ready = selector.select(timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/selectors.py", line 416, in select
-    fd_event_list = self._selector.poll(timeout)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/_utils/signal_handling.py", line 73, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 41313) is killed by signal: Killed. 
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/train.py", line 198, in <module>
-    main(config_path=args.config)
-  File "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/train.py", line 159, in main
-    trainer.fit(model, datamodule=data_module)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
-    call._call_and_handle_interrupt(
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
-    self._run(model, ckpt_path=ckpt_path)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1012, in _run
-    results = self._run_stage()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1054, in _run_stage
-    self._run_sanity_check()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py", line 1083, in _run_sanity_check
-    val_loop.run()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/utilities.py", line 179, in _decorator
-    return loop_run(self, *args, **kwargs)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 138, in run
-    batch, batch_idx, dataloader_idx = next(data_fetcher)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 134, in __next__
-    batch = super().__next__()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/loops/fetchers.py", line 61, in __next__
-    batch = next(self.iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 341, in __next__
-    out = next(self._iterator)
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/utilities/combined_loader.py", line 142, in __next__
-    out = next(self.iterators[0])
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 708, in __next__
-    data = self._next_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1458, in _next_data
-    idx, data = self._get_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1420, in _get_data
-    success, data = self._try_get_data()
-  File "/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1264, in _try_get_data
-    raise RuntimeError(
-RuntimeError: DataLoader worker (pid(s) 41313) exited unexpectedly
-slurmstepd: error: Detected 1 oom_kill event in StepId=23513.0. Some of the step tasks have been OOM Killed.
-srun: error: studgpu-node02: task 0: Out Of Memory
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.

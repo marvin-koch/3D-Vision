@@ -302,7 +302,7 @@ class AttentionBothCoplanar(pl.LightningModule):
         self.save_hyperparameters()
 
         # Edge prediction head
-        self.edge_loss_w = edge_loss_w
+        # self.edge_loss_w = edge_loss_w
         self.edge_predictor = nn.Sequential(
             nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
             nn.ReLU(),
@@ -329,6 +329,17 @@ class AttentionBothCoplanar(pl.LightningModule):
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels,
                       self.hparams.out_channels),
+        )
+
+        self.gat_DeepLSD = pyg_nn.GAT(
+            in_channels=self.hparams.in_channels_DeepLSD,
+            hidden_channels=self.hparams.hidden_channels,
+            out_channels=self.hparams.out_channels,
+            v2=self.hparams.v2,
+            num_layers=self.hparams.num_layers,
+            dropout=self.hparams.dropout,
+            act=self.hparams.act,
+            jk=self.hparams.jk_layer
         )
 
         # GNN layers

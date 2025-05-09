@@ -1,0 +1,128 @@
+_wandb:
+    value:
+        cli_version: 0.19.9
+        m:
+            - "1": trainer/global_step
+              "6":
+                - 3
+              "7": []
+        python_version: 3.9.21
+        t:
+            "1":
+                - 1
+                - 5
+                - 9
+                - 41
+                - 53
+                - 55
+                - 77
+                - 103
+                - 105
+                - 106
+            "2":
+                - 1
+                - 5
+                - 9
+                - 41
+                - 53
+                - 55
+                - 77
+                - 103
+                - 105
+                - 106
+            "3":
+                - 7
+                - 13
+                - 23
+                - 55
+                - 66
+            "4": 3.9.21
+            "5": 0.19.9
+            "8":
+                - 5
+            "12": 0.19.9
+            "13": linux-x86_64
+act:
+    value: relu
+data:
+    value:
+        accum_grads: 32
+        batch_size: 1
+        edge_sample_size:
+            - 32
+            - 16
+        json_dir: /work/scratch/maurdu/data/json_output/
+        method: sample
+        num_workers: 2
+        roi_output_size:
+            - 96
+            - 16
+        train_split: 0.8
+        val_split: 0.1
+dropout:
+    value: 0.2
+edge_loss_w:
+    value: 1
+edge_sample_size:
+    value:
+        - 32
+        - 16
+geom_channels:
+    value: 5
+hidden_channels:
+    value: 128
+in_channels:
+    value: null
+in_channels_DeepLSD:
+    value: 1280
+jk_layer:
+    value: lstm
+learning_rate:
+    value: 0.0005
+mlp_dropout:
+    value: 0.2
+model:
+    value:
+        act: relu
+        dropout: 0.2
+        geom_channels: 5
+        hidden_channels: 128
+        in_channels: null
+        in_channels_DeepLSD: 1280
+        jk_layer: lstm
+        mlp_dropout: 0.2
+        num_layers: 6
+        out_channels: 128
+        skip_init: "False"
+        v2: true
+node_loss_w:
+    value: 1
+num_layers:
+    value: 6
+out_channels:
+    value: 128
+roi_align_embedding_shape:
+    value:
+        - 96
+        - 16
+skip_init:
+    value: "False"
+threshold_structural:
+    value: 0.5
+training:
+    value:
+        accelerator: auto
+        devices: auto
+        early_stopping_patience: 20
+        edge_loss_w: 1
+        epochs: 100
+        experiment_name: Attention_Edge_Sampler
+        learning_rate: 0.0005
+        log_dir: lightning_logs
+        monitor_metric: val_combined_auc_epoch
+        monitor_mode: max
+        node_loss_w: 1
+        seed: 42
+        threshold_structural: 0.5
+v2:
+    value: true
