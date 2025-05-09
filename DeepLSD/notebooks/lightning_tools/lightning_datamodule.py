@@ -10,6 +10,10 @@ from torch.utils.data import WeightedRandomSampler
 import numpy as np
 import torch
 
+from torch.utils.data import Subset # For type hinting in the new methods
+from multiprocessing import Pool, cpu_count
+from tqdm import tqdm # Import tqdm
+
 class GraphDataModuleInductive(pl.LightningDataModule):
     def __init__(self, json_dir: str, roi_output_size: tuple = (64, 64),
                  batch_size: int = 32, train_split: float = 0.8,
@@ -87,7 +91,7 @@ class GraphDataModuleInductive(pl.LightningDataModule):
     
 
     def val_dataloader(self):
-        return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, persistent_workers=self.num_workers > 0)
+        return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, persistent_workers=False)
 
     def test_dataloader(self):
-        return DataLoader(self.test_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, persistent_workers=self.num_workers > 0)
+        return DataLoader(self.test_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, persistent_workers=False)

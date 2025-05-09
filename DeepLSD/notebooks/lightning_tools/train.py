@@ -10,6 +10,8 @@ import argparse
 from structural_textural_lightning import LitGATTexturalStructural, plot_roc_curve
 from lightning_datamodule import GraphDataModuleInductive
 from gluestick_matin import *
+from precomputed_datamodule import GraphDataModule
+
 
 def main(config_path: str):
     # --- Load Configuration from YAML ---
@@ -40,20 +42,30 @@ def main(config_path: str):
     roi_output_size_tuple = tuple(cfg_data.get('roi_output_size', [64, 64]))
     num_workers = cfg_data.get('num_workers', 0)
     # Automatically set num_workers to 0 if no CUDA detected to avoid potential issues
-    if not torch.cuda.is_available() and num_workers > 0:
-        print(f"Warning: CUDA not available, setting num_workers to 0 (was {num_workers})")
-        num_workers = 0
-    print("Using following method to extract features: {}".format(cfg_data.get('method', 'roi')))
-    data_module = GraphDataModuleInductive(
-        json_dir=cfg_data.get('json_dir', './json_output/'),
-        roi_output_size=roi_output_size_tuple,
-        batch_size=cfg_data.get('batch_size', 1),
-        train_split=cfg_data.get('train_split', 0.8),
-        val_split=cfg_data.get('val_split', 0.1),
-        num_workers=num_workers,
-        method = cfg_data.get('method', 'roi'),
-        edge_sample_size = cfg_data.get('edge_sample_size', (32,8))
-    )
+    use_precomputed_data = cfg_data.get('use_precomputed', False),
+    if not use_precomputed_data:
+        if not torch.cuda.is_available() and num_workers > 0:
+            print(f"Warning: CUDA not available, setting num_workers to 0 (was {num_workers})")
+            num_workers = 0
+        print("Using following method to extract features: {}".format(cfg_data.get('method', 'roi')))
+        data_module = GraphDataModuleInductive(
+            json_dir=cfg_data.get('json_dir', './json_output/'),
+            roi_output_size=roi_output_size_tuple,
+            batch_size=cfg_data.get('batch_size', 1),
+            train_split=cfg_data.get('train_split', 0.8),
+            val_split=cfg_data.get('val_split', 0.1),
+            num_workers=num_workers,
+            method = cfg_data.get('method', 'roi'),
+            edge_sample_size = cfg_data.get('edge_sample_size', (32,8))
+        )
+    else:
+        print("Using precomputed data ")
+        data_module = GraphDataModule(
+            data_path = cfg_data.get('precompute_dir','./graph_data/')
+            batch_size=cfg_data.get('batch_size', 1),
+            num_workers=num_workers,
+
+        )
 
     # --- Model ---
     print("Initializing Model...")
