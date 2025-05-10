@@ -42,8 +42,8 @@ def main(config_path: str):
     roi_output_size_tuple = tuple(cfg_data.get('roi_output_size', [64, 64]))
     num_workers = cfg_data.get('num_workers', 0)
     # Automatically set num_workers to 0 if no CUDA detected to avoid potential issues
-    use_precomputed_data = cfg_data.get('use_precomputed', False),
-    if not use_precomputed_data:
+    use_precomputed_data = cfg_data.get('use_precomputed', False)
+    if True:
         if not torch.cuda.is_available() and num_workers > 0:
             print(f"Warning: CUDA not available, setting num_workers to 0 (was {num_workers})")
             num_workers = 0
@@ -61,7 +61,7 @@ def main(config_path: str):
     else:
         print("Using precomputed data ")
         data_module = GraphDataModule(
-            data_path = cfg_data.get('precompute_dir','./graph_data/')
+            data_path = cfg_data.get('precompute_dir','./graph_data/'),
             batch_size=cfg_data.get('batch_size', 1),
             num_workers=num_workers,
 

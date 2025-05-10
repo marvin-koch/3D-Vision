@@ -988,7 +988,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         )
         self.edge_loss_w = edge_loss_w
         self.edge_predictor = nn.Sequential(
-            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels + self.hparams.patch_dim, self.hparams.out_channels),
+            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
         )
@@ -1010,7 +1010,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
                 layers.append(SelfAttnLayer(self.hparams.out_channels, self.hparams.skip_init))
             else:
                 layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
-                edge_attr_dim=self.hparams.geom_channels,
+                edge_attr_dim=self.hparams.edge_downsample_dim,
                 hidden_dim=self.hparams.out_channels))
                 # layers.append(LocalEdgeLayer(self.hparams.out_channels))
 
@@ -1058,7 +1058,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         
         src, dst = batch.full_edge_index
         edge_geo = edge_geometry(geo, src, dst)             # [E,5]
-        local_edge_geo = edge_geo[batch.flat_idx_local] 
+        #local_edge_geo = edge_geo[batch.flat_idx_local] 
         # Alternate layers
         for layer in self.layers:
             if isinstance(layer, SelfAttnLayer):

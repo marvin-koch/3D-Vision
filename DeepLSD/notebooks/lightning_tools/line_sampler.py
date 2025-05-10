@@ -115,6 +115,24 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 
 class EdgeSampler(pl.LightningModule):
+    def __init__(
+        self,
+        num_samples_u: int = 50,  # samples along the line direction
+        num_samples_v: int = 5,   # samples across between the two lines
+    ):
+        super().__init__()
+        if num_samples_u <= 0 or num_samples_v <= 0:
+            raise ValueError("Number of samples (u and v) must be positive.")
+
+        self.num_samples_u = num_samples_u
+        self.num_samples_v = num_samples_v
+
+        # Precompute and register the (u,v) sampling grid
+        u = torch.linspace(0, 1, steps=num_samples_u, dtype=torch.float32)
+        v = torch.linspace(0, 1, steps=num_samples_v, dtype=torch.float32)
+        uu, vv = torch.meshgrid(u, v, indexing='ij')  # shapes (Nu, Nv)
+        self.register_buffer('uu', uu)
+        self.register_buffer('vv', vv)
     def forward(self,
                 img:    torch.Tensor,   # (C, H, W)
                 quads:  torch.Tensor,   # (E, 4, 2)
