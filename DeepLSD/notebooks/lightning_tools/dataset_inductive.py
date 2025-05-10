@@ -102,9 +102,6 @@ class GraphDatasetInductive(Dataset):
 
         self.edge_sampler = EdgeSampler(num_samples_u=num_samples_edge,num_samples_v=width_edge)
 
-
-        self.edge_sampler    = self.edge_sampler
-
         # Only instantiate the sampler if we're going to use it
         if self.method == "sample":
             num_samples, width = self.roi_output_size
