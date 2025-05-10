@@ -1065,7 +1065,7 @@ class AttentionEdgeSampleFull(pl.LightningModule):
                 desc = layer(desc)
             else:
                 flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, local_edge_geo)
+                delta = layer(flat, edge_index, edge_patch)
 
                 delta_dense, _ = to_dense_batch(delta, batch_idx)
                 desc = desc + delta_dense.transpose(1,2)
@@ -1083,10 +1083,9 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         h_src, h_dst = features[src], features[dst]
        
         edge_in = torch.cat([
-            0.5 * (h_src + h_dst),        # symmetric mean      [E, D]
+            0.5 * (h_src + h_dst),        # symmetric mean      [E, D]t
             (h_src - h_dst).abs(),        # symmetric distance  [E, D]
-            edge_geo, # geometric extras    [E, 5]
-            edge_patch
+            edge_geo # geometric extras    [E, 5]
         ], dim=1)  
                 
         edge_in = self.edge_predictor(edge_in)  # overwrite so save memory these are now logits

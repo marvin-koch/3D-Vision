@@ -110,202 +110,60 @@ class LineSampler(pl.LightningModule):
 
 
 
+import torch
+import torch.nn.functional as F
+import pytorch_lightning as pl
+
 class EdgeSampler(pl.LightningModule):
-    """
-    Samples pixel data from quadrilateral regions defined by pairs of lines.
-
-    For each ordered pair of distinct lines (line_i, line_j), it defines a
-    quadrilateral region connecting their endpoints (start_i, end_i, end_j, start_j).
-    It then samples pixel values from this region using bilinear interpolation
-    via F.grid_sample. This is intended for generating edge attributes in a
-    graph representation where lines are nodes.
-
-    Assumes usage within a PyTorch Lightning setup where device placement is handled.
-    """
-    def __init__(
-        self,
-        num_samples_u: int = 50, # Samples along the effective line direction
-        num_samples_v: int = 5,  # Samples between the pair of lines
-    ):
+    def forward(self,
+                img:    torch.Tensor,   # (C, H, W)
+                quads:  torch.Tensor,   # (E, 4, 2)
+                align_corners: bool = True
+              ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        Initializes the EdgeSampler.
-
-        Args:
-            num_samples_u: Number of points to sample along the 'u' direction,
-                           interpolating between the start-points-line and end-points-line.
-            num_samples_v: Number of points to sample along the 'v' direction,
-                           interpolating between line_i and line_j.
+        Now only samples the provided E quads, returns:
+        - patches:     (E, C, num_samples_u, num_samples_v)
+        - edge_index:  (2, E)  in the same order as `quads`
         """
-        super().__init__()
-        if num_samples_u <= 0 or num_samples_v <= 0:
-            raise ValueError("Number of samples (u and v) must be positive.")
-
-        self.num_samples_u = num_samples_u
-        self.num_samples_v = num_samples_v
-
-        # Precompute and cache the local sampling grid (u, v)
-        # Ensure float type for interpolation calculations
-        u = torch.linspace(0, 1, steps=num_samples_u, dtype=torch.float32)
-        v = torch.linspace(0, 1, steps=num_samples_v, dtype=torch.float32)
-        uu, vv = torch.meshgrid(u, v, indexing='ij') # uu:(Nu, Nv), vv:(Nu, Nv)
-
-        # Register as buffers so they move with the module’s device
-        # and are saved with the state_dict. PTL handles the device placement.
-        self.register_buffer('uu', uu)
-        self.register_buffer('vv', vv)
-
-    def forward(
-        self,
-        img: torch.Tensor,
-        lines: torch.Tensor,
-        align_corners: bool = True
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """
-        Samples quadrilateral regions between pairs of lines from an image.
-
-        Args:
-            img: Input image tensor (C, H, W). Expected to be on the correct device.
-            lines: Lines defined by start/end points.
-                   Tensor of shape (N, 2, 2) where N is the number of lines.
-                   Coordinates should be in pixel space (x corresponding to W, y to H).
-                   Expected to be on the correct device.
-            align_corners: Argument passed to F.grid_sample. If True, the
-                           extreme values -1 and 1 are considered pixel centers.
-                           If False, they are considered pixel corners.
-
-        Returns:
-            Tuple[torch.Tensor, torch.Tensor]:
-            - sampled_patches: Tensor containing the sampled quadrilaterals,
-              shape (M, C, num_samples_u, num_samples_v), where M = N * (N - 1)
-              is the number of ordered pairs of distinct lines. On the same device as input.
-            - edge_indices: Tensor indicating the pairs of line indices (i, j)
-              corresponding to each sampled patch, shape (2, M) (PyG format).
-              On the same device as input.
-        """
-        # --- Input Validation and Preparation ---
-        if img.dim() != 3:
-            raise ValueError(f"Input image must be a 3D tensor (C, H, W), but got shape {img.shape}")
-        if not isinstance(lines, torch.Tensor):
-             raise TypeError(f"Lines must be a torch.Tensor, but got {type(lines)}")
-        if lines.dim() != 3 or lines.shape[1:] != (2, 2):
-             raise ValueError(f"Lines tensor must have shape (N, 2, 2), but got {lines.shape}")
-
-        # Ensure lines tensor is float for coordinate calculations
-        # (It usually is, but good to be safe or cast if necessary upstream)
-        if not torch.is_floating_point(lines):
-             # If lines are integer coordinates, cast them for interpolation
-             lines = lines.float()
-             # Consider raising a warning or error if precision loss is critical
-        # After your input‐validation, before any math:
-        lines = lines.to(dtype=lines.dtype)
-
         C, H, W = img.shape
-        N = lines.shape[0] # Number of lines
-        img_dtype = img.dtype # Use image dtype for grid sampling compatibility
-        computation_dtype = lines.dtype # Use lines dtype for coordinate math
+        E       = quads.size(0)
 
-        if N <= 1:
-             # Cannot form pairs if N < 2
-             M = 0
-             out_shape = (M, C, self.num_samples_u, self.num_samples_v)
-             # Create edge_indices on the same device as lines implicitly via device=lines.device
-             # Although lines might be empty tensor if N=0, check N=1 case first
-             edge_indices = torch.empty((M, 2), dtype=torch.long)
-             # Create empty tensor on the same device as img
-             sampled_patches = torch.empty(out_shape, dtype=img_dtype)
-             return sampled_patches, edge_indices.t() # Return (2, M) format
+        # unpack corner points
+        P00 = quads[:,0]  # (E,2)
+        P10 = quads[:,1]
+        P11 = quads[:,2]
+        P01 = quads[:,3]
 
-        # --- Generate Pairs of Line Indices ---
-        # Create index tensor on the same device as the input 'lines' tensor
-        idx = torch.arange(N)
-        # Use cartesian_prod and filter self-loops
-        all_pairs = torch.cartesian_prod(idx, idx) # Shape (N*N, 2)
-        
-        # mask = all_pairs[:, 0] != all_pairs[:, 1]
-        # edge_indices = all_pairs[mask] # Shape (M, 2), M = N * (N-1). Inherits device from idx.
-        
-        edge_indices = all_pairs
-        idx_i = edge_indices[:, 0] # Shape (M,)
-        idx_j = edge_indices[:, 1] # Shape (M,)
-        M = edge_indices.shape[0] # Number of pairs
+        # build (u,v)-grid as before, broadcast to (E, Nu, Nv)
+        uu = self.uu.view(1, self.num_samples_u, self.num_samples_v, 1)
+        vv = self.vv.view(1, self.num_samples_u, self.num_samples_v, 1)
 
-        # --- Extract Corner Points for Each Pair ---
-        # Indexing preserves the device
-        lines_i = lines[idx_i]  # (M, 2, 2)
-        lines_j = lines[idx_j]  # (M, 2, 2)
+        # bilinear interp: same formula you had
+        P00 = P00.view(E,1,1,2);  P10 = P10.view(E,1,1,2)
+        P01 = P01.view(E,1,1,2);  P11 = P11.view(E,1,1,2)
+        P_i = (1 - uu)*P00 + uu*P10
+        P_j = (1 - uu)*P01 + uu*P11
+        XY  = (1 - vv)*P_i  + vv*P_j   # (E, Nu, Nv, 2)
+        X, Y = XY[...,0], XY[...,1]
 
-        # P00 = start_i, P10 = end_i, P01 = start_j, P11 = end_j
-        # Coordinates are (x, y)
-        P00 = lines_i[:, 0, :] # (M, 2) [x, y]
-        P10 = lines_i[:, 1, :] # (M, 2)
-        P01 = lines_j[:, 0, :] # (M, 2)
-        P11 = lines_j[:, 1, :] # (M, 2)
+        # normalize to [-1,1]
+        Xn = 2*X/(W-1) - 1
+        Yn = 2*Y/(H-1) - 1
+        grid = torch.stack([Xn, Yn], dim=-1).to(img.dtype)
 
-        # --- Bilinear Interpolation for Sampling Grid ---
-        # Buffers self.uu and self.vv are automatically on the correct device.
-        # Cast them to the computation dtype (float type of lines) for coordinate math.
-  
-        uu = self.uu.to(dtype=computation_dtype)
-        vv = self.vv.to(dtype=computation_dtype)
+        # repeat image E times
+        img_rep = img.unsqueeze(0).expand(E, C, H, W)
 
-        # Reshape points and grid for broadcasting:
-        # Points: (M, 1, 1, 2)
-        # Grid params: (1, Nu, Nv, 1)
-        # View operations preserve the device
-        P00 = P00.view(M, 1, 1, 2)
-        P10 = P10.view(M, 1, 1, 2)
-        P01 = P01.view(M, 1, 1, 2)
-        P11 = P11.view(M, 1, 1, 2)
-        uu = uu.view(1, self.num_samples_u, self.num_samples_v, 1)
-        vv = vv.view(1, self.num_samples_u, self.num_samples_v, 1)
-
-        # Bilinear interpolation formula:
-        # P(u,v) = (1-v) * ((1-u)P00 + u*P10) + v * ((1-u)P01 + u*P11)
-        # The calculation happens on the device of the operands (which is the correct device).
-        P_i = (1 - uu) * P00 + uu * P10 # (M, Nu, Nv, 2)
-        P_j = (1 - uu) * P01 + uu * P11 # (M, Nu, Nv, 2)
-        XY = (1 - vv) * P_i + vv * P_j  # (M, Nu, Nv, 2)
-
-        # Extract X and Y coordinates
-        X = XY[..., 0] # (M, Nu, Nv)
-        Y = XY[..., 1] # (M, Nu, Nv)
-
-        # --- Normalize Coordinates ---
-        # Normalize to the range [-1, +1] for grid_sample
-        # Handle cases where W or H might be 1
-        # Use float division
-        W_eff = torch.tensor(max(1, W - 1), dtype=computation_dtype)
-        H_eff = torch.tensor(max(1, H - 1), dtype=computation_dtype)
-        Xn = 2 * X / W_eff - 1
-        Yn = 2 * Y / H_eff - 1
-
-        # Stack normalized coordinates to create the grid expected by grid_sample
-        # Shape: (M, num_samples_u, num_samples_v, 2) where the last dim is (x, y)
-        # Ensure the grid dtype matches the image dtype for grid_sample,
-        # although grid_sample often handles float grids with various image types.
-        # Casting here ensures compatibility if needed.
-        grid = torch.stack([Xn, Yn], dim=-1).to(dtype=img_dtype)
-
-        # --- Sampling ---
-        # grid_sample expects input image shape (N, C, Hin, Win) and grid shape (N, Hout, Wout, 2)
-        # Our image is (C, H, W) and grid is (M, Nu, Nv, 2).
-        # We need to repeat the image M times to match the first dimension of the grid.
-        # Expand preserves device.
-        img_rep = img.unsqueeze(0).expand(M, C, H, W)
-
-        # Perform the sampling
-        # Output shape: (M, C, Nu, Nv) which is (M, C, num_samples_u, num_samples_v)
-        # Output tensor will be on the same device as img_rep and grid.
-        sampled_patches = F.grid_sample(
-            img_rep,
-            grid,
-            mode='bilinear',       # Common interpolation mode
-            padding_mode='zeros',  # How to handle samples outside the image boundaries
+        patches = F.grid_sample(
+            img_rep, grid,
+            mode='bilinear',
+            padding_mode='zeros',
             align_corners=align_corners
         )
 
-        # edge_indices is already on the correct device (derived from lines.device)
-        return sampled_patches, edge_indices.t() # Return edge_indices transposed (2, M) for PyG standard
+    
+        return patches
+
 
 
 def extract_line_feature_ROIAlign(img: np.ndarray, 

@@ -261,43 +261,64 @@ class GraphDatasetInductive(Dataset):
                 full_edge_index.append([i, j])
                 full_edge_labels.append(coplanarity_matrix[i][j])
                 
-            for j in knn[i]:  
-                edge_list.append([i, j])
-                edge_labels.append(coplanarity_matrix[i][j])
+            # for j in knn[i]:  
+            #     edge_list.append([i, j])
+            #     edge_labels.append(coplanarity_matrix[i][j])
                 
                 
-        edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
-        edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)           
+        # edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
+        # edge_labels = torch.tensor(edge_labels, dtype=torch.float).unsqueeze(1)           
 
         full_edge_index = torch.tensor(full_edge_index, dtype=torch.long).t().contiguous()
         full_edge_labels = torch.tensor(full_edge_labels, dtype=torch.float).unsqueeze(1)
         
         
         
-        edge_attr = self.edge_sampler((
-            torch.tensor(img_np, dtype=torch.float32)
-                .div(255.0)
-                .permute(2, 0, 1)  # C,H,W
-        ), coords)[0]
-        edge_attr = edge_attr
-        N = coords.shape[0]
-        src, dst = edge_index              # each is length E_local
-        flat_idx_local = src * N + dst     # vectorized  i*N + j
+        # edge_attr = self.edge_sampler((
+        #     torch.tensor(img_np, dtype=torch.float32)
+        #         .div(255.0)
+        #         .permute(2, 0, 1)  # C,H,W
+        # ), coords)[0]
+        # edge_attr = edge_attr
+        # N = coords.shape[0]
+        # src, dst = edge_index              # each is length E_local
+        # flat_idx_local = src * N + dst     # vectorized  i*N + j
 
+
+      # 8) Directly sample edge attributes only for these local edges
+        img_t = torch.tensor(img_np, dtype=torch.float32).div(255).permute(2,0,1)
      
+
+        # 1) flatten knn into a single edge_index of shape (2, E):
+        src = torch.arange(N, device=coords.device).unsqueeze(1).expand(-1, k).reshape(-1)
+        dst = knn.reshape(-1)
+        local_edge_index = torch.stack([src, dst], dim=0)   # (2, N*k)
+
+        # 2) build the M = N*k “quad” coords exactly as before,
+        #    but here we pass only (start_i, end_i, end_j, start_j)
+        lines_i = coords[src]   # (E, 2, 2)
+        lines_j = coords[dst]   # (E, 2, 2)
+        quads = torch.stack([
+            lines_i[:,0],  # start_i
+            lines_i[:,1],  # end_i
+            lines_j[:,1],  # end_j
+            lines_j[:,0],  # start_j
+        ], dim=1)         # (E, 4, 2)
+
+        # 3) now call the sampler and overwrite both the edge_attr and edge_index
+        edge_attr = self.edge_sampler(img_t, quads)
 
         return Data(
             x=x_emb,
             y=y,
             coordinates=coords,
             geo=geo,
-            edge_index=edge_index,
-            edge_labels=edge_labels,
+            edge_index=local_edge_index,
             full_edge_index=full_edge_index,
             full_edge_labels=full_edge_labels,
             roi_features=roi_features,
             edge_attr = edge_attr,
             edge_dist = D,
-            flat_idx_local=flat_idx_local,
+            #flat_idx_local=flat_idx_local,
             # img_path = file_path_img
         )
