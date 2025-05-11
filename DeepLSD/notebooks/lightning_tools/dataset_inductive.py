@@ -318,7 +318,7 @@ class GraphDatasetInductive(Dataset):
             full_edge_labels=full_edge_labels,
             roi_features=roi_features,
             edge_attr = edge_attr,
-            edge_dist = D,
+            # edge_dist = D,
             #flat_idx_local=flat_idx_local,
             # img_path = file_path_img
         )

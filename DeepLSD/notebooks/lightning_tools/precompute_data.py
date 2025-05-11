@@ -11,6 +11,7 @@ from torch.utils.data import Subset # For type hinting in the new methods
 from structural_textural_lightning import LitGATTexturalStructural, plot_roc_curve
 from lightning_datamodule import GraphDataModuleInductive
 from gluestick_matin import *
+import gzip
 
 # Attempt to import Batch from torch_geometric.data for specific handling
 try:
@@ -47,22 +48,21 @@ def _debatch_pytorch_standard(batch_data):
         # Fallback: if it's a single complex object not covered, treat it as one sample.
         return [batch_data]
 
-
 def save_datamodule_samples(datamodule: pl.LightningDataModule, save_path: str):
     """
     Draws samples from the datamodule's train, validation, and test dataloaders
-    and saves them individually to the specified path with progress bars.
+    and saves them individually as .pt.gz files to the specified path with progress bars.
 
     The data is saved in the expected structure:
     save_path/
      ├── train/
-     │   ├── sample_0.pt
+     │   ├── sample_0.pt.gz
      │   └── ...
      ├── validation/
-     │   ├── sample_0.pt
+     │   ├── sample_0.pt.gz
      │   └── ...
      └── test/
-         ├── sample_0.pt
+         ├── sample_0.pt.gz
          └── ...
 
     Args:
@@ -128,11 +128,14 @@ def save_datamodule_samples(datamodule: pl.LightningDataModule, save_path: str):
             total_batches = None # tqdm will not show ETA
 
         any_batch_processed = False
+        # Assuming batch_size is 1 as per problem description for dataloaders used with this function
         for batch_data in tqdm(dataloader_instance, desc=f"Saving {split_name}", unit="batch", total=total_batches, ncols=100):
             any_batch_processed = True
             samples_in_batch = []
 
-            if IS_TORCH_GEOMETRIC_AVAILABLE and isinstance(batch_data, TG_Batch):
+            # The IS_TORCH_GEOMETRIC_AVAILABLE and TG_Batch check is for torch_geometric.data.Batch
+            # These are assumed to be defined globally or passed/imported appropriately.
+            if IS_TORCH_GEOMETRIC_AVAILABLE and isinstance(batch_data, TG_Batch): # type: ignore
                 samples_in_batch = batch_data.to_data_list()
             else:
                 # Use the helper for standard PyTorch batch formats
@@ -141,24 +144,24 @@ def save_datamodule_samples(datamodule: pl.LightningDataModule, save_path: str):
             if not samples_in_batch and batch_data is not None:
                 # If de-batching returned empty but original batch was not,
                 # save the whole batch as one sample to avoid data loss.
+                # This case is less likely if batch_size=1, as _debatch_pytorch_standard([item]) -> [item]
                 tqdm.write(f"Warning: De-batching for {split_name} batch of type {type(batch_data)} resulted in empty list or was not handled by specific de-batchers. Saving entire batch as one sample.")
                 samples_in_batch = [batch_data]
 
 
             for sample_item in samples_in_batch:
-                sample_filename = f"sample_{sample_idx_counter}.pt"
+                # Changed to .pt.gz
+                sample_filename = f"sample_{sample_idx_counter}.pt.gz"
                 file_path = os.path.join(split_dir, sample_filename)
-                try:
-                    torch.save(sample_item, file_path)
-                    sample_idx_counter += 1
-                except Exception as e:
-                    tqdm.write(f"Error: Failed to save {split_name} sample (idx {sample_idx_counter}) to {file_path}: {str(e)[:150]}...")
+                with gzip.open(file_path, 'wb') as f:
+                    torch.save(sample_item, f)
+                sample_idx_counter += 1
         
         if not any_batch_processed and (total_batches is None or total_batches == 0) and sample_idx_counter == 0:
             print(f"Warning: {split_name.capitalize()} dataloader did not yield any batches, or was empty.")
             
         print(f"Finished saving {sample_idx_counter} {split_name} samples.")
-    
+
     print(f"\nAll available samples processed. Check {base_dir} for output.")
 
 

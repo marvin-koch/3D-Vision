@@ -1,22 +1,26 @@
 import os
 import torch
-from torch.utils.data import Dataset
+from torch_geometric.data import Dataset
 from pytorch_lightning import LightningDataModule
 from torch_geometric.loader import DataLoader as PyGDataLoader
+import gzip
 
 class PyGGraphDataset(Dataset):
     def __init__(self, data_dir: str):
         self.data_dir = data_dir
-        # Sort files for consistent order, helpful for reproducibility/debugging
-        self.sample_files = sorted([f for f in os.listdir(data_dir) if f.endswith('.pt')])
+        # Sort files for consistent order, look for .pt.gz files
+        self.sample_files = sorted([f for f in os.listdir(data_dir) if f.endswith('.pt.gz')])
 
     def __len__(self):
         return len(self.sample_files)
 
     def __getitem__(self, idx: int):
         file_path = os.path.join(self.data_dir, self.sample_files[idx])
-        # Loads a single torch_geometric.data.Data object
-        return torch.load(file_path)
+        # Load from a gzipped file
+        with gzip.open(file_path, 'rb') as f:
+            # Loads a single torch_geometric.data.Data object or any saved torch object
+            return torch.load(f, weights_only=False)
+        return data_obj
 
 class GraphDataModule(LightningDataModule):
     def __init__(self, data_path: str, batch_size: int = 32, num_workers: int = 0):
@@ -25,7 +29,7 @@ class GraphDataModule(LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         # save_hyperparameters() is good practice for PL modules
-        self.save_hyperparameters('batch_size', 'num_workers')
+        self.save_hyperparameters('data_path','batch_size', 'num_workers')
 
         self.train_dataset = None
         self.val_dataset = None

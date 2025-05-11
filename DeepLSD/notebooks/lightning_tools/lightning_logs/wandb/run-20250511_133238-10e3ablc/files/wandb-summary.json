@@ -1,0 +1,1 @@
+{"_step":2,"train_node_acc":0.6014580726623535,"_wandb":{"runtime":230},"epoch":0,"train_loss":0.6119216680526733,"_runtime":186.664613198,"train_edge_acc":0.7436071038246155,"trainer/global_step":29,"_timestamp":1.746963345050179e+09}

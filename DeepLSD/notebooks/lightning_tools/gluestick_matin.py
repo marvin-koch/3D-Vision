@@ -946,46 +946,65 @@ class AttentionEdgeSampleFull(pl.LightningModule):
         edge_loss_w: float = 1.0,          # Weight for edge loss (new)
         threshold_structural: float = 0.5,  # Threshold for accuracy/recall calc
         mlp_dropout: float = 0.0,          # drop out for merge features
-        skip_init=False
+        skip_init=False,
+        only_linear = True,
         ):
         super().__init__()
         self.save_hyperparameters()
 
         self.hparams.patch_dim = edge_downsample_dim
-        self.edge_patch_enc = nn.Sequential( 
-            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=4, stride=1, padding=1),
+        if not only_linear:
+            self.edge_patch_enc = nn.Sequential( 
+                nn.Conv2d(in_channels=3, out_channels=5, kernel_size=7, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(in_channels=5, out_channels=7, kernel_size=5, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.Flatten(start_dim=1)
+            )
+            # Convolutional ROI embedding
+            self.conv_roi_embedding = nn.Sequential(
+                nn.Conv2d(in_channels=3, out_channels=5, kernel_size=7, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.Conv2d(in_channels=5, out_channels=6, kernel_size=7, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.Flatten(start_dim=1)
+            )
+            with torch.no_grad():
+                # make a dummy batch of size 1
+                x = torch.randn(1, 3, *self.hparams.roi_align_embedding_shape)
+                self.hparams.channels_conv_roi_embedding = self.conv_roi_embedding(x).shape[1]
+                x = torch.randn(1, 3, *edge_sample_size)
+                self.patch_dim_intermediate   = self.edge_patch_enc(x).shape[1]         # ← output of edge_patch_enc
+                self.hparams.patch_dim_intermediate =  self.patch_dim_intermediate
+                print("Patch output dimension after edge_patch_enc is {}".format(self.hparams.patch_dim_intermediate))
+                print("Node  output dimension after conv_roi_embedding is {}".format(self.hparams.channels_conv_roi_embedding))
+                # Edge prediction head
+                self.edge_downsampler = nn.Sequential(
+                nn.Linear(self.hparams.patch_dim_intermediate,self.hparams.edge_downsample_dim),
+                nn.ReLU(),
+            )
+        else:
+            width,height =  self.hparams.roi_align_embedding_shape
+            self.edge_patch_enc = nn.Sequential(
+            nn.Flatten(start_dim=1),
+            nn.Linear(3*width*height, self.hparams.patch_dim),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=2, out_channels=1, kernel_size=3, stride=1, padding=1),
+            )
+            self.edge_downsampler = nn.Sequential(
+                nn.Linear(self.hparams.patch_dim,self.hparams.patch_dim),
+                nn.ReLU(),
+            )
+            self.conv_roi_embedding = nn.Sequential(
+            nn.Flatten(start_dim=1),
+            nn.Linear(3*width*height, self.hparams.out_channels),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Flatten(start_dim=1)
-        )
+            )
         
-        # Convolutional ROI embedding
-        self.conv_roi_embedding = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=6, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=3, out_channels=2, kernel_size=5, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Flatten(start_dim=1)
-        )
         
-        with torch.no_grad():
-            # make a dummy batch of size 1
-            x = torch.randn(1, 3, *self.hparams.roi_align_embedding_shape)
-            self.hparams.channels_conv_roi_embedding = self.conv_roi_embedding(x).shape[1]
-            x = torch.randn(1, 3, *edge_sample_size)
-            self.patch_dim_intermediate   = self.edge_patch_enc(x).shape[1]         # ← output of edge_patch_enc
-            self.hparams.patch_dim_intermediate =  self.patch_dim_intermediate
-            print("Patch output dimension after edge_patch_enc is {}".format(self.hparams.patch_dim_intermediate))
-        # Edge prediction head
-        self.edge_downsampler = nn.Sequential(
-            nn.Linear(self.hparams.patch_dim_intermediate,self.hparams.edge_downsample_dim),
-            nn.ReLU(),
-        )
         self.edge_loss_w = edge_loss_w
         self.edge_predictor = nn.Sequential(
             nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),

@@ -9,9 +9,10 @@ import argparse
 
 from structural_textural_lightning import LitGATTexturalStructural, plot_roc_curve
 from lightning_datamodule import GraphDataModuleInductive
-from gluestick_matin import *
+# from gluestick_matin import *
+from gluestick_fully_linear import *
 from precomputed_datamodule import GraphDataModule
-
+import gzip
 
 def main(config_path: str):
     # --- Load Configuration from YAML ---
@@ -38,12 +39,14 @@ def main(config_path: str):
     pl.seed_everything(cfg_train.get('seed', 42), workers=True)
 
     # --- Data ---
-    print("Setting up DataModule...")
+    print("Setting up DataModule with batch_size {} and accum_grad {}.".format(cfg_data.get('batch_size', 1),cfg_train.get('accum_grads', 1)))
+    print("Effective batch_size is {}".format(cfg_data.get('batch_size', 1) * cfg_train.get('accum_grads', 1)))
     roi_output_size_tuple = tuple(cfg_data.get('roi_output_size', [64, 64]))
     num_workers = cfg_data.get('num_workers', 0)
     # Automatically set num_workers to 0 if no CUDA detected to avoid potential issues
     use_precomputed_data = cfg_data.get('use_precomputed', False)
-    if True:
+    print("use_precomputed_data is {}".format(use_precomputed_data))
+    if not use_precomputed_data:
         if not torch.cuda.is_available() and num_workers > 0:
             print(f"Warning: CUDA not available, setting num_workers to 0 (was {num_workers})")
             num_workers = 0
@@ -64,7 +67,6 @@ def main(config_path: str):
             data_path = cfg_data.get('precompute_dir','./graph_data/'),
             batch_size=cfg_data.get('batch_size', 1),
             num_workers=num_workers,
-
         )
 
     # --- Model ---
@@ -72,28 +74,50 @@ def main(config_path: str):
     jk_layer_val = cfg_model.get('jk_layer')
     if isinstance(jk_layer_val, str) and jk_layer_val.lower() == 'null':
         jk_layer_val = None
-
-    model = AttentionEdgeSampleFull(
-        in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
-        in_channels=cfg_model.get('in_channels', 1024),
-        hidden_channels=cfg_model.get('hidden_channels', 128),
-        out_channels=cfg_model.get('out_channels', 64),
-        geom_channels=cfg_model.get('geom_channels', 5),
-        roi_align_embedding_shape=roi_output_size_tuple,
-        num_layers=cfg_model.get('num_layers', 3),
-        dropout=cfg_model.get('dropout', 0.2),
-        act=cfg_model.get('act', 'relu'),
-        v2=cfg_model.get('v2', True),
-        jk_layer=jk_layer_val,
-        learning_rate=cfg_train.get('learning_rate', 1e-3),
-        node_loss_w=cfg_train.get('node_loss_w', 1.0),
-        edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
-        threshold_structural=cfg_train.get('threshold_structural', 0.5),
-        mlp_dropout=cfg_model.get('mlp_dropout',0.0),
-        skip_init=cfg_model.get('skip_init', False),
-        edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
-        edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
-    )
+    if not cfg_model.get('only_linear', True):
+        model = AttentionEdgeSampleFull(
+            in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
+            in_channels=cfg_model.get('in_channels', 1024),
+            hidden_channels=cfg_model.get('hidden_channels', 128),
+            out_channels=cfg_model.get('out_channels', 64),
+            geom_channels=cfg_model.get('geom_channels', 5),
+            roi_align_embedding_shape=roi_output_size_tuple,
+            num_layers=cfg_model.get('num_layers', 3),
+            dropout=cfg_model.get('dropout', 0.2),
+            act=cfg_model.get('act', 'relu'),
+            v2=cfg_model.get('v2', True),
+            jk_layer=jk_layer_val,
+            learning_rate=cfg_train.get('learning_rate', 1e-3),
+            node_loss_w=cfg_train.get('node_loss_w', 1.0),
+            edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
+            threshold_structural=cfg_train.get('threshold_structural', 0.5),
+            mlp_dropout=cfg_model.get('mlp_dropout',0.0),
+            skip_init=cfg_model.get('skip_init', False),
+            edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
+            edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
+        )
+    else:
+        model = AttentionEdgeSampleLinear(
+            in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
+            in_channels=cfg_model.get('in_channels', 1024),
+            hidden_channels=cfg_model.get('hidden_channels', 128),
+            out_channels=cfg_model.get('out_channels', 64),
+            geom_channels=cfg_model.get('geom_channels', 5),
+            roi_align_embedding_shape=roi_output_size_tuple,
+            num_layers=cfg_model.get('num_layers', 3),
+            dropout=cfg_model.get('dropout', 0.2),
+            act=cfg_model.get('act', 'relu'),
+            v2=cfg_model.get('v2', True),
+            jk_layer=jk_layer_val,
+            learning_rate=cfg_train.get('learning_rate', 1e-3),
+            node_loss_w=cfg_train.get('node_loss_w', 1.0),
+            edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
+            threshold_structural=cfg_train.get('threshold_structural', 0.5),
+            mlp_dropout=cfg_model.get('mlp_dropout',0.0),
+            skip_init=cfg_model.get('skip_init', False),
+            edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
+            edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
+        )
 
     # --- Logging and Checkpointing ---
     log_dir = cfg_train.get('log_dir', "lightning_logs")
