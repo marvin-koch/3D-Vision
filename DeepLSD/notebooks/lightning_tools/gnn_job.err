@@ -1,13 +1,13 @@
-/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
 [rank: 0] Seed set to 42
 wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
 wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
 wandb: Tracking run with wandb version 0.19.9
-wandb: Run data is saved locally in lightning_logs/wandb/run-20250511_141935-aif2y3g1
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250512_012620-phrkjdq6
 wandb: Run `wandb offline` to turn off syncing.
 wandb: Syncing run Attention_Edge_Sampler
 wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
-wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/aif2y3g1
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/phrkjdq6
 GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 HPU available: False, using: 0 HPUs
@@ -15,41 +15,65 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 
   | Name                    | Type              | Params | Mode 
 ----------------------------------------------------------------------
-0 | edge_patch_enc          | Sequential        | 1.6 K  | train
-1 | conv_roi_embedding      | Sequential        | 2.0 K  | train
-2 | edge_downsampler        | Sequential        | 3.4 K  | train
-3 | edge_predictor          | Sequential        | 33.7 K | train
-4 | node_fuse               | Sequential        | 211 K  | train
-5 | layers                  | ModuleList        | 651 K  | train
-6 | mlp_textural_structural | Sequential        | 16.6 K | train
-7 | criterion               | BCEWithLogitsLoss | 0      | train
+0 | edge_patch_enc          | Sequential        | 46.1 K | train
+1 | node_linear             | Sequential        | 786 K  | train
+2 | edge_predictor          | Sequential        | 33.7 K | train
+3 | node_fuse               | Sequential        | 197 K  | train
+4 | layers                  | ModuleList        | 651 K  | train
+5 | mlp_textural_structural | Sequential        | 16.6 K | train
+6 | criterion               | BCEWithLogitsLoss | 0      | train
   | other params            | n/a               | 2      | n/a  
 ----------------------------------------------------------------------
-920 K     Trainable params
+1.7 M     Trainable params
 0         Non-trainable params
-920 K     Total params
-3.683     Total estimated model params size (MB)
-90        Modules in train mode
+1.7 M     Total params
+6.928     Total estimated model params size (MB)
+81        Modules in train mode
 0         Modules in eval mode
 SLURM auto-requeueing enabled. Setting signal handlers.
-/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
-/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
-/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
-/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_matin.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
-Metric val_combined_auc_epoch improved. New best score: 0.836
-Epoch 0, global step 336: 'val_combined_auc_epoch' reached 0.83627 (best 0.83627), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=00-val_combined_auc_epoch=0.8363.ckpt' as top 1
-Metric val_combined_auc_epoch improved by 0.035 >= min_delta = 0.0. New best score: 0.871
-Epoch 1, global step 672: 'val_combined_auc_epoch' reached 0.87105 (best 0.87105), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=01-val_combined_auc_epoch=0.8711.ckpt' as top 1
-Epoch 2, global step 1008: 'val_combined_auc_epoch' was not in top 1
-Metric val_combined_auc_epoch improved by 0.022 >= min_delta = 0.0. New best score: 0.893
-Epoch 3, global step 1344: 'val_combined_auc_epoch' reached 0.89291 (best 0.89291), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=03-val_combined_auc_epoch=0.8929.ckpt' as top 1
-Epoch 4, global step 1680: 'val_combined_auc_epoch' was not in top 1
-Metric val_combined_auc_epoch improved by 0.011 >= min_delta = 0.0. New best score: 0.903
-Epoch 5, global step 2016: 'val_combined_auc_epoch' reached 0.90346 (best 0.90346), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=05-val_combined_auc_epoch=0.9035.ckpt' as top 1
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+Metric val_combined_auc_epoch improved. New best score: 0.827
+Epoch 0, global step 336: 'val_combined_auc_epoch' reached 0.82675 (best 0.82675), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=00-val_combined_auc_epoch=0.8267.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.028 >= min_delta = 0.0. New best score: 0.855
+Epoch 1, global step 672: 'val_combined_auc_epoch' reached 0.85495 (best 0.85495), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=01-val_combined_auc_epoch=0.8550.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.032 >= min_delta = 0.0. New best score: 0.886
+Epoch 2, global step 1008: 'val_combined_auc_epoch' reached 0.88646 (best 0.88646), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=02-val_combined_auc_epoch=0.8865.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.007 >= min_delta = 0.0. New best score: 0.894
+Epoch 3, global step 1344: 'val_combined_auc_epoch' reached 0.89370 (best 0.89370), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=03-val_combined_auc_epoch=0.8937.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.001 >= min_delta = 0.0. New best score: 0.895
+Epoch 4, global step 1680: 'val_combined_auc_epoch' reached 0.89487 (best 0.89487), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=04-val_combined_auc_epoch=0.8949.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.010 >= min_delta = 0.0. New best score: 0.905
+Epoch 5, global step 2016: 'val_combined_auc_epoch' reached 0.90462 (best 0.90462), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=05-val_combined_auc_epoch=0.9046.ckpt' as top 1
 Epoch 6, global step 2352: 'val_combined_auc_epoch' was not in top 1
-Metric val_combined_auc_epoch improved by 0.013 >= min_delta = 0.0. New best score: 0.917
-Epoch 7, global step 2688: 'val_combined_auc_epoch' reached 0.91673 (best 0.91673), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=07-val_combined_auc_epoch=0.9167.ckpt' as top 1
-Metric val_combined_auc_epoch improved by 0.003 >= min_delta = 0.0. New best score: 0.919
-Epoch 8, global step 3024: 'val_combined_auc_epoch' reached 0.91944 (best 0.91944), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=08-val_combined_auc_epoch=0.9194.ckpt' as top 1
-Metric val_combined_auc_epoch improved by 0.005 >= min_delta = 0.0. New best score: 0.924
-Epoch 9, global step 3360: 'val_combined_auc_epoch' reached 0.92394 (best 0.92394), saving model to 'lightning_logs/lightning_project/aif2y3g1/checkpoints/best-model-epoch=09-val_combined_auc_epoch=0.9239.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.007 >= min_delta = 0.0. New best score: 0.912
+Epoch 7, global step 2688: 'val_combined_auc_epoch' reached 0.91185 (best 0.91185), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=07-val_combined_auc_epoch=0.9118.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.006 >= min_delta = 0.0. New best score: 0.918
+Epoch 8, global step 3024: 'val_combined_auc_epoch' reached 0.91780 (best 0.91780), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=08-val_combined_auc_epoch=0.9178.ckpt' as top 1
+Epoch 9, global step 3360: 'val_combined_auc_epoch' was not in top 1
+Metric val_combined_auc_epoch improved by 0.003 >= min_delta = 0.0. New best score: 0.921
+Epoch 10, global step 3696: 'val_combined_auc_epoch' reached 0.92111 (best 0.92111), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=10-val_combined_auc_epoch=0.9211.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.009 >= min_delta = 0.0. New best score: 0.930
+Epoch 11, global step 4032: 'val_combined_auc_epoch' reached 0.92987 (best 0.92987), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=11-val_combined_auc_epoch=0.9299.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.001 >= min_delta = 0.0. New best score: 0.931
+Epoch 12, global step 4368: 'val_combined_auc_epoch' reached 0.93131 (best 0.93131), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=12-val_combined_auc_epoch=0.9313.ckpt' as top 1
+Epoch 13, global step 4704: 'val_combined_auc_epoch' was not in top 1
+Metric val_combined_auc_epoch improved by 0.008 >= min_delta = 0.0. New best score: 0.940
+Epoch 14, global step 5040: 'val_combined_auc_epoch' reached 0.93955 (best 0.93955), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=14-val_combined_auc_epoch=0.9396.ckpt' as top 1
+Epoch 15, global step 5376: 'val_combined_auc_epoch' was not in top 1
+Epoch 16, global step 5712: 'val_combined_auc_epoch' was not in top 1
+Metric val_combined_auc_epoch improved by 0.003 >= min_delta = 0.0. New best score: 0.943
+Epoch 17, global step 6048: 'val_combined_auc_epoch' reached 0.94292 (best 0.94292), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=17-val_combined_auc_epoch=0.9429.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.001 >= min_delta = 0.0. New best score: 0.944
+Epoch 18, global step 6384: 'val_combined_auc_epoch' reached 0.94416 (best 0.94416), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=18-val_combined_auc_epoch=0.9442.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.003 >= min_delta = 0.0. New best score: 0.948
+Epoch 19, global step 6720: 'val_combined_auc_epoch' reached 0.94750 (best 0.94750), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=19-val_combined_auc_epoch=0.9475.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.001 >= min_delta = 0.0. New best score: 0.949
+Epoch 20, global step 7056: 'val_combined_auc_epoch' reached 0.94881 (best 0.94881), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=20-val_combined_auc_epoch=0.9488.ckpt' as top 1
+Epoch 21, global step 7392: 'val_combined_auc_epoch' was not in top 1
+Metric val_combined_auc_epoch improved by 0.000 >= min_delta = 0.0. New best score: 0.949
+Epoch 22, global step 7728: 'val_combined_auc_epoch' reached 0.94925 (best 0.94925), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=22-val_combined_auc_epoch=0.9493.ckpt' as top 1
+Metric val_combined_auc_epoch improved by 0.002 >= min_delta = 0.0. New best score: 0.951
+Epoch 23, global step 8064: 'val_combined_auc_epoch' reached 0.95134 (best 0.95134), saving model to 'lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=23-val_combined_auc_epoch=0.9513.ckpt' as top 1
