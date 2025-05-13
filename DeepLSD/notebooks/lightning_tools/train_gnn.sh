@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --time=30:00:00 # total time allocated
+#SBATCH --time=24:00:00 # total time allocated
 #SBATCH --mem-per-cpu=16000 # memory per CPU core in MB
-#SBATCH --output=gnn_job.out # specify a file to direct standard output stream,
+#SBATCH --output=gnn_job_2.out # specify a file to direct standard output stream,
 #SBATCH --account=3dv # mandatory course tag
-#SBATCH --error=gnn_job.err # specify a file to direct standard error stream
+#SBATCH --error=gnn_job_2.err # specify a file to direct standard error stream
 #SBATCH --open-mode=truncate # truncate overwrites output and error files, append just appends
 #SBATCH --mail-type=START,END,FAIL
 # ./etc/profile.d/modules.sh

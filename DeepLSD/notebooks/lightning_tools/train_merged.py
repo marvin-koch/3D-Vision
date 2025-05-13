@@ -94,7 +94,7 @@ def main(config_path: str):
             mlp_dropout=cfg_model.get('mlp_dropout',0.0),
             skip_init=cfg_model.get('skip_init', False),
             edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
-            edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
+            edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
     else:
         model = AttentionEdgeSampleLinear(
@@ -116,7 +116,7 @@ def main(config_path: str):
             mlp_dropout=cfg_model.get('mlp_dropout',0.0),
             skip_init=cfg_model.get('skip_init', False),
             edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
-            edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
+            edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
 
     # --- Logging and Checkpointing ---

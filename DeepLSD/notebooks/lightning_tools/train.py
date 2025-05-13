@@ -94,7 +94,7 @@ def main(config_path: str):
             mlp_dropout=cfg_model.get('mlp_dropout',0.0),
             skip_init=cfg_model.get('skip_init', False),
             edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
-            edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
+            edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
     else:
         model = AttentionEdgeSampleLinear(
@@ -116,7 +116,7 @@ def main(config_path: str):
             mlp_dropout=cfg_model.get('mlp_dropout',0.0),
             skip_init=cfg_model.get('skip_init', False),
             edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
-            edge_downsample_dim=cfg_data.get('edge_downsample_dim', 20),
+            edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
 
     # --- Logging and Checkpointing ---
@@ -190,9 +190,20 @@ def main(config_path: str):
         accumulate_grad_batches=cfg_train.get('accum_grads', 1)
     )
 
+    resume_from_ckpt_path_config = cfg_model.get("load_model_path", None)
+    ckpt_to_resume_for_fit = None # Default to None (start training from scratch)
+
+    if resume_from_ckpt_path_config and os.path.isfile(resume_from_ckpt_path_config):
+        print(f"Found model checkpoint at '{resume_from_ckpt_path_config}'. Attempting to load and continue training.")
+        ckpt_to_resume_for_fit = resume_from_ckpt_path_config
+    elif resume_from_ckpt_path_config: # Path was specified in config, but file does not exist
+        print(f"Warning: Model checkpoint path '{resume_from_ckpt_path_config}' provided in config but file not found. Starting training from scratch.")
+    else: # No load_model_path specified in config for resuming
+        print("No resume model checkpoint path provided in cfg_model.load_model_path. Starting training from scratch.")
+    
     # --- Training ---
     print("\n--- Starting Training ---")
-    trainer.fit(model, datamodule=data_module)
+    trainer.fit(model, datamodule=data_module, ckpt_path=ckpt_to_resume_for_fit)
     print("--- Training Finished ---")
     print(f"Best model saved at: {checkpoint_callback.best_model_path}")
 

@@ -1,0 +1,41 @@
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+[rank: 0] Seed set to 42
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: matin_ml (sup-res-dl) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.9
+wandb: Run data is saved locally in lightning_logs/wandb/run-20250513_100451-4ou5mng0
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Attention_Edge_Sampler
+wandb: ⭐️ View project at https://wandb.ai/sup-res-dl/lightning_project
+wandb: 🚀 View run at https://wandb.ai/sup-res-dl/lightning_project/runs/4ou5mng0
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+Restoring states from the checkpoint path at /home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=41-val_combined_auc_epoch=0.9618.ckpt
+/home/maurdu/miniconda3/envs/deeplsd/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:362: The dirpath has changed from 'lightning_logs/lightning_project/phrkjdq6/checkpoints' to 'lightning_logs/lightning_project/4ou5mng0/checkpoints', therefore `best_model_score`, `kth_best_model_path`, `kth_value`, `last_model_path` and `best_k_models` won't be reloaded. Only `best_model_path` will be reloaded.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name                    | Type              | Params | Mode 
+----------------------------------------------------------------------
+0 | edge_patch_enc          | Sequential        | 46.1 K | train
+1 | node_linear             | Sequential        | 786 K  | train
+2 | edge_predictor          | Sequential        | 33.7 K | train
+3 | node_fuse               | Sequential        | 197 K  | train
+4 | layers                  | ModuleList        | 651 K  | train
+5 | mlp_textural_structural | Sequential        | 16.6 K | train
+6 | criterion               | BCEWithLogitsLoss | 0      | train
+  | other params            | n/a               | 2      | n/a  
+----------------------------------------------------------------------
+1.7 M     Trainable params
+0         Non-trainable params
+1.7 M     Total params
+6.928     Total estimated model params size (MB)
+81        Modules in train mode
+0         Modules in eval mode
+Restored all states from the checkpoint at /home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=41-val_combined_auc_epoch=0.9618.ckpt
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/gluestick_fully_linear.py:152: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+Epoch 42, global step 14448: 'val_combined_auc_epoch' reached 0.95831 (best 0.95831), saving model to 'lightning_logs/lightning_project/4ou5mng0/checkpoints/best-model-epoch=42-val_combined_auc_epoch=0.9583.ckpt' as top 1

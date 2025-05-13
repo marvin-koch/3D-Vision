@@ -331,7 +331,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
 
 
         self.node_fuse = nn.Sequential(
-            nn.Linear(self.hparams.in_channels + self.hparams.in_channels_DeepLSD +  self.hparams.geom_channels, self.hparams.in_channels),
+            nn.Linear(self.hparams.in_channels + self.hparams.in_channels_DeepLSD, self.hparams.in_channels),
             nn.Dropout(p=self.hparams.mlp_dropout),
             nn.ReLU(),
             nn.Linear(self.hparams.in_channels,
@@ -340,7 +340,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
             nn.ReLU(),
         )
         self.merge_node_edges = nn.Sequential(
-            nn.Linear(self.hparams.in_channels + self.hparams.k * self.hparams.edge_downsample_dim +  self.hparams.geom_channels,
+            nn.Linear(self.hparams.in_channels + self.hparams.k * self.hparams.edge_downsample_dim,
                       2 * self.hparams.in_channels),
             nn.Dropout(p=self.hparams.mlp_dropout),
             nn.ReLU(),
@@ -365,7 +365,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
 
         # Node prediction head
         self.mlp_textural_structural = nn.Sequential(
-            nn.Linear(self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
+            nn.Linear(self.hparams.out_channels+  self.hparams.geom_channels, self.hparams.out_channels),
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
         )
@@ -393,7 +393,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         geo = batch.geo
         # ROI conv and fuse
         roi_feats = self.node_linear(roi_features)
-        concat_feat = torch.cat([roi_feats, x, geo], dim=1)
+        concat_feat = torch.cat([roi_feats, x], dim=1)
         concat_feat = self.node_fuse(concat_feat)
         edge_feat = self.edge_patch_enc(batch.edge_attr)  
         src, dst = batch.edge_index
@@ -408,13 +408,13 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         
         edge_feat_aggregated_per_node = edge_feat.view(num_nodes, k * self.hparams.edge_downsample_dim)
         # Concatenate node features, aggregated edge features, and node geometric features
-        features_to_merge = torch.cat([concat_feat, edge_feat_aggregated_per_node, geo], dim=1)
+        features_to_merge = torch.cat([concat_feat, edge_feat_aggregated_per_node], dim=1)
         # Apply the merge layer
         h_in = self.merge_node_edges(features_to_merge) 
         h_out= self.gat_merged(h_in, edge_index, edge_attr = edge_geo)
         
         # Node logits
-        node_logits = self.mlp_textural_structural(h_out)
+        node_logits = self.mlp_textural_structural(torch.cat([h_out,geo],dim=1))
 
         # Edge logits
         src_full, dst_full = batch.full_edge_index

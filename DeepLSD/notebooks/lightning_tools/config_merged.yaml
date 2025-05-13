@@ -4,12 +4,12 @@ data:
   precompute_dir: '/work/scratch/maurdu/data/graph_data/'
   roi_output_size: [64,32]       # Output size (height, width) for ROI Align features
   edge_sample_size: [32,24]       # Output size (height, width) for edge sampling
-  batch_size:  2             # Number of graphs per batch
+  batch_size:  1             # Number of graphs per batch
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 2               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 4                # Gradient accumulation
+  accum_grads: 8                # Gradient accumulation
   method: 'sample'
   use_precomputed: true # use pre_computed
   k_nn: 7 # ToDo: Implement value to use for the k_nn graph
@@ -17,22 +17,22 @@ model:
   # Input dimensions
   in_channels_DeepLSD: 1280       # Dimension of the initial DeepLSD embedding feature per node
   # CNN output channels_conv_roi_embedding = (roi_output_size[0]//2 * roi_output_size[1]//2) -> calculated internally
-  in_channels: 128               # Dimension expected by the roi_GAT
+  in_channels: 256               # Dimension expected by the roi_GAT
   geom_channels: 5          # ← new do not change without changing code in gluestick_{...}.py
-
   edge_downsample_dim: 64 # project embedded edges to this dimension/num_channels
-  hidden_channels: 128           # Number of hidden units in GAT layers
-  out_channels: 128                #  Output dimension of the GAT layers (input to the final MLP))
+  hidden_channels: 256           # Number of hidden units in GAT layers
+  out_channels: 256                #  Output dimension of the GAT layers (input to the final MLP))
   num_layers: 6                   # Number of GAT layers
   dropout: 0.1                    # Dropout rate within GAT layers
-  act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
+  act: 'elu'                     # Activation function for GAT ('relu', 'elu', etc.)
   v2: true                        # Use GATv2 formulation (set to false for GATv1)
-  jk_layer: 'cat'                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
+  jk_layer: 'lstm'                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
   skip_init: "False"
   only_linear: true               # use only linear layers no conv
   # MLP Drop-outs
   mlp_dropout: 0.1
   # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
+
 
 training:
   learning_rate: 0.0005            # Optimizer learning rate
@@ -49,5 +49,5 @@ training:
   monitor_metric: 'val_combined_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
   monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
   seed: 42                        # Random seed for reproducibility
-  experiment_name: "Attention_Edge_Sampler"
+  experiment_name: "GAT_Edges_Merged"
 
