@@ -56,7 +56,7 @@ def _load_array_from_json_or_npy(field, json_dict, desc="array"):
         return np.array(json_dict[field])
     path_field = f"{field}_path"
     if path_field in json_dict:
-        arr_path = json_dict[path_field]
+        arr_path = "../" +json_dict[path_field]
         if not os.path.exists(arr_path):
             raise FileNotFoundError(f"{desc} file not found: {arr_path}")
         return np.load(arr_path)
@@ -72,7 +72,7 @@ from line_sampler import LineSampler, EdgeSampler  # <-- your LightningModule
 from line_sampler import extract_line_feature_ROIAlign
 
 class GraphDatasetInductive(Dataset):
-    def __init__(self, json_dir, roi_output_size=(64, 64), method="sample", device=None, edge_sample_size = (32,16)):
+    def __init__(self, json_dir, roi_output_size=(96, 16), method="sample", device=None, edge_sample_size = (32,16)):
         super().__init__()
         json_files = [
             os.path.join(json_dir, f)
@@ -85,7 +85,7 @@ class GraphDatasetInductive(Dataset):
                 data = orjson.loads(f.read())
 
           
-            img_path = data.get('file_path')
+            img_path = "../" + data.get('file_path')
             # try to load once
                     # == FAST EXISTENCE CHECK ==
             if img_path and os.path.exists(img_path):
@@ -147,7 +147,7 @@ class GraphDatasetInductive(Dataset):
         )  # shape: (N,N)
 
         # --- 3) load file_path & image ---
-        file_path_img = graph_data.get("file_path", None)
+        file_path_img = "../" +graph_data.get("file_path", None)
         img = _load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
 
         # --- 4) load per-line features & coords & labels ---
