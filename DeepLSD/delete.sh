@@ -3,7 +3,7 @@ set -euo pipefail # Exit on error, treat unset variables as errors, and ensure p
 
 BASE_PATH="/work/scratch/maurdu/data"
 # Set to true for testing (will print what would be deleted), false to actually delete.
-DRY_RUN=true # <<<< YOU HAD THIS AS false, I've kept it for this example, but normally start with true
+DRY_RUN=true # 
 
 # --- Sanity check: Ensure BASE_PATH exists ---
 if [ ! -d "$BASE_PATH" ]; then
