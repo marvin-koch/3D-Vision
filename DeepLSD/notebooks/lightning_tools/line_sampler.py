@@ -316,3 +316,171 @@ def extract_line_feature_ROIAlign(img: np.ndarray,
         plt.show()
 
     return roi_results
+
+
+
+
+import cv2
+import numpy as np
+import torch
+
+def extract_fixed_oriented_patches(
+    img: np.ndarray,
+    lines: np.ndarray,
+    patch_size: tuple = (64, 128),        # (height, width) of every patch
+    draw_line: bool = True,               # re‑draw the line inside the patch?
+    border_value: int | tuple = 0         # padding colour if patch sticks out
+) -> torch.Tensor:
+    """
+    Parameters
+    ----------
+    img        : H×W×C  (uint8/float32)  –  RGB/BGR or grayscale.
+    lines      : (N, 2, 2)  –  [[x1,y1],[x2,y2]] in pixel coords.
+    patch_size : (patch_h, patch_w)  –  SAME for every line.
+    draw_line  : If True, cv2.line is drawn on the patch (helps the CNN).
+    border_value : Background colour for areas outside the image.
+
+    Returns
+    -------
+    torch.Tensor  (N, C, patch_h, patch_w)
+    """
+    if lines is None or len(lines) == 0:
+        raise ValueError("`lines` is empty!")
+
+    # ensure 3‑D image (H,W,C)
+    if img.ndim == 2:
+        img = img[..., None]
+    H, W, C = img.shape
+    patch_h, patch_w = patch_size
+    half_h, half_w   = patch_h // 2, patch_w // 2
+
+    # container for all patches
+    patches = []
+
+    for p1, p2 in lines:
+        x1, y1 = p1
+        x2, y2 = p2
+
+        # -- 1. centre & angle ------------------------------------------------
+        cx, cy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+        angle  = np.degrees(np.arctan2(y2 - y1, x2 - x1))   # line's angle
+
+        # -- 2. rotate ENTIRE image around the centre (nearest‑neighbour) ----
+        M = cv2.getRotationMatrix2D((cx, cy), -angle, 1.0)  # negative = align
+        rotated = cv2.warpAffine(
+            img,
+            M,
+            dsize=(W, H),
+            flags=cv2.INTER_NEAREST,       # *no* interpolation smoothing
+            borderValue=border_value
+        )
+
+        # -- 3. find new centre position after rotation ----------------------
+        cx_r, cy_r, _ = np.dot(M, np.array([cx, cy, 1.0]))
+
+        # -- 4. crop a regular axis‑aligned rectangle around the centre -------
+        patch = cv2.getRectSubPix(
+            rotated,
+            patchSize=(patch_w, patch_h),   # note: (width, height) order
+            center=(cx_r, cy_r)
+        )
+
+        # -- 5. (optional) draw the line again in local coords ---------------
+        if draw_line:
+            # endpoints in the rotated frame
+            p1_r = tuple(np.dot(M, np.array([x1, y1, 1.0]))[:2] -
+                         np.array([cx_r - half_w, cy_r - half_h]))
+            p2_r = tuple(np.dot(M, np.array([x2, y2, 1.0]))[:2] -
+                         np.array([cx_r - half_w, cy_r - half_h]))
+            cv2.line(patch, p1_r, p2_r, color=(255, 255, 255), thickness=1)
+
+        patches.append(patch)
+
+    # -- 6. stack and convert to PyTorch (N, C, H, W) -------------------------
+    patches_np = np.stack(patches)                       # (N, H, W, C)
+    patches_t  = torch.from_numpy(patches_np).permute(0, 3, 1, 2)
+    return patches_t
+
+
+import cv2
+import numpy as np
+import torch
+
+def extract_oriented_feature_patches_feature_map(
+    feature_map: torch.Tensor,
+    lines: np.ndarray,
+    patch_size_img: tuple,              # same (H,W) you used on the RGB image
+    downsample_ratio: int,              # e.g. 4 for a stride‑4 backbone
+    draw_line: bool = False,
+    border_value: float | tuple = 0.0,
+) -> torch.Tensor:
+    """
+    Returns
+    -------
+    patches_t : (N, C, H_f, W_f)  torch tensor
+                H_f = round(patch_size_img[0]/downsample_ratio)
+                W_f = round(patch_size_img[1]/downsample_ratio)
+    """
+    # ------------------------------------------------------------------ #
+    # 0.  book‑keeping                                                   #
+    # ------------------------------------------------------------------ #
+    if feature_map.dim() == 4:          # (1,C,Hf,Wf) → (C,Hf,Wf)
+        feature_map = feature_map.squeeze(0)
+    C, Hf, Wf = feature_map.shape
+    fmap_np = feature_map.permute(1, 2, 0).cpu().numpy()      # (Hf,Wf,C)
+
+    # size we want to crop on the *feature* grid
+    H_patch = int(round(patch_size_img[0] / downsample_ratio))
+    W_patch = int(round(patch_size_img[1] / downsample_ratio))
+    half_h, half_w = H_patch // 2, W_patch // 2
+
+    # scale line coordinates to feature‑map resolution
+    lines_f = np.asarray(lines, dtype=np.float32) / downsample_ratio
+    patches = []
+
+    # ------------------------------------------------------------------ #
+    # 1.  iterate over lines                                             #
+    # ------------------------------------------------------------------ #
+    for (x1f, y1f), (x2f, y2f) in lines_f:
+        # centre & angle
+        cx, cy = (x1f + x2f) / 2.0, (y1f + y2f) / 2.0
+        angle  = np.degrees(np.arctan2(y2f - y1f, x2f - x1f))
+
+        # rotate entire feature map (nearest = no interpolation blur)
+        M = cv2.getRotationMatrix2D((cx, cy), -angle, 1.0)
+        rot = cv2.warpAffine(
+            fmap_np,
+            M,
+            dsize=(Wf, Hf),
+            flags=cv2.INTER_NEAREST,
+            borderValue=border_value,
+        )
+
+        # new feature‑map coords of the patch centre
+        cx_r, cy_r, _ = M @ np.array([cx, cy, 1.0])
+
+        # crop axis‑aligned rectangle
+        patch = cv2.getRectSubPix(
+            rot,
+            patchSize=(W_patch, H_patch),    # (width, height)
+            center=(cx_r, cy_r),
+        )
+
+        if draw_line:
+            # endpoints in rotated frame, then local coords in the patch
+            p1_r = (M @ np.array([x1f, y1f, 1.]))[:2] - [cx_r - half_w, cy_r - half_h]
+            p2_r = (M @ np.array([x2f, y2f, 1.]))[:2] - [cx_r - half_w, cy_r - half_h]
+            cv2.line(patch,
+                     tuple(np.round(p1_r).astype(int)),
+                     tuple(np.round(p2_r).astype(int)),
+                     color=(1.0,) * C, thickness=1)
+
+        patches.append(patch)
+
+    # ------------------------------------------------------------------ #
+    # 2.  stack & back to torch                                          #
+    # ------------------------------------------------------------------ #
+    patches_np = np.stack(patches)                          # (N, Hf_p, Wf_p, C)
+    patches_t  = torch.from_numpy(patches_np).permute(0, 3, 1, 2)  # (N,C,Hf_p,Wf_p)
+    return patches_t
+

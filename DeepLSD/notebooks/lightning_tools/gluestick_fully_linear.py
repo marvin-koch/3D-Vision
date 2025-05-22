@@ -308,29 +308,33 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
 
         node_height, node_width =  self.hparams.roi_align_embedding_shape
         edge_height, edge_width =  self.hparams.edge_sample_size
-        self.edge_patch_enc = nn.Sequential(
-        nn.Flatten(start_dim=1),
-        nn.Linear(3* edge_height * edge_width, self.hparams.edge_downsample_dim),
-        nn.Dropout(p=self.hparams.mlp_dropout),
-        nn.ReLU(),
-        )
-        self.node_linear = nn.Sequential(
-        nn.Flatten(start_dim=1),
-        nn.Linear(3*node_height*node_width, self.hparams.hidden_channels),
-        nn.Dropout(p=self.hparams.mlp_dropout),
-        nn.ReLU(),
-        )
-        
-        
-        self.edge_loss_w = edge_loss_w
-        self.edge_predictor = nn.Sequential(
-            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
-            nn.ReLU(),
-            nn.Linear(self.hparams.out_channels, 1)
+     
+
+  
+        # Image‐patch branch
+        self.img_cnn = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool2d(1),    # → (B*N,32,1,1)
+            nn.Flatten(),               # → (B*N, 32)
+            nn.Linear(32, self.hparams.out_channels),
+            nn.ReLU(inplace=True),
         )
 
+        # Feature‐map‐patch branch
+        self.fmap_cnn = nn.Sequential(
+            nn.Conv2d(256, 64, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(64, self.hparams.out_channels),
+            nn.ReLU(inplace=True),
+        )
+        
+        self.edge_loss_w = edge_loss_w
+  
         self.node_fuse = nn.Sequential(
-            nn.Linear(self.hparams.hidden_channels + self.hparams.in_channels_DeepLSD +  self.hparams.geom_channels,
+            nn.Linear(self.hparams.out_channels + self.hparams.out_channels +  self.hparams.geom_channels,
                       self.hparams.out_channels),
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels,
@@ -343,9 +347,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
             if i % 2 == 0:
                 layers.append(SelfAttnLayer(self.hparams.out_channels, self.hparams.skip_init))
             else:
-                layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
-                edge_attr_dim=self.hparams.edge_downsample_dim,
-                hidden_dim=self.hparams.out_channels))
+                layers.append(LocalEdgeLayer(self.hparams.out_channels))
                 # layers.append(LocalEdgeLayer(self.hparams.out_channels))
 
         self.layers = nn.ModuleList(layers)
@@ -357,6 +359,12 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
             nn.Linear(self.hparams.out_channels, 1)
         )
 
+        self.edge_predictor = nn.Sequential(
+            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
+            nn.ReLU(),
+            nn.Linear(self.hparams.out_channels, 1)
+        )
+
         # Loss
         self.criterion = nn.BCEWithLogitsLoss()
 
@@ -364,19 +372,27 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         self.validation_step_outputs = []
         self.test_step_outputs = []
         
-        #Learned weights for loss
-        self.log_sigma_node = nn.Parameter(torch.zeros(()))
-        self.log_sigma_edge = nn.Parameter(torch.zeros(()))
-       
+    
                     
     def forward(self, batch):
         
-        x, edge_index, batch_idx = batch.x, batch.edge_index, batch.batch
-        roi_features = batch.roi_features 
+        edge_index, batch_idx = batch.edge_index, batch.batch
         geo = batch.geo
-        # ROI conv and fuse
-        roi_feats = self.node_linear(roi_features)
-        concat_feat = torch.cat([roi_feats, x, geo], dim=1)
+        patches_fmap = batch.patches_fmap
+        patches_img = batch.patches_img
+
+        B, N, C1, H1, W1 = patches_img.shape
+        _, _, C2, H2, W2 = patches_fmap.shape
+
+        img_flat  = patches_img .reshape(B * N, C1, H1, W1)
+        fmap_flat = patches_fmap.reshape(B * N, C2, H2, W2)
+
+        emb_img  = self.img_cnn(img_flat)   # (B*N, img_emb)
+        emb_fmap = self.fmap_cnn(fmap_flat) # (B*N, fmap_emb)
+
+        geo_flat = batch.geo.reshape(B*N, 5)
+        concat_feat = torch.cat([emb_img, emb_fmap, geo_flat], dim=1)
+
         concat_feat = self.node_fuse(concat_feat)
         
         # Prepare for global attention
@@ -386,8 +402,6 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         
      
         
-        edge_patch = self.edge_patch_enc(batch.edge_attr)  
-
         
         src, dst = batch.full_edge_index
         edge_geo = edge_geometry(geo, src, dst)             # [E,5]
@@ -398,7 +412,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
                 desc = layer(desc)
             else:
                 flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, edge_patch)
+                delta = layer(flat, edge_index)
 
                 delta_dense, _ = to_dense_batch(delta, batch_idx)
                 desc = desc + delta_dense.transpose(1,2)
@@ -460,9 +474,8 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         # combined
         
       
-        loss = (node_loss * torch.exp(-2*self.log_sigma_node) +
-                edge_loss * torch.exp(-2*self.log_sigma_edge) +
-                self.log_sigma_node + self.log_sigma_edge) * 0.5
+        loss = (node_loss  +
+                edge_loss ) * 0.5
 
         # loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
         

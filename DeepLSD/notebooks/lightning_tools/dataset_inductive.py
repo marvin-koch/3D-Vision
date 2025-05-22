@@ -8,7 +8,8 @@ import torch.nn as nn
 
 import cv2
 from torch_geometric.data import Data, Dataset
-# from notebooks.models.dataset_utils import extract_line_feature_ROIAlign,sample_lines_grid
+#from notebooks.models.dataset_utils import extract_line_feature_ROIAlign,sample_lines_grid, extract_fixed_oriented_patches, extract_oriented_feature_patches
+from line_sampler import extract_fixed_oriented_patches, extract_oriented_feature_patches
 from sklearn.neighbors import NearestNeighbors
 import torch.nn.functional as F
 
@@ -155,20 +156,14 @@ class GraphDatasetInductive(Dataset):
         if not lines:
             raise ValueError("No lines found in JSON.")
 
-        feats, labels, line_coords = [], [], []
+        labels, line_coords = [], [], []
         for ln in lines:
-            # embedding: either inline or .npy
-            emb = _load_array_from_json_or_npy(
-                "embedding_DeepLSD", ln, desc="Line embedding"
-            )
-            feats.append(emb)
-
+    
             # struct score
             labels.append(ln.get("struct_score", 0.0))
             # coords always inline
             line_coords.append(ln["coordinates"])
 
-        x_emb = torch.tensor(np.vstack(feats), dtype=torch.float)
         coords = torch.tensor(line_coords, dtype=torch.float)
         y      = torch.tensor(labels, dtype=torch.float).unsqueeze(1)
         N      = x_emb.size(0)
@@ -176,41 +171,39 @@ class GraphDatasetInductive(Dataset):
 
 
         img =_load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
-        # === Feature extraction ===
-        if self.method == "roi":
-            roi_features = extract_line_feature_ROIAlign(
-                img=img,
-                lines=line_coords,
-                output_size=self.roi_output_size,
-                plot_results=True
-            )
-        else:  # self.method == "sample"
-            # 1) load & prep image tensor
-            img_np = img
-            img_t  = (
-                torch.tensor(img_np, dtype=torch.float32)
-                    .div(255.0)
-                    .permute(2, 0, 1)  # C,H,W
-            )
+        downsample_ratio = 2
+        feature_map = _load_array_from_json_or_npy(
+            "feature_map", ln, desc="Line embedding"
+        )
+        img_np = img
+        img_t  = (
+            torch.tensor(img_np, dtype=torch.float32)
+                .div(255.0)
+                .permute(2, 0, 1)  # C,H,W
+        )
 
-            # 2) prep lines tensor
-            lines_t = torch.tensor(line_coords, dtype=torch.float32)
+        # 2) prep lines tensor
+        lines_t = torch.tensor(line_coords, dtype=torch.float32)       
+        strip_img = extract_fixed_oriented_patches(
+            img           = img_np,                    # (H,W,C) NumPy
+            lines         = line_coords,               # (N,2,2)
+            patch_size    = (64, 128),                 # pixels on *image*
+            draw_line     = True,                     # draw line on patch
+        )                                              # → (N, 3, 64, 128)
 
-            # 3) sample
-            #    returns (N, C, num_samples, width)
-            roi_features = self.sampler.sample_lines_grid(
-                img=img_t,
-                lines=lines_t,
-                align_corners=True
-            )
 
-        # sanity‐check
-        if roi_features is None or roi_features.shape[0] != N:
-            logging.warning(
-                f"ROI feature issue for {self.filter_json_files[idx]}; "
-                f"got {None if roi_features is None else roi_features.shape}, expected ({N}, …)."
-            )
-            raise ValueError('ROI feature extraction failed.')
+        # ---------------------------------------------------------------- #
+        # the *corresponding* patch on the feature map
+        # ---------------------------------------------------------------- #
+        strip_fmap = extract_oriented_feature_patches(
+            feature_map       = feature_map,              # (1,C,Hf,Wf) torch
+            lines             = line_coords,           # same pixel coords!
+            patch_size_img    = (64, 128),             # same number you used above
+            downsample_ratio  = downsample_ratio,       # e.g. 4 or 8
+            draw_line         = False
+        )       
+
+        
 
         # === build graph ===
         
@@ -309,14 +302,14 @@ class GraphDatasetInductive(Dataset):
         edge_attr = self.edge_sampler(img_t, quads)
 
         return Data(
-            x=x_emb,
             y=y,
             coordinates=coords,
             geo=geo,
             edge_index=local_edge_index,
             full_edge_index=full_edge_index,
             full_edge_labels=full_edge_labels,
-            roi_features=roi_features,
+            strip_img=strip_img,
+            strip_fmap=strip_fmap,
             edge_attr = edge_attr,
             # edge_dist = D,
             #flat_idx_local=flat_idx_local,
