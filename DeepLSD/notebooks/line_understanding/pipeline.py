@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from line_understanding.visualization import *
-from line_understanding.save import save_lines_to_json
+from line_understanding.save import save_lines_to_hdf5
 from line_understanding.dataloader import HypersimLoader, ETH3DLoader
 from line_understanding.edges import *
 from line_understanding.geometry import *
@@ -79,7 +79,7 @@ def process_image(
     )
     print(f"Loaded and normals computed: {time.time() - start}")
 
-    lines, features, downsample = detect_lines(
+    lines, df_np, angle_np, downsample_h, downsample_w = detect_lines(
         color_img, net, device
     )
     print(f"DeepLSD time: {time.time() - start}")
@@ -94,7 +94,7 @@ def process_image(
 
     comp_rgb, new_lines, line_info = draw_and_split(
         color_img, lines, is_struct, is_depth_sep,
-        features, downsample, normal_map, depth_map,
+        normal_map, depth_map,
         struct_color, text_color, thickness=thickness
     )
     print(f"Lines drawn and split: {time.time() - start}")
@@ -190,8 +190,8 @@ def process_image(
                 copl_matrix[i, j] = 1
 
     # Save results
-    save_lines_to_json(
-        image_id, frame_str, line_info, copl_matrix,
+    save_lines_to_hdf5(
+        image_id=image_id, frame_str=frame_str, line_info=line_info, coplanarity_matrix=copl_matrix, df_np=df_np, angle_np=angle_np, downsample_h=downsample_h, downsample_w=downsample_w,
         file_path_str=file_path
     )
 

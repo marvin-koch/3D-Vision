@@ -12,15 +12,15 @@ if __name__ == "__main__":
     frames = [f"{i:04d}" for i in range(1, 100)]
     
     desired_images = [
-        #"ai_001_001",
-        #"ai_001_002",
-        #"ai_001_003",
-        # "ai_001_004",
-        # "ai_001_005",
-        # "ai_001_006",
-        # "ai_001_007",
-        # "ai_001_008",
-        # "ai_001_009",
+        "ai_001_001",
+        "ai_001_002",
+        "ai_001_003",
+        "ai_001_004",
+        "ai_001_005",
+        "ai_001_006",
+        "ai_001_007",
+        "ai_001_008",
+        "ai_001_009",
         "ai_001_010",
         "ai_002_001",
         "ai_002_002",
@@ -29,9 +29,42 @@ if __name__ == "__main__":
         "ai_002_005",
         "ai_002_006",
         "ai_002_007",
+        "ai_002_008",
+        "ai_002_009",
+        "ai_002_010",
+        "ai_003_001",
+        "ai_003_002",
+        "ai_003_003",
+        "ai_003_004",
+        "ai_003_005",
+        "ai_003_006",
+        "ai_003_007",
+        "ai_003_008",
+        "ai_003_009",
+        "ai_003_010",
+        "ai_004_001",
+        "ai_004_002",
+        "ai_004_003",
+        "ai_004_004",
+        "ai_004_005",
+        "ai_004_006",
+        "ai_004_007",
+        "ai_004_008",
+        "ai_004_009",
+        "ai_004_010",
+        "ai_005_001",
+        "ai_005_002",
+        "ai_005_003",
+        "ai_005_004",
+        "ai_005_005",
+        "ai_005_006",
+        "ai_005_007",
+        "ai_005_008",
+        "ai_005_009",
+        "ai_005_010",
     ]
     
-    base_dir = '/work/scratch/maurdu/data'
+    base_dir = 'data'
     
     print("Generate Images")
     
@@ -58,7 +91,7 @@ if __name__ == "__main__":
                 continue
             process_image(
                 base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
-                thresh_normal=8.2e13, thresh_depth=0.2, dataset="hypersim", plot=True, file_path = required_file,
+                thresh_normal=8.2e13, thresh_depth=0.2, dataset="hypersim", plot=False, file_path = required_file,
             )
         if cuda_available:
             torch.cuda.empty_cache()

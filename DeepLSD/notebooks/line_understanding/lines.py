@@ -18,28 +18,43 @@ def detect_lines(
     Run DeepLSD line detection and return predicted lines, combined features, downsample ratio, and duration.
     """
     gray = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
-    df_handle = net.df_head[5].register_forward_hook(ft.hook_df)
+    # df_handle = net.df_head[5].register_forward_hook(ft.hook_df)
 
-    ang_handle = net.angle_head[5].register_forward_hook(ft.hook_angle)
+    # ang_handle = net.angle_head[5].register_forward_hook(ft.hook_angle)
     tensor = torch.tensor(gray, dtype=torch.float32, device=device)[None, None] / 255.0
 
     with torch.no_grad():
         out = net({'image': tensor})
 
-    df_handle.remove()
-    ang_handle.remove()
+    # df_handle.remove()
+    # ang_handle.remove()
 
     lines = out['lines'][0]
+    df_norm = out['df_norm']
+            # Closest line direction prediction
+    angle_filed = out['line_level']
+
+    df_np        = df_norm.squeeze(0).cpu().numpy()
+    angle_np     = angle_filed.squeeze(0).cpu().numpy()
+
+    assert df_np.shape == angle_np.shape, "df and angle maps should have the same shape"
+    H_out, W_out = df_np.shape
+
+
+    downsample_h = color_img.shape[1] / H_out
+    downsample_w = color_img.shape[2] / W_out
+
     if isinstance(lines, torch.Tensor):
         lines = lines.cpu().numpy()
 
-    features = torch.cat([ft.df_intermediate_features, ft.angle_intermediate_features], dim=1)
-    downsample = color_img.shape[1] / features.shape[3]
+    #features = torch.cat([ft.df_intermediate_features, ft.angle_intermediate_features], dim=1)
+
+
     if device == "cuda":
         del tensor, out
         torch.cuda.empty_cache()
 
-    return lines, features, downsample
+    return lines, df_np, angle_np, downsample_h, downsample_w
 
 
 
@@ -170,8 +185,6 @@ def draw_and_split(
     lines: np.ndarray,
     is_struct: List[bool],
     is_depth_sep: List[bool],
-    features: torch.Tensor,
-    downsample: float,
     normal_map: np.ndarray,
     depth_map: np.ndarray,
     struct_color: Tuple[int,int,int],
@@ -185,9 +198,7 @@ def draw_and_split(
     new_ls, info = [], []
     for i, l in enumerate(lines):
         line = l.reshape(2,2) if l.shape==(4,) else l
-        embedding = ft.sample_line_features(
-            features, line, num_samples=10, downsample_ratio=downsample
-        ).cpu().numpy()
+        
 
         if is_struct[i] and not is_depth_sep[i]:
             l1, l2 = create_optimal_offset_lines_fast(line, normal_map, offset_amount=1.0)
@@ -198,7 +209,6 @@ def draw_and_split(
                 "score": 1,
                 "offset_lines": [l1.tolist(), l2.tolist()],
                 "new_line_indices": [idx1, idx2],
-                "line_embedding": embedding.tolist()
             })
             new_thickness = thickness + 1
 
@@ -218,7 +228,6 @@ def draw_and_split(
                 "score": 1,
                 "new_line_indices": [idx],
                 "shifted": True,
-                "line_embedding": embedding.tolist()
             })
             cv2.line(comp, tuple(map(int, map(round, shifted[0]))),
                      tuple(map(int, map(round, shifted[1]))), struct_color, thickness)
@@ -229,7 +238,6 @@ def draw_and_split(
                 "base_line": line.tolist(),
                 "score": 0,
                 "new_line_indices": [idx],
-                "line_embedding": embedding.tolist()
             })
             cv2.line(comp, tuple(map(int, map(round, line[0]))),
                      tuple(map(int, map(round, line[1]))), text_color, thickness)
