@@ -36,11 +36,11 @@ def main(config_path: str):
     cfg_train = cfg.get('training', {})
 
     # --- Set Seed ---
-    pl.seed_everything(cfg_train.get('seed', 42), workers=True)
+    pl.seed_everything(cfg_data.get('seed', 42), workers=True)
 
     # --- Data ---
-    print("Setting up DataModule with batch_size {} and accum_grad {}.".format(cfg_data.get('batch_size', 1),cfg_train.get('accum_grads', 1)))
-    print("Effective batch_size is {}".format(cfg_data.get('batch_size', 1) * cfg_train.get('accum_grads', 1)))
+    print("Setting up DataModule with batch_size {} and accum_grad {}.".format(cfg_data.get('batch_size', 1),cfg_data.get('accum_grads', 1)))
+    print("Effective batch_size is {}".format(cfg_data.get('batch_size', 1) * cfg_data.get('accum_grads', 1)))
     roi_output_size_tuple = tuple(cfg_data.get('roi_output_size', [64, 64]))
     num_workers = cfg_data.get('num_workers', 0)
     # Automatically set num_workers to 0 if no CUDA detected to avoid potential issues
@@ -97,7 +97,7 @@ def main(config_path: str):
             edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
     else:
-        model = AttentionEdgeSampleLinear(
+        model = AttentionEdgeSampleLinearNoWeight(
             in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
             in_channels=cfg_model.get('in_channels', 1024),
             hidden_channels=cfg_model.get('hidden_channels', 128),
@@ -187,7 +187,7 @@ def main(config_path: str):
         devices=actual_devices,       # Use resolved devices
         log_every_n_steps=10,
         deterministic=cfg_train.get('seed', 42) is not None, # Enable deterministic if seed is set
-        accumulate_grad_batches=cfg_train.get('accum_grads', 1)
+        accumulate_grad_batches=cfg_data.get('accum_grads', 1)
     )
 
     resume_from_ckpt_path_config = cfg_model.get("load_model_path", None)

@@ -1,17 +1,17 @@
 data:
-  data_dir: '/work/scratch/maurdu/data/'
-  json_dir: '/work/scratch/maurdu/data/json_output/'      # Path to the directory containing graph JSON files
-  precompute_dir: '/work/scratch/maurdu/data/graph_data/'
+  data_dir: '../data/'
+  json_dir: '../json_output/'      # Path to the directory containing graph JSON files
+  precompute_dir: '../data/graph_data/'
   roi_output_size: [64,32]       # Output size (height, width) for ROI Align features
   edge_sample_size: [32,24]       # Output size (height, width) for edge sampling
-  batch_size:  4             # Number of graphs per batch
+  batch_size:  1             # Number of graphs per batch
   train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 2               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 2                # Gradient accumulation
+  accum_grads: 8                # Gradient accumulation
   method: 'sample'
-  use_precomputed: true # use pre_computed
+  use_precomputed: false # use pre_computed
   k_nn: 7 # ToDo: Implement value to use for the k_nn graph
 model:
   # Input dimensions
@@ -31,9 +31,9 @@ model:
   skip_init: "False"
   only_linear: true               # use only linear layers no conv
   # MLP Drop-outs
-  mlp_dropout: 0.1
+  mlp_dropout: 0.0
   # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
-  load_model_path: "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=41-val_combined_auc_epoch=0.9618.ckpt"
+  #load_model_path: "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=41-val_combined_auc_epoch=0.9618.ckpt"
 training:
   learning_rate: 0.0005            # Optimizer learning rate
   node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
@@ -48,5 +48,5 @@ training:
   monitor_metric: 'val_combined_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
   monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
   seed: 42                        # Random seed for reproducibility
-  experiment_name: "Attention_Edge_Sampler"
+  experiment_name: "Attention_Edge_Sampler_No_Weight"
 

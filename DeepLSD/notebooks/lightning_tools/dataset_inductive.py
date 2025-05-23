@@ -56,7 +56,7 @@ def _load_array_from_json_or_npy(field, json_dict, desc="array"):
         return np.array(json_dict[field])
     path_field = f"{field}_path"
     if path_field in json_dict:
-        arr_path = json_dict[path_field]
+        arr_path = "../" + json_dict[path_field]
         if not os.path.exists(arr_path):
             raise FileNotFoundError(f"{desc} file not found: {arr_path}")
         return np.load(arr_path)
@@ -85,7 +85,7 @@ class GraphDatasetInductive(Dataset):
                 data = orjson.loads(f.read())
 
           
-            img_path = data.get('file_path')
+            img_path = "../" +data.get('file_path')
             # try to load once
                     # == FAST EXISTENCE CHECK ==
             if img_path and os.path.exists(img_path):
@@ -147,7 +147,7 @@ class GraphDatasetInductive(Dataset):
         )  # shape: (N,N)
 
         # --- 3) load file_path & image ---
-        file_path_img = graph_data.get("file_path", None)
+        file_path_img = "../" +graph_data.get("file_path", None)
         img = _load_image(filepath=file_path_img, color_conversion=cv2.COLOR_BGR2RGB)
 
         # --- 4) load per-line features & coords & labels ---
@@ -251,6 +251,8 @@ class GraphDatasetInductive(Dataset):
         # 6) build k‐NN graph from D
         k = 7  # number of neighbors
         # topk returns self in position 0, so grab 1:k+1
+        k = min(k, N - 1)
+
         knn = D.topk(k+1, largest=False).indices[:,1:]  # (N,k)
 
         edge_list, edge_labels = [], []
@@ -306,7 +308,9 @@ class GraphDatasetInductive(Dataset):
         ], dim=1)         # (E, 4, 2)
 
         # 3) now call the sampler and overwrite both the edge_attr and edge_index
+        
         edge_attr = self.edge_sampler(img_t, quads)
+
 
         return Data(
             x=x_emb,
