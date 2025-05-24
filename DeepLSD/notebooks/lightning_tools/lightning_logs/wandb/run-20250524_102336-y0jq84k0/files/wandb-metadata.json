@@ -1,0 +1,45 @@
+{
+  "os": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "CPython 3.9.21",
+  "startedAt": "2025-05-24T08:23:36.939297Z",
+  "args": [
+    "--config",
+    "config_cnn.yaml"
+  ],
+  "program": "/mnt/c/Users/shan2/Documents/ETH/MA4/3DV/GitHub/3DV-CNN/3D-Vision/DeepLSD/notebooks/lightning_tools/train.py",
+  "codePath": "DeepLSD/notebooks/lightning_tools/train.py",
+  "git": {
+    "remote": "https://github.com/marvin-koch/3D-Vision.git",
+    "commit": "549a500a54aa6577592bfa76c776967243da59bd"
+  },
+  "email": "marvinkoch2306@gmail.com",
+  "root": "lightning_logs",
+  "host": "Loq-Shangeeth",
+  "executable": "/home/shangeeth/wsl_deeplsd_39/bin/python",
+  "codePathLocal": "train.py",
+  "cpu_count": 14,
+  "cpu_count_logical": 28,
+  "gpu": "NVIDIA GeForce RTX 4060 Ti",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1081101176832",
+      "used": "52517113856"
+    }
+  },
+  "memory": {
+    "total": "16626917376"
+  },
+  "cpu": {
+    "count": 14,
+    "countLogical": 28
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4060 Ti",
+      "memoryTotal": "8585740288",
+      "architecture": "Ada"
+    }
+  ],
+  "cudaVersion": "12.6"
+}

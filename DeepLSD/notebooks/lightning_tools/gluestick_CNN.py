@@ -437,7 +437,8 @@ class AttentionCNN(pl.LightningModule):
         self.validation_step_outputs = []
         self.test_step_outputs = []
         
-    
+        self.log_sigma_node = nn.Parameter(torch.zeros(()))
+        self.log_sigma_edge = nn.Parameter(torch.zeros(()))
                     
     def forward(self, batch):
         
@@ -580,11 +581,11 @@ class AttentionCNN(pl.LightningModule):
         # combined
         
       
-        loss = (node_loss  +
-                edge_loss ) * 0.5
-
+     
         # loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
-        
+        loss = (node_loss * torch.exp(-2*self.log_sigma_node) +
+                edge_loss * torch.exp(-2*self.log_sigma_edge) +
+                self.log_sigma_node + self.log_sigma_edge) * 0.5
         # metrics
         with torch.no_grad():
             n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
@@ -608,7 +609,10 @@ class AttentionCNN(pl.LightningModule):
         # losses
         node_loss = self.criterion(node_logits, node_labels)
         edge_loss = self.criterion(edge_logits, full_edge_labels)
-        total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
+        total_loss = (node_loss * torch.exp(-2*self.log_sigma_node) +
+                edge_loss * torch.exp(-2*self.log_sigma_edge) +
+                self.log_sigma_node + self.log_sigma_edge) * 0.5
+
 
         # log losses
         self.log('val_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=True, logger=True)
@@ -707,7 +711,10 @@ class AttentionCNN(pl.LightningModule):
         # losses
         node_loss = self.criterion(node_logits, node_labels)
         edge_loss = self.criterion(edge_logits, full_edge_labels)
-        total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
+       # total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
+        total_loss = (node_loss * torch.exp(-2*self.log_sigma_node) +
+                edge_loss * torch.exp(-2*self.log_sigma_edge) +
+                self.log_sigma_node + self.log_sigma_edge) * 0.5
 
         # log losses
         self.log('test_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=False, logger=True)
@@ -775,4 +782,17 @@ class AttentionCNN(pl.LightningModule):
 
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.AdamW(
+            self.parameters(),
+            lr            = self.hparams.learning_rate,   # same LR usually works
+            betas         = (0.9, 0.999),
+            eps           = 1e-8,
+            weight_decay  = 1e-4,        # **decoupled** L2, not mixed into the grads
+        )
+
+        # warm-up → cosine ↓ to zero (good default for vision & graphs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+            optimizer, T_0=10, T_mult=2, eta_min=0.0
+        )
+
+        return [optimizer], [scheduler]

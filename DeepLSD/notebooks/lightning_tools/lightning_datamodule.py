@@ -15,12 +15,12 @@ from multiprocessing import Pool, cpu_count
 from tqdm import tqdm # Import tqdm
 
 class GraphDataModuleInductive(pl.LightningDataModule):
-    def __init__(self, json_dir: str, roi_output_size: tuple = (64, 64),
+    def __init__(self, h5_path: str, roi_output_size: tuple = (64, 64),
                  batch_size: int = 32, train_split: float = 0.8,
                  val_split: float = 0.1, num_workers: int = 0,
                  method = 'roi', edge_sample_size = (32,16)):
         super().__init__()
-        self.json_dir = json_dir
+        self.h5_path = h5_path
         self.roi_output_size = roi_output_size
         self.method = method
 
@@ -41,21 +41,21 @@ class GraphDataModuleInductive(pl.LightningDataModule):
     def prepare_data(self):
         # Optional: Download data, etc. Not needed if data is local.
         # Check if json_dir exists
-        if not os.path.isdir(self.json_dir):
-            raise FileNotFoundError(f"JSON directory not found: {self.json_dir}")
+        if not os.path.isfile(self.h5_path):
+            raise FileNotFoundError(f"JSON directory not found: {self.h5_path}")
 
     def setup(self, stage: str = None):
         # Load data and perform splits
         if not self.full_dataset:
             try:
                  self.full_dataset = GraphDatasetInductive(
-                     json_dir=self.json_dir,
+                     h5_path=self.h5_path,
                      roi_output_size=self.roi_output_size,
                      method = self.method,
                      edge_sample_size=self.edge_sample_size
                  )
             except Exception as e:
-                 print(f"Error loading dataset from {self.json_dir}: {e}")
+                 print(f"Error loading dataset from {self.h5_path}: {e}")
                  raise
 
         if stage == 'fit' or stage is None:

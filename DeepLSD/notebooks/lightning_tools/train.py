@@ -10,7 +10,7 @@ import argparse
 from structural_textural_lightning import LitGATTexturalStructural, plot_roc_curve
 from lightning_datamodule import GraphDataModuleInductive
 # from gluestick_matin import *
-from gluestick_fully_linear import *
+from gluestick_CNN import *
 from precomputed_datamodule import GraphDataModule
 import gzip
 
@@ -51,8 +51,10 @@ def main(config_path: str):
             print(f"Warning: CUDA not available, setting num_workers to 0 (was {num_workers})")
             num_workers = 0
         print("Using following method to extract features: {}".format(cfg_data.get('method', 'roi')))
+
+        hdf5_path = "C:\\Users\\shan2\\Documents\\ETH\\MA4\\3DV\\GitHub\\3D-Vision\\DeepLSD\\notebooks\\line.data.h5"
         data_module = GraphDataModuleInductive(
-            json_dir=cfg_data.get('json_dir', './json_output/'),
+            h5_path=cfg_data.get('h5_path', hdf5_path),
             roi_output_size=roi_output_size_tuple,
             batch_size=cfg_data.get('batch_size', 1),
             train_split=cfg_data.get('train_split', 0.8),
@@ -97,10 +99,12 @@ def main(config_path: str):
             edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
     else:
-        model = AttentionEdgeSampleLinear(
+        model = AttentionCNN(
             in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
             in_channels=cfg_model.get('in_channels', 1024),
             hidden_channels=cfg_model.get('hidden_channels', 128),
+            hidden_channels_cnn=cfg_model.get('hidden_channels_cnn', 64),
+
             out_channels=cfg_model.get('out_channels', 64),
             geom_channels=cfg_model.get('geom_channels', 5),
             roi_align_embedding_shape=roi_output_size_tuple,
@@ -182,6 +186,7 @@ def main(config_path: str):
     trainer = pl.Trainer(
         max_epochs=cfg_train.get('epochs', 20),
         logger=logger,
+        precision  = cfg_train.get('precision', "16-mixed"),  # "16" also works
         callbacks=[checkpoint_callback, early_stop_callback],
         accelerator=actual_accelerator, # Use resolved accelerator
         devices=actual_devices,       # Use resolved devices

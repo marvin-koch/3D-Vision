@@ -11,7 +11,6 @@ data:
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 0               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 8                # Gradient accumulation
   method: 'sample'
   use_precomputed: false # use pre_computed
   k_nn: 7 # ToDo: Implement value to use for the k_nn graph
@@ -24,7 +23,7 @@ model:
 
   edge_downsample_dim: 20 # project embedded edges to this dimension/num_channels
   hidden_channels: 128           # Number of hidden units in GAT layers
-  hidden_channels_cnn: 64           # Number of hidden units in GAT layers
+  hidden_channels_cnn: 96           # Number of hidden units in GAT layers
 
   out_channels: 128                #  Output dimension of the GAT layers (input to the final MLP))
   num_layers: 6                   # Number of GAT layers
@@ -42,6 +41,8 @@ training:
   learning_rate: 0.0005            # Optimizer learning rate
   node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
   edge_loss_w: 1.0                # Weight for the edge classification loss term (if multiple losses were used)
+  precision: "16-mixed"
+  accum_grads: 8                # Gradient accumulation
 
   threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
   epochs: 80                      # Maximum number of training epochs
