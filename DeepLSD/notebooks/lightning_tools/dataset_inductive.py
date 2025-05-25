@@ -66,7 +66,9 @@ class GraphDatasetInductive(Dataset):
                               if isinstance(self.h5[g]['metadata'][()], bytes) 
                               else self.h5[g]['metadata'][()])
             fp = meta.get('file_path')
-            if fp and os.path.isfile(fp):
+            lines_meta = meta.get('lines', [])
+
+            if fp and os.path.isfile(fp) and len(lines_meta) > 0:
                 valid.append(g)
             else:
                 # you could also log.warning(f"Skipping {g}: missing {fp}")

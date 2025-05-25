@@ -370,7 +370,7 @@ class AttentionCNN(pl.LightningModule):
         self.bands_cnn = nn.Sequential(
             # conv1: 7×7, stride 2, padding 3 → 64 channels
             nn.LazyConv2d(self.hparams.hidden_channels_cnn, kernel_size=7, stride=2, padding=3, bias=False),
-            nn.BatchNorm2d(self.hparams.hidden_channels_cnn),
+            nn.InstanceNorm2d(self.hparams.hidden_channels_cnn, affine=True),
             nn.ReLU(inplace=True),
 
             # max-pool 3×3, stride 2
@@ -393,7 +393,7 @@ class AttentionCNN(pl.LightningModule):
         self.node_fuse = nn.Sequential(
             nn.Linear(self.hparams.hidden_channels_cnn +  self.hparams.geom_channels,
                       self.hparams.out_channels),
-            nn.BatchNorm1d(self.hparams.out_channels),
+            nn.LayerNorm(self.hparams.out_channels),
 
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels,
@@ -416,7 +416,7 @@ class AttentionCNN(pl.LightningModule):
         # Node prediction head
         self.mlp_textural_structural = nn.Sequential(
             nn.Linear(self.hparams.out_channels + self.hparams.hidden_channels_cnn, self.hparams.out_channels),
-            nn.BatchNorm1d(self.hparams.out_channels),
+            nn.LayerNorm(self.hparams.out_channels),
 
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
@@ -424,7 +424,7 @@ class AttentionCNN(pl.LightningModule):
 
         self.edge_predictor = nn.Sequential(
             nn.Linear(2*self.hparams.out_channels + self.hparams.out_channels * 2 + self.edge_geo_channels, self.hparams.out_channels),
-            nn.BatchNorm1d(self.hparams.out_channels),
+            nn.LayerNorm(self.hparams.out_channels),
 
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
