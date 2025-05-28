@@ -45,46 +45,34 @@ class GraphDataModuleInductive(pl.LightningDataModule):
             raise FileNotFoundError(f"JSON directory not found: {self.json_dir}")
 
     def setup(self, stage: str = None):
-        # Load data and perform splits
-        if not self.full_dataset:
-            try:
-                 self.full_dataset = GraphDatasetInductive(
-                     json_dir=self.json_dir,
-                     roi_output_size=self.roi_output_size,
-                     method = self.method,
-                     edge_sample_size=self.edge_sample_size
-                 )
-            except Exception as e:
-                 print(f"Error loading dataset from {self.json_dir}: {e}")
-                 raise
-
-        if stage == 'fit' or stage is None:
-            n_total = len(self.full_dataset)
-            n_train = int(self.train_split * n_total)
-            n_val = int(self.val_split * n_total)
-            n_test = n_total - n_train - n_val
-
-            if n_train <= 0 or n_val <= 0 or n_test <= 0:
-                 raise ValueError(f"Dataset size {n_total} is too small for the requested splits.")
-
-            self.train_ds, self.val_ds, self.test_ds = random_split(
-                self.full_dataset, [n_train, n_val, n_test]
+        # Load full dataset once
+        if self.full_dataset is None:
+            self.full_dataset = GraphDatasetInductive(
+                json_dir=self.json_dir,
+                roi_output_size=self.roi_output_size,
+                method=self.method,
+                edge_sample_size=self.edge_sample_size
             )
-            print(f"Dataset split: Train={len(self.train_ds)}, Val={len(self.val_ds)}, Test={len(self.test_ds)}")
 
+        n_total = len(self.full_dataset)
+        n_train = int(self.train_split * n_total)
+        n_val   = int(self.val_split   * n_total)
+        n_test  = n_total - n_train - n_val
 
-        if stage == 'test' or stage is None:
-             # Ensure test_ds is available if it wasn't created during 'fit'
-             if not self.test_ds:
-                  n_total = len(self.full_dataset)
-                  n_train = int(self.train_split * n_total)
-                  n_val = int(self.val_split * n_total)
-                  n_test = n_total - n_train - n_val
-                  # We only need test split here, but random_split requires all lengths
-                  _, _, self.test_ds = random_split(
-                       self.full_dataset, [n_train, n_val, n_test]
-                  )
+        if n_train <= 0 or n_val <= 0 or n_test <= 0:
+            raise ValueError(f"Dataset size {n_total} is too small for the requested splits.")
 
+        # Create ordered index lists
+        train_idxs = list(range(0,               n_train))
+        val_idxs   = list(range(n_train,         n_train + n_val))
+        test_idxs  = list(range(n_train + n_val, n_total))
+
+        # Wrap each in a Subset (preserves order)
+        self.train_ds = Subset(self.full_dataset, train_idxs)
+        self.val_ds   = Subset(self.full_dataset, val_idxs)
+        self.test_ds  = Subset(self.full_dataset, test_idxs)
+
+        print(f"Dataset split: Train={len(self.train_ds)}, Val={len(self.val_ds)}, Test={len(self.test_ds)}")
 
     def train_dataloader(self):
         return DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)

@@ -14,6 +14,8 @@ from gluestick_fully_linear import *
 from precomputed_datamodule import GraphDataModule
 import gzip
 
+
+
 def main(config_path: str):
     # --- Load Configuration from YAML ---
     print(f"Loading configuration from: {config_path}")
@@ -136,10 +138,11 @@ def main(config_path: str):
     monitor_metric = cfg_train.get('monitor_metric', 'val_auc')
     monitor_mode = cfg_train.get('monitor_mode', 'max')
     checkpoint_callback = ModelCheckpoint(
-        monitor=monitor_metric,
-        mode=monitor_mode,
+        # monitor=monitor_metric,
+        # mode=monitor_mode,
         filename=f'best-model-{{epoch:02d}}-{{{monitor_metric}:.4f}}',
-        save_top_k=1,
+        save_top_k=-1,
+        every_n_epochs=1,
         verbose=True
     )
     early_stop_callback = EarlyStopping(

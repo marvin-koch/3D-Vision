@@ -86,9 +86,11 @@ class GraphDatasetInductive(Dataset):
 
           
             img_path = "../" +data.get('file_path')
+            lines = data.get("lines", [])
+
             # try to load once
                     # == FAST EXISTENCE CHECK ==
-            if img_path and os.path.exists(img_path):
+            if img_path and os.path.exists(img_path) and len(lines) > 0:
                 self.filter_json_files.append(jf)
             else:
                 logging.warning(f"Skipping {jf} because image not found: {img_path}")
@@ -249,7 +251,7 @@ class GraphDatasetInductive(Dataset):
         D = seg_seg_dist(p1,p2, p1,p2)    # (N,N)
 
         # 6) build k‐NN graph from D
-        k = 7  # number of neighbors
+        k = 10  # number of neighbors
         # topk returns self in position 0, so grab 1:k+1
         k = min(k, N - 1)
 

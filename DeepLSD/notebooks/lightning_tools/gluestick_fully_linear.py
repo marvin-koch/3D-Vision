@@ -256,6 +256,9 @@ class EdgeSamplerLayer(MessagePassing):
             nn.ReLU(),
             nn.Linear(hidden_dim, node_dim),
         )
+        
+        # self.ln = nn.LayerNorm(node_dim)
+
 
     def forward(self,
                 x: torch.Tensor,
@@ -310,9 +313,9 @@ class EdgeSamplerLayerNoPatch(MessagePassing):
         m = torch.cat([x_i, x_j], dim=-1)  # -> [E, 2*node_dim+edge_attr_dim]
         return self.edge_mlp(m)                       # -> [E, node_dim]
 
-
-
     
+from torch_geometric.nn import GATv2Conv
+
 class AttentionEdgeSampleLinear(pl.LightningModule):
     def __init__(self,
         # Model HParams
@@ -346,12 +349,16 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         self.edge_patch_enc = nn.Sequential(
         nn.Flatten(start_dim=1),
         nn.Linear(3* edge_height * edge_width, self.hparams.edge_downsample_dim),
+        nn.LayerNorm(self.hparams.edge_downsample_dim),         # ← swapped out
+
         nn.Dropout(p=self.hparams.mlp_dropout),
         nn.ReLU(),
         )
         self.node_linear = nn.Sequential(
         nn.Flatten(start_dim=1),
         nn.Linear(3*node_height*node_width, self.hparams.hidden_channels),
+        nn.LayerNorm(self.hparams.hidden_channels),         # ← swapped out
+
         nn.Dropout(p=self.hparams.mlp_dropout),
         nn.ReLU(),
         )
@@ -360,6 +367,8 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         self.edge_loss_w = edge_loss_w
         self.edge_predictor = nn.Sequential(
             nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
+            nn.LayerNorm(self.hparams.out_channels),         # ← swapped out
+
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
         )
@@ -367,6 +376,8 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         self.node_fuse = nn.Sequential(
             nn.Linear(self.hparams.hidden_channels + self.hparams.in_channels_DeepLSD +  self.hparams.geom_channels,
                       self.hparams.out_channels),
+            nn.LayerNorm(self.hparams.out_channels),         # ← swapped out
+
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels,
                       self.hparams.out_channels),
@@ -381,6 +392,18 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
                 layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
                 edge_attr_dim=self.hparams.edge_downsample_dim,
                 hidden_dim=self.hparams.out_channels))
+                
+                # layers.append(
+
+                #     GATv2Conv(
+                #         in_channels  = self.hparams.out_channels,
+                #         out_channels = self.hparams.out_channels,
+                #         heads        = 2,
+                #         concat       = False,             # keep dims = out_channels
+                #         dropout      = self.hparams.dropout,
+                #         edge_dim     = self.hparams.edge_downsample_dim
+                #     )
+                # )
                 # layers.append(LocalEdgeLayer(self.hparams.out_channels))
 
         self.layers = nn.ModuleList(layers)
@@ -388,6 +411,8 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         # Node prediction head
         self.mlp_textural_structural = nn.Sequential(
             nn.Linear(self.hparams.out_channels, self.hparams.out_channels),
+            nn.LayerNorm(self.hparams.out_channels),         # ← swapped out
+
             nn.ReLU(),
             nn.Linear(self.hparams.out_channels, 1)
         )
@@ -399,9 +424,7 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         self.validation_step_outputs = []
         self.test_step_outputs = []
         
-        #Learned weights for loss
-        self.log_sigma_node = nn.Parameter(torch.zeros(()))
-        self.log_sigma_edge = nn.Parameter(torch.zeros(()))
+      
        
                     
     def forward(self, batch):
@@ -433,15 +456,23 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
                 desc = layer(desc)
             else:
                 flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, edge_patch)
+                flat_norm = layer.ln(flat)   
+
+                delta = layer(flat_norm, edge_index, edge_patch)
 
                 delta_dense, _ = to_dense_batch(delta, batch_idx)
                 desc = desc + delta_dense.transpose(1,2)
+                
+                # delta = layer(flat, batch.edge_index, edge_attr=edge_patch)
+                # x = F.relu(flat + delta)
+                # desc, mask = to_dense_batch(x, batch.batch)
+                # desc        = desc.transpose(1,2)
+
 
         # Collapse to node features
         features = desc.transpose(1,2)[mask]
         
-        features = F.dropout(features, p=self.hparams.mlp_dropout, training=self.training)
+        #features = F.dropout(features, p=self.hparams.mlp_dropout, training=self.training)
 
         # Node logits
         node_logits = self.mlp_textural_structural(features)
@@ -495,387 +526,8 @@ class AttentionEdgeSampleLinear(pl.LightningModule):
         # combined
         
       
-        loss = (node_loss * torch.exp(-2*self.log_sigma_node) +
-                edge_loss * torch.exp(-2*self.log_sigma_edge) +
-                self.log_sigma_node + self.log_sigma_edge) * 0.5
-
-        # loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
-        
-        # metrics
-        with torch.no_grad():
-            n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
-            node_acc=accuracy_score(sampled_node_labels.int().detach().cpu().numpy().ravel(),n_preds)
-            e_probs=torch.sigmoid(sampled_edge_logits); e_preds=(e_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
-            edge_acc=accuracy_score(sampled_edge_labels.int().detach().cpu().numpy().ravel(), e_preds)
-            
-            
-        self.log('train_loss',loss,on_step=True,on_epoch=False, prog_bar=True, logger=True)
-        self.log('train_node_acc',node_acc,on_step=True,on_epoch=False, prog_bar=True, logger=True)
-        self.log('train_edge_acc',edge_acc,on_step=True,on_epoch=False, prog_bar=True, logger=True)
-        return loss
-
-    def validation_step(self, batch: Batch, batch_idx: int):
-        # forward
-        node_logits, edge_logits = self(batch)
-        # labels
-        node_labels      = batch.y.float()               # [N,1]
-        full_edge_labels = batch.full_edge_labels.float()  # [N*N,1]
-
-        # losses
-        node_loss = self.criterion(node_logits, node_labels)
-        edge_loss = self.criterion(edge_logits, full_edge_labels)
-        total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
-
-        # log losses
-        self.log('val_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=True, logger=True)
-        self.log('val_edge_loss', edge_loss,  on_step=True,on_epoch=False, prog_bar=True, logger=True)
-        self.log('val_loss',      total_loss, on_step=True,on_epoch=False, prog_bar=True,  logger=True)
-
-        # store for epoch-end
-        self.validation_step_outputs.append({
-            'node_preds': node_logits.sigmoid().detach(),
-            'node_labels': node_labels.detach(),
-            'edge_preds': edge_logits.sigmoid().detach(),
-            'edge_labels': full_edge_labels.detach(),
-            'loss': total_loss
-        })
-        return {'loss': total_loss,  
-            'node_preds': node_logits.sigmoid(),
-            'node_labels': node_labels,
-            'edge_preds': edge_logits.sigmoid(),
-            'edge_labels': full_edge_labels}
-
-
-    def on_validation_epoch_end(self):
-        if not self.validation_step_outputs:
-            return
-        
-        losses = torch.stack([x['loss'] for x in self.validation_step_outputs]).mean()
-        all_node_preds = torch.cat([x['node_preds'] for x in self.validation_step_outputs]).cpu().numpy()
-        all_node_labels = torch.cat([x['node_labels'] for x in self.validation_step_outputs]).cpu().numpy()
-        all_edge_preds = torch.cat([x['edge_preds'] for x in self.validation_step_outputs]).cpu().numpy()
-        all_edge_labels = torch.cat([x['edge_labels'] for x in self.validation_step_outputs]).cpu().numpy()
-
-        # Node metrics
-        node_binary = (all_node_preds >= self.hparams.threshold_structural).astype(int)
-        node_acc = accuracy_score(all_node_labels, node_binary)
-        node_recall = recall_score(all_node_labels, node_binary, zero_division=0)
-        node_auc = auc(*roc_curve(all_node_labels, all_node_preds)[:2]) if len(np.unique(all_node_labels))>1 else 0.0
-
-        # Edge metrics
-        edge_binary = (all_edge_preds >= self.hparams.threshold_structural).astype(int)
-        edge_acc = accuracy_score(all_edge_labels, edge_binary)
-        edge_recall = recall_score(all_edge_labels, edge_binary, zero_division=0)
-        edge_auc = auc(*roc_curve(all_edge_labels, all_edge_preds)[:2]) if len(np.unique(all_edge_labels))>1 else 0.0
-
-        self.log('val_loss_epoch', losses, on_epoch=True, prog_bar=False, logger=True)
-        self.log('val_node_acc_epoch', node_acc, on_epoch=True, prog_bar=False, logger=True)
-        self.log('val_node_recall_epoch', node_recall, on_epoch=True, prog_bar=False, logger=True)
-        self.log('val_node_auc_epoch', node_auc, on_epoch=True, prog_bar=False, logger=True)
-        self.log('val_edge_acc_epoch', edge_acc, on_epoch=True, prog_bar=False, logger=True)
-        self.log('val_edge_recall_epoch', edge_recall, on_epoch=True, prog_bar=False, logger=True)
-        self.log('val_edge_auc_epoch', edge_auc, on_epoch=True, prog_bar=False, logger=True)
-        combined_auc = 0.5 * (edge_auc + node_auc)
-        self.log('val_combined_auc_epoch', combined_auc, on_epoch=True, prog_bar=False, logger=True)
-        self.validation_step_outputs.clear()
-
-
-        # 5) —— Visualization —— 
-        # Pull one batch so we have the raw image + coordinates
-    
-     
-        # color_img   = self._viz_image      # H×W×3 numpy
-        # pred_lines = self._viz_lines      # list of [(x1,y1),(x2,y2)]
-
-        # color_img =_load_image(filepath="../" + color_img, color_conversion=cv2.COLOR_BGR2RGB)
-
-        # node_preds_viz = self.validation_step_outputs[0]['node_preds'].flatten().tolist()
-        # edge_preds_viz  = self.validation_step_outputs[0]['edge_preds'].numpy()
-
-        # # 5a) Structural plots
-        # figs_struct = []
-        # flat_node_scores = node_preds_viz
-        # for i in range(min(4, len(pred_lines))):
-        #     fig, ax = plt.subplots(figsize=(4,4))
-        #     plot_lines_bool(ax, color_img, pred_lines, flat_node_scores)
-        #     figs_struct.append(fig)
-
-        # # 5b) Coplanarity plots
-        # num_lines = len(pred_lines)
-        # edge_array = edge_preds_viz.reshape((num_lines, -1))
-        # figs_copl = []
-        # for i in range(min(4, num_lines)):
-        #     fig, ax = plt.subplots(figsize=(4,4))
-        #     plot_coplanar_lines(ax, pred_lines, edge_array[i], color_img)
-        #     figs_copl.append(fig)
-
-        # # 6) Log all to W&B
-        # self.logger.experiment.log({
-        #     "Validation/Structural": [
-        #         wandb.Image(fig, caption=f"Line {i} structural")
-        #         for i, fig in enumerate(figs_struct)
-        #     ],
-        #     "Validation/Coplanarity": [
-        #         wandb.Image(fig, caption=f"Line {i} coplanarity")
-        #         for i, fig in enumerate(figs_copl)
-        #     ],
-        #     "epoch": self.current_epoch
-        # })
-
-        # # 7) Clean up
-        # for fig in figs_struct + figs_copl:
-        #     plt.close(fig)
-
-
-    def test_step(self, batch: Batch, batch_idx: int):
-        # forward
-        node_logits, edge_logits = self(batch)
-        # labels
-        node_labels      = batch.y.float()
-        full_edge_labels = batch.full_edge_labels.float()
-
-        # losses
-        node_loss = self.criterion(node_logits, node_labels)
-        edge_loss = self.criterion(edge_logits, full_edge_labels)
-        total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
-
-        # log losses
-        self.log('test_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=False, logger=True)
-        self.log('test_edge_loss', edge_loss,  on_step=True, on_epoch=False, prog_bar=False, logger=True)
-        self.log('test_loss',      total_loss, on_step=True, on_epoch=False, prog_bar=True,  logger=True)
-
-        # store for epoch-end
-        self.test_step_outputs.append({
-            'node_preds': node_logits.sigmoid().detach(),
-            'node_labels': node_labels.detach(),
-            'edge_preds': edge_logits.sigmoid().detach(),
-            'edge_labels': full_edge_labels.detach(),
-            'loss': total_loss
-        })
-        return {
-            'node_preds': node_logits.sigmoid(),
-            'node_labels': node_labels,
-            'edge_preds': edge_logits.sigmoid(),
-            'edge_labels': full_edge_labels,
-            'loss': total_loss
-        }
-
-
-    def on_test_epoch_end(self):
-        if not self.test_step_outputs:
-            return
-        losses = torch.stack([x['loss'] for x in self.test_step_outputs]).mean()
-        all_node_preds = torch.cat([x['node_preds'] for x in self.test_step_outputs]).cpu().numpy()
-        all_node_labels = torch.cat([x['node_labels'] for x in self.test_step_outputs]).cpu().numpy()
-        all_edge_preds = torch.cat([x['edge_preds'] for x in self.test_step_outputs]).cpu().numpy()
-        all_edge_labels = torch.cat([x['edge_labels'] for x in self.test_step_outputs]).cpu().numpy()
-
-        node_binary = (all_node_preds >= self.hparams.threshold_structural).astype(int)
-        node_acc = accuracy_score(all_node_labels, node_binary)
-        node_recall = recall_score(all_node_labels, node_binary, zero_division=0)
-        node_auc = auc(*roc_curve(all_node_labels, all_node_preds)[:2]) if len(np.unique(all_node_labels))>1 else 0.0
-
-        edge_binary = (all_edge_preds >= self.hparams.threshold_structural).astype(int)
-        edge_acc = accuracy_score(all_edge_labels, edge_binary)
-        edge_recall = recall_score(all_edge_labels, edge_binary, zero_division=0)
-        edge_auc = auc(*roc_curve(all_edge_labels, all_edge_preds)[:2]) if len(np.unique(all_edge_labels))>1 else 0.0
-
-        self.log('test_loss_epoch', losses, on_epoch=True, prog_bar=False, logger=True)
-        self.log('test_node_acc_epoch', node_acc, on_epoch=True, prog_bar=False, logger=True)
-        self.log('test_node_recall_epoch', node_recall, on_epoch=True, prog_bar=False, logger=True)
-        self.log('test_node_auc_epoch', node_auc, on_epoch=True, prog_bar=False, logger=True)
-        self.log('test_edge_acc_epoch', edge_acc, on_epoch=True, prog_bar=False, logger=True)
-        self.log('test_edge_recall_epoch', edge_recall, on_epoch=True, prog_bar=False, logger=True)
-        self.log('test_edge_auc_epoch', edge_auc, on_epoch=True, prog_bar=False, logger=True)
-
-    def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.hparams.learning_rate)
-    
-    
-    
-  
-class AttentionEdgeSampleLinearNoWeight(pl.LightningModule):
-    def __init__(self,
-        # Model HParams
-        in_channels_DeepLSD: int,
-        in_channels: int,
-        hidden_channels: int,
-        out_channels: int,
-        geom_channels: int,
-        roi_align_embedding_shape: tuple,
-        num_layers: int,
-        dropout: float = 0.5,
-        act: str = 'relu',
-        v2: bool = True,
-        jk_layer: str = None,
-        edge_sample_size = (32,16),
-        edge_downsample_dim = 20,
-        # Training HParams
-        learning_rate: float = 1e-3,
-        node_loss_w: float = 1.0,          # Weight for node loss
-        edge_loss_w: float = 1.0,          # Weight for edge loss (new)
-        threshold_structural: float = 0.5,  # Threshold for accuracy/recall calc
-        mlp_dropout: float = 0.0,          # drop out for merge features
-        skip_init=False,
-        ):
-        super().__init__()
-        self.save_hyperparameters()
-        
-
-        node_height, node_width =  self.hparams.roi_align_embedding_shape
-        edge_height, edge_width =  self.hparams.edge_sample_size
-        self.edge_patch_enc = nn.Sequential(
-        nn.Flatten(start_dim=1),
-        nn.Linear(3* edge_height * edge_width, self.hparams.edge_downsample_dim),
-        nn.Dropout(p=self.hparams.mlp_dropout),
-        nn.ReLU(),
-        )
-        self.node_linear = nn.Sequential(
-        nn.Flatten(start_dim=1),
-        nn.Linear(3*node_height*node_width, self.hparams.hidden_channels),
-        nn.Dropout(p=self.hparams.mlp_dropout),
-        nn.ReLU(),
-        )
-        
-        
-        self.edge_loss_w = edge_loss_w
-        self.edge_predictor = nn.Sequential(
-            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
-            nn.ReLU(),
-            nn.Linear(self.hparams.out_channels, 1)
-        )
-
-        self.node_fuse = nn.Sequential(
-            nn.Linear(self.hparams.hidden_channels + self.hparams.in_channels_DeepLSD +  self.hparams.geom_channels,
-                      self.hparams.out_channels),
-            nn.ReLU(),
-            nn.Linear(self.hparams.out_channels,
-                      self.hparams.out_channels),
-        )
-
-        # GNN layers
-        layers = []
-        for i in range(self.hparams.num_layers):
-            if i % 2 == 0:
-                layers.append(SelfAttnLayer(self.hparams.out_channels, self.hparams.skip_init))
-            else:
-                layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
-                edge_attr_dim=self.hparams.edge_downsample_dim,
-                hidden_dim=self.hparams.out_channels))
-                # layers.append(LocalEdgeLayer(self.hparams.out_channels))
-
-        self.layers = nn.ModuleList(layers)
-
-        # Node prediction head
-        self.mlp_textural_structural = nn.Sequential(
-            nn.Linear(self.hparams.out_channels, self.hparams.out_channels),
-            nn.ReLU(),
-            nn.Linear(self.hparams.out_channels, 1)
-        )
-
-        # Loss
-        self.criterion = nn.BCEWithLogitsLoss()
-
-        # Containers for metrics
-        self.validation_step_outputs = []
-        self.test_step_outputs = []
-        
-        #Learned weights for loss
-   
-                    
-    def forward(self, batch):
-        
-        x, edge_index, batch_idx = batch.x, batch.edge_index, batch.batch
-        roi_features = batch.roi_features 
-        geo = batch.geo
-        # ROI conv and fuse
-        roi_feats = self.node_linear(roi_features)
-        concat_feat = torch.cat([roi_feats, x, geo], dim=1)
-        concat_feat = self.node_fuse(concat_feat)
-        
-        # Prepare for global attention
-        roi_dense, mask = to_dense_batch(concat_feat, batch_idx)
-        desc = roi_dense.transpose(1, 2)
-        
-        
-     
-        
-        edge_patch = self.edge_patch_enc(batch.edge_attr)  
-
-        
-        src, dst = batch.full_edge_index
-        edge_geo = edge_geometry(geo, src, dst)             # [E,5]
-        #local_edge_geo = edge_geo[batch.flat_idx_local] 
-        # Alternate layers
-        for layer in self.layers:
-            if isinstance(layer, SelfAttnLayer):
-                desc = layer(desc)
-            else:
-                flat = desc.transpose(1,2)[mask]
-                delta = layer(flat, edge_index, edge_patch)
-
-                delta_dense, _ = to_dense_batch(delta, batch_idx)
-                desc = desc + delta_dense.transpose(1,2)
-
-        # Collapse to node features
-        features = desc.transpose(1,2)[mask]
-        
-        features = F.dropout(features, p=self.hparams.mlp_dropout, training=self.training)
-
-        # Node logits
-        node_logits = self.mlp_textural_structural(features)
-
-        # Edge logits
-
-        h_src, h_dst = features[src], features[dst]
        
-        edge_in = torch.cat([
-            0.5 * (h_src + h_dst),        # symmetric mean      [E, D]t
-            (h_src - h_dst).abs(),        # symmetric distance  [E, D]
-            edge_geo # geometric extras    [E, 5]
-        ], dim=1)  
-                
-        edge_in = self.edge_predictor(edge_in)  # overwrite so save memory these are now logits
-
-        return node_logits, edge_in
-
-
-    def training_step(self, batch, batch_idx):
-        node_logits, edge_logits = self(batch)
-        node_labels = batch.y.view(-1,1).float()
-        full_edge_labels = batch.full_edge_labels
-        # sample nodes
-        pos_n = (node_labels==1).nonzero(as_tuple=True)[0]
-        neg_n = (node_labels==0).nonzero(as_tuple=True)[0]
-        if pos_n.numel()>0:
-            perm = torch.randperm(neg_n.size(0))
-            sampled_neg_n = neg_n[perm[:pos_n.size(0)]]
-            keep_n = torch.cat([pos_n, sampled_neg_n])
-        else:
-            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0))
-            keep_n=neg_n[perm[:k]]
-        sampled_node_logits = node_logits[keep_n]
-        sampled_node_labels = node_labels[keep_n]
-        node_loss = self.criterion(sampled_node_logits, sampled_node_labels)
-        # sample edges
-        edge_labels_flat = full_edge_labels.view(-1,1)
-        pos_e = (edge_labels_flat==1).nonzero(as_tuple=True)[0]
-        neg_e = (edge_labels_flat==0).nonzero(as_tuple=True)[0]
-        if pos_e.numel()>0:
-            perm_e = torch.randperm(neg_e.size(0))
-            sampled_neg_e = neg_e[perm_e[:pos_e.size(0)]]
-            keep_e = torch.cat([pos_e, sampled_neg_e])
-        else:
-            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0))
-            keep_e=neg_e[perm_e[:k_e]]
-        sampled_edge_logits = edge_logits[keep_e]
-        sampled_edge_labels = edge_labels_flat[keep_e]
-        edge_loss = self.criterion(sampled_edge_logits, sampled_edge_labels)
-        # combined
-        
-      
-        loss = (node_loss +
-                edge_loss) * 0.5
+        loss = (node_loss + edge_loss) * 0.5
 
         # loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
         
@@ -902,7 +554,8 @@ class AttentionEdgeSampleLinearNoWeight(pl.LightningModule):
         # losses
         node_loss = self.criterion(node_logits, node_labels)
         edge_loss = self.criterion(edge_logits, full_edge_labels)
-        total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
+
+        total_loss = (node_loss + edge_loss) * 0.5
 
         # log losses
         self.log('val_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=True, logger=True)
@@ -999,7 +652,8 @@ class AttentionEdgeSampleLinearNoWeight(pl.LightningModule):
         # losses
         node_loss = self.criterion(node_logits, node_labels)
         edge_loss = self.criterion(edge_logits, full_edge_labels)
-        total_loss = self.hparams.node_loss_w * node_loss + self.hparams.edge_loss_w * edge_loss
+
+        total_loss = (node_loss + edge_loss) * 0.5
 
         # log losses
         self.log('test_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=False, logger=True)
@@ -1064,13 +718,445 @@ class AttentionEdgeSampleLinearNoWeight(pl.LightningModule):
 
 
         self.test_step_outputs.clear()
-
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.hparams.learning_rate)
+        opt = torch.optim.AdamW(self.parameters(), lr=self.hparams.learning_rate, weight_decay=1e-4)
+        scheduler = {
+            'scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=200),
+            'interval': 'epoch'
+        }
+        return [opt], [scheduler]
     
-    
-    
-    
+from sklearn.metrics import precision_recall_curve, auc, average_precision_score
+from sklearn.metrics import precision_recall_curve, auc, average_precision_score, f1_score
+
+class AttentionEdgeSampleLinearNoWeight(pl.LightningModule):
+    def __init__(self,
+        # Model HParams
+        in_channels_DeepLSD: int,
+        in_channels: int,
+        hidden_channels: int,
+        out_channels: int,
+        geom_channels: int,
+        roi_align_embedding_shape: tuple,
+        num_layers: int,
+        dropout: float = 0.5,
+        act: str = 'relu',
+        v2: bool = True,
+        jk_layer: str = None,
+        edge_sample_size = (32,16),
+        edge_downsample_dim = 20,
+        # Training HParams
+        learning_rate: float = 1e-3,
+        node_loss_w: float = 1.0,          # Weight for node loss
+        edge_loss_w: float = 1.0,          # Weight for edge loss (new)
+        threshold_structural: float = 0.5,  # Threshold for accuracy/recall calc
+        mlp_dropout: float = 0.0,          # drop out for merge features
+        skip_init=False,
+        ):
+        super().__init__()
+        self.save_hyperparameters()
+        
+
+        node_height, node_width =  self.hparams.roi_align_embedding_shape
+        edge_height, edge_width =  self.hparams.edge_sample_size
+        self.edge_patch_enc = nn.Sequential(
+        nn.Flatten(start_dim=1),
+        nn.Linear(3* edge_height * edge_width, self.hparams.edge_downsample_dim),
+        #nn.LayerNorm(self.hparams.edge_downsample_dim),         # ← swapped out
+
+        nn.Dropout(p=self.hparams.mlp_dropout),
+        nn.ReLU(),
+        )
+        self.node_linear = nn.Sequential(
+        nn.Flatten(start_dim=1),
+        nn.Linear(3*node_height*node_width, self.hparams.hidden_channels),
+        #nn.LayerNorm(self.hparams.hidden_channels),         # ← swapped out
+
+        nn.Dropout(p=self.hparams.mlp_dropout),
+        nn.ReLU(),
+        )
+        
+        
+        self.edge_loss_w = edge_loss_w
+        self.edge_predictor = nn.Sequential(
+            nn.Linear(2*self.hparams.out_channels + self.hparams.geom_channels, self.hparams.out_channels),
+            #nn.LayerNorm(self.hparams.out_channels),         # ← swapped out
+
+            nn.ReLU(),
+            nn.Linear(self.hparams.out_channels, 1)
+        )
+
+        self.node_fuse = nn.Sequential(
+            nn.Linear(self.hparams.hidden_channels + self.hparams.in_channels_DeepLSD +  self.hparams.geom_channels,
+                      self.hparams.out_channels),
+            #nn.LayerNorm(self.hparams.out_channels),         # ← swapped out
+
+            nn.ReLU(),
+            nn.Linear(self.hparams.out_channels,
+                      self.hparams.out_channels),
+        )
+
+        # GNN layers
+        layers = []
+        for i in range(self.hparams.num_layers):
+            if i % 2 == 0:
+                layers.append(SelfAttnLayer(self.hparams.out_channels, self.hparams.skip_init))
+            else:
+                layers.append(EdgeSamplerLayer(node_dim=self.hparams.out_channels,
+                edge_attr_dim=self.hparams.edge_downsample_dim,
+                hidden_dim=self.hparams.out_channels))
+                
+                
+                # layers.append(LocalEdgeLayer(self.hparams.out_channels))
+
+        self.layers = nn.ModuleList(layers)
+
+        # Node prediction head
+        self.mlp_textural_structural = nn.Sequential(
+            nn.Linear(self.hparams.out_channels, self.hparams.out_channels),
+            # nn.LayerNorm(self.hparams.out_channels),         # ← swapped out
+
+            nn.ReLU(),
+            nn.Linear(self.hparams.out_channels, 1)
+        )
+
+        # Loss
+        self.criterion = nn.BCEWithLogitsLoss()
+
+        # Containers for metrics
+        self.validation_step_outputs = []
+        self.test_step_outputs = []
+        
+      
+       
+                    
+    def forward(self, batch):
+        
+        x, edge_index, batch_idx = batch.x, batch.edge_index, batch.batch
+        roi_features = batch.roi_features 
+        geo = batch.geo
+        # ROI conv and fuse
+        roi_feats = self.node_linear(roi_features)
+        concat_feat = torch.cat([roi_feats, x, geo], dim=1)
+        concat_feat = self.node_fuse(concat_feat)
+        
+        # Prepare for global attention
+        roi_dense, mask = to_dense_batch(concat_feat, batch_idx)
+        desc = roi_dense.transpose(1, 2)
+        
+        
+     
+        
+        edge_patch = self.edge_patch_enc(batch.edge_attr)  
+
+        
+        src, dst = batch.full_edge_index
+        edge_geo = edge_geometry(geo, src, dst)             # [E,5]
+        #local_edge_geo = edge_geo[batch.flat_idx_local] 
+        # Alternate layers
+        for layer in self.layers:
+            if isinstance(layer, SelfAttnLayer):
+                desc = layer(desc)
+            else:
+                flat = desc.transpose(1,2)[mask]
+                # flat_norm = layer.ln(flat)   
+
+                delta = layer(flat, edge_index, edge_patch)
+
+                delta_dense, _ = to_dense_batch(delta, batch_idx)
+                desc = desc + delta_dense.transpose(1,2)
+                
+
+
+
+        # Collapse to node features
+        features = desc.transpose(1,2)[mask]
+        
+        #features = F.dropout(features, p=self.hparams.mlp_dropout, training=self.training)
+
+        # Node logits
+        node_logits = self.mlp_textural_structural(features)
+
+        # Edge logits
+
+        h_src, h_dst = features[src], features[dst]
+       
+        edge_in = torch.cat([
+            0.5 * (h_src + h_dst),        # symmetric mean      [E, D]t
+            (h_src - h_dst).abs(),        # symmetric distance  [E, D]
+            edge_geo # geometric extras    [E, 5]
+        ], dim=1)  
+                
+        edge_in = self.edge_predictor(edge_in)  # overwrite so save memory these are now logits
+
+        return node_logits, edge_in
+
+
+    def training_step(self, batch, batch_idx):
+        node_logits, edge_logits = self(batch)
+        node_labels = batch.y.view(-1,1).float()
+        full_edge_labels = batch.full_edge_labels
+        # sample nodes
+        pos_n = (node_labels==1).nonzero(as_tuple=True)[0]
+        neg_n = (node_labels==0).nonzero(as_tuple=True)[0]
+        if pos_n.numel()>0:
+            perm = torch.randperm(neg_n.size(0))
+            sampled_neg_n = neg_n[perm[:pos_n.size(0)]]
+            keep_n = torch.cat([pos_n, sampled_neg_n])
+        else:
+            k=min(32,neg_n.size(0)); perm=torch.randperm(neg_n.size(0))
+            keep_n=neg_n[perm[:k]]
+        sampled_node_logits = node_logits[keep_n]
+        sampled_node_labels = node_labels[keep_n]
+        node_loss = self.criterion(sampled_node_logits, sampled_node_labels)
+        # sample edges
+        edge_labels_flat = full_edge_labels.view(-1,1)
+        pos_e = (edge_labels_flat==1).nonzero(as_tuple=True)[0]
+        neg_e = (edge_labels_flat==0).nonzero(as_tuple=True)[0]
+        if pos_e.numel()>0:
+            perm_e = torch.randperm(neg_e.size(0))
+            sampled_neg_e = neg_e[perm_e[:pos_e.size(0)]]
+            keep_e = torch.cat([pos_e, sampled_neg_e])
+        else:
+            k_e=min(32,neg_e.size(0)); perm_e=torch.randperm(neg_e.size(0))
+            keep_e=neg_e[perm_e[:k_e]]
+        sampled_edge_logits = edge_logits[keep_e]
+        sampled_edge_labels = edge_labels_flat[keep_e]
+        edge_loss = self.criterion(sampled_edge_logits, sampled_edge_labels)
+        # combined
+        
+      
+       
+        loss = (node_loss + edge_loss) * 0.5
+
+        # loss = self.hparams.node_loss_w*node_loss + self.hparams.edge_loss_w*edge_loss
+        
+        # metrics
+        with torch.no_grad():
+            n_probs=torch.sigmoid(sampled_node_logits); n_preds=(n_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
+            node_acc=accuracy_score(sampled_node_labels.int().detach().cpu().numpy().ravel(),n_preds)
+            e_probs=torch.sigmoid(sampled_edge_logits); e_preds=(e_probs>=self.hparams.threshold_structural).int().detach().cpu().numpy().ravel()
+            edge_acc=accuracy_score(sampled_edge_labels.int().detach().cpu().numpy().ravel(), e_preds)
+            
+            
+        self.log('train_loss',loss,on_step=True,on_epoch=False, prog_bar=True, logger=True)
+        self.log('train_node_acc',node_acc,on_step=True,on_epoch=False, prog_bar=True, logger=True)
+        self.log('train_edge_acc',edge_acc,on_step=True,on_epoch=False, prog_bar=True, logger=True)
+        return loss
+
+    def validation_step(self, batch: Batch, batch_idx: int):
+        # forward
+        node_logits, edge_logits = self(batch)
+        # labels
+        node_labels      = batch.y.float()               # [N,1]
+        full_edge_labels = batch.full_edge_labels.float()  # [N*N,1]
+
+        # losses
+        node_loss = self.criterion(node_logits, node_labels)
+        edge_loss = self.criterion(edge_logits, full_edge_labels)
+
+        total_loss = (node_loss + edge_loss) * 0.5
+
+        # log losses
+        self.log('val_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=True, logger=True)
+        self.log('val_edge_loss', edge_loss,  on_step=True,on_epoch=False, prog_bar=True, logger=True)
+        self.log('val_loss',      total_loss, on_step=True,on_epoch=False, prog_bar=True,  logger=True)
+
+        # store for epoch-end
+        self.validation_step_outputs.append({
+            'node_preds': node_logits.sigmoid().detach(),
+            'node_labels': node_labels.detach(),
+            'edge_preds': edge_logits.sigmoid().detach(),
+            'edge_labels': full_edge_labels.detach(),
+            'loss': total_loss
+        })
+        return {'loss': total_loss,  
+            'node_preds': node_logits.sigmoid(),
+            'node_labels': node_labels,
+            'edge_preds': edge_logits.sigmoid(),
+            'edge_labels': full_edge_labels}
+
+
+ 
+  
+    def on_validation_epoch_end(self):
+        if not self.validation_step_outputs:
+            return
+
+        # aggregate outputs
+        losses = torch.stack([x['loss'] for x in self.validation_step_outputs]).mean()
+        all_node_preds = torch.cat([x['node_preds'] for x in self.validation_step_outputs]).cpu().numpy()
+        all_node_labels = torch.cat([x['node_labels'] for x in self.validation_step_outputs]).cpu().numpy()
+        all_edge_preds = torch.cat([x['edge_preds'] for x in self.validation_step_outputs]).cpu().numpy()
+        all_edge_labels = torch.cat([x['edge_labels'] for x in self.validation_step_outputs]).cpu().numpy()
+
+        # binary decisions
+        thresh = self.hparams.threshold_structural
+        node_binary = (all_node_preds >= thresh).astype(int)
+        edge_binary = (all_edge_preds >= thresh).astype(int)
+
+        # confusion values
+        tn_n, fp_n, fn_n, tp_n = confusion_matrix(all_node_labels, node_binary, labels=[0,1]).ravel()
+        tn_e, fp_e, fn_e, tp_e = confusion_matrix(all_edge_labels, edge_binary, labels=[0,1]).ravel()
+
+        # compute metrics
+        node_acc = (tp_n + tn_n) / (tp_n + tn_n + fp_n + fn_n)
+        node_recall = tp_n / (tp_n + fn_n) if (tp_n + fn_n)>0 else 0.0
+        node_precision = tp_n / (tp_n + fp_n) if (tp_n + fp_n)>0 else 0.0
+        node_specificity = tn_n / (tn_n + fp_n) if (tn_n + fp_n)>0 else 0.0
+        node_auc = auc(*roc_curve(all_node_labels, all_node_preds)[:2]) if len(np.unique(all_node_labels))>1 else 0.0
+
+        edge_acc = (tp_e + tn_e) / (tp_e + tn_e + fp_e + fn_e)
+        edge_recall = tp_e / (tp_e + fn_e) if (tp_e + fn_e)>0 else 0.0
+        edge_precision = tp_e / (tp_e + fp_e) if (tp_e + fp_e)>0 else 0.0
+        edge_specificity = tn_e / (tn_e + fp_e) if (tn_e + fp_e)>0 else 0.0
+        edge_auc = auc(*roc_curve(all_edge_labels, all_edge_preds)[:2]) if len(np.unique(all_edge_labels))>1 else 0.0
+
+
+        # ---- NEW: PR‐AUC / average precision ----
+            # Option A: direct from sklearn
+        node_pr_auc = average_precision_score(all_node_labels, all_node_preds) \
+                    if len(np.unique(all_node_labels))>1 else 0.0
+        edge_pr_auc = average_precision_score(all_edge_labels, all_edge_preds) \
+                    if len(np.unique(all_edge_labels))>1 else 0.0
+        combined_auc = 0.5 * (node_auc + edge_auc)
+        
+        combined_pr_auc = 0.5 * (node_pr_auc + edge_pr_auc)
+
+
+        # log metrics
+        self.log_dict({
+            'val_loss_epoch': losses,
+            'val_node_acc_epoch': node_acc,
+            'val_node_recall_epoch': node_recall,
+            'val_node_precision_epoch': node_precision,
+            'val_node_specificity_epoch': node_specificity,
+            'val_node_auc_epoch': node_auc,
+            'val_edge_acc_epoch': edge_acc,
+            'val_edge_recall_epoch': edge_recall,
+            'val_edge_precision_epoch': edge_precision,
+            'val_edge_specificity_epoch': edge_specificity,
+            'val_edge_auc_epoch': edge_auc,
+            'val_combined_auc_epoch': combined_auc,
+            'val_edge_pr_auc_epoch': edge_pr_auc,
+            'val_node_pr_auc_epoch': node_pr_auc,
+            'val_combined_pr_auc_epoch': combined_pr_auc,
+
+            'tn_n': tn_n,
+            'tp_n': tp_n,
+            'fp_n': fp_n,
+            'fn_n': fn_n,
+            'tn_e': tn_e,
+            'tp_e': tp_e,
+            'fp_e': fp_e,
+            'fn_e': fn_e,
+        }, on_epoch=True, prog_bar=False)
+
+      
+
+        self.validation_step_outputs.clear()
+
+    def test_step(self, batch: Batch, batch_idx: int):
+        # forward
+        node_logits, edge_logits = self(batch)
+        # labels
+        node_labels      = batch.y.float()
+        full_edge_labels = batch.full_edge_labels.float()
+
+        # losses
+        node_loss = self.criterion(node_logits, node_labels)
+        edge_loss = self.criterion(edge_logits, full_edge_labels)
+
+        total_loss = (node_loss + edge_loss) * 0.5
+
+        # log losses
+        self.log('test_node_loss', node_loss,  on_step=True, on_epoch=False, prog_bar=False, logger=True)
+        self.log('test_edge_loss', edge_loss,  on_step=True, on_epoch=False, prog_bar=False, logger=True)
+        self.log('test_loss',      total_loss, on_step=True, on_epoch=False, prog_bar=True,  logger=True)
+
+        # store for epoch-end
+        self.test_step_outputs.append({
+            'node_preds': node_logits.sigmoid().detach(),
+            'node_labels': node_labels.detach(),
+            'edge_preds': edge_logits.sigmoid().detach(),
+            'edge_labels': full_edge_labels.detach(),
+            'loss': total_loss
+        })
+        return {
+            'node_preds': node_logits.sigmoid(),
+            'node_labels': node_labels,
+            'edge_preds': edge_logits.sigmoid(),
+            'edge_labels': full_edge_labels,
+            'loss': total_loss
+        }
+
+
+    def on_test_epoch_end(self):
+        if not self.test_step_outputs:
+            return
+
+        losses = torch.stack([x['loss'] for x in self.test_step_outputs]).mean()
+        all_node_preds = torch.cat([x['node_preds'] for x in self.test_step_outputs]).cpu().numpy()
+        all_node_labels = torch.cat([x['node_labels'] for x in self.test_step_outputs]).cpu().numpy()
+        all_edge_preds = torch.cat([x['edge_preds'] for x in self.test_step_outputs]).cpu().numpy()
+        all_edge_labels = torch.cat([x['edge_labels'] for x in self.test_step_outputs]).cpu().numpy()
+
+        thresh = self.hparams.threshold_structural
+        node_binary = (all_node_preds >= thresh).astype(int)
+        edge_binary = (all_edge_preds >= 0.75).astype(int)
+
+        tn_n, fp_n, fn_n, tp_n = confusion_matrix(all_node_labels, node_binary, labels=[0,1]).ravel()
+        tn_e, fp_e, fn_e, tp_e = confusion_matrix(all_edge_labels, edge_binary, labels=[0,1]).ravel()
+        
+               # ---- NEW: PR‐AUC / average precision ----
+            # Option A: direct from sklearn
+        node_pr_auc = average_precision_score(all_node_labels, all_node_preds) \
+                    if len(np.unique(all_node_labels))>1 else 0.0
+        edge_pr_auc = average_precision_score(all_edge_labels, all_edge_preds) \
+                    if len(np.unique(all_edge_labels))>1 else 0.0
+        
+            # ---- NEW: F1‐score (threshold‐dependent) ----
+        node_f1 = f1_score(all_node_labels, node_binary) if len(np.unique(all_node_labels))>1 else 0.0
+        edge_f1 = f1_score(all_edge_labels, edge_binary) if len(np.unique(all_edge_labels))>1 else 0.0
+
+
+
+        self.log_dict({
+            'test_loss_epoch': losses,
+            'test_node_acc_epoch': (tp_n + tn_n) / (tp_n + tn_n + fp_n + fn_n),
+            'test_node_recall_epoch': tp_n / (tp_n + fn_n) if (tp_n + fn_n)>0 else 0.0,
+            'test_node_precision_epoch': tp_n / (tp_n + fp_n) if (tp_n + fp_n)>0 else 0.0,
+            'test_node_specificity_epoch': tn_n / (tn_n + fp_n) if (tn_n + fp_n)>0 else 0.0,
+            'test_node_auc_epoch': auc(*roc_curve(all_node_labels, all_node_preds)[:2]) if len(np.unique(all_node_labels))>1 else 0.0,
+            'test_edge_acc_epoch': (tp_e + tn_e) / (tp_e + tn_e + fp_e + fn_e),
+            'test_edge_recall_epoch': tp_e / (tp_e + fn_e) if (tp_e + fn_e)>0 else 0.0,
+            'test_edge_precision_epoch': tp_e / (tp_e + fp_e) if (tp_e + fp_e)>0 else 0.0,
+            'test_edge_specificity_epoch': tn_e / (tn_e + fp_e) if (tn_e + fp_e)>0 else 0.0,
+            'test_edge_auc_epoch': auc(*roc_curve(all_edge_labels, all_edge_preds)[:2]) if len(np.unique(all_edge_labels))>1 else 0.0,
+            'test_edge_pr_auc_epoch': edge_pr_auc,
+            'test_node_pr_auc_epoch': node_pr_auc,
+            'test_node_f1_epoch':     node_f1,
+            'test_edge_f1_epoch':     edge_f1,
+
+            'tn_n': tn_n,
+            'tp_n': tp_n,
+            'fp_n': fp_n,
+            'fn_n': fn_n,
+            'tn_e': tn_e,
+            'tp_e': tp_e,
+            'fp_e': fp_e,
+            'fn_e': fn_e,
+        }, on_epoch=True, prog_bar=False)
+
+
+        self.test_step_outputs.clear()
+    def configure_optimizers(self):
+        opt = torch.optim.AdamW(self.parameters(), lr=self.hparams.learning_rate, weight_decay=1e-4)
+        scheduler = {
+            'scheduler': torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=200),
+            'interval': 'epoch'
+        }
+        return [opt], [scheduler]
   
 class AttentionEdgeSampleLinearNoWeightNoEdge(pl.LightningModule):
     def __init__(self,

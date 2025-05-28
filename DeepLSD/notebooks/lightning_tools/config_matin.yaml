@@ -9,10 +9,10 @@ data:
   val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
   # test_split is implicitly 1.0 - train_split - val_split
   num_workers: 2               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
-  accum_grads: 8                # Gradient accumulation
+  accum_grads: 32                # Gradient accumulation
   method: 'sample'
   use_precomputed: false # use pre_computed
-  k_nn: 7 # ToDo: Implement value to use for the k_nn graph
+  k_nn: 10 # ToDo: Implement value to use for the k_nn graph
 model:
   # Input dimensions
   in_channels_DeepLSD: 1280       # Dimension of the initial DeepLSD embedding feature per node
@@ -31,22 +31,23 @@ model:
   skip_init: "False"
   only_linear: true               # use only linear layers no conv
   # MLP Drop-outs
-  mlp_dropout: 0.0
+  mlp_dropout: 0.1
   # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
-  #load_model_path: "/home/maurdu/3D-Vision/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/phrkjdq6/checkpoints/best-model-epoch=41-val_combined_auc_epoch=0.9618.ckpt"
+  load_model_path: "/Users/marvin/Documents/ETHZ/MA4/3DVision/repo/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/21pbvrmm/checkpoints/best-model-epoch=11-val_combined_auc_epoch=0.8713.ckpt"
+
 training:
   learning_rate: 0.0005            # Optimizer learning rate
   node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
   edge_loss_w: 1.0                # Weight for the edge classification loss term (if multiple losses were used)
 
   threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
-  epochs: 80                      # Maximum number of training epochs
+  epochs: 50                      # Maximum number of training epochs
   accelerator: 'auto'             # Hardware accelerator ('cpu', 'gpu', 'tpu', 'mps', 'auto')
   devices: 'auto'                 # Devices to use ('auto', 1 for 1 GPU, [0, 1] for GPUs 0 and 1, etc.)
   log_dir: "lightning_logs"       # Base directory for saving logs and checkpoints
   early_stopping_patience: 20      # Number of epochs with no improvement in monitored metric before stopping
-  monitor_metric: 'val_combined_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
+  monitor_metric: 'val_edge_pr_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
   monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
   seed: 42                        # Random seed for reproducibility
-  experiment_name: "Attention_Edge_Sampler_No_Weight"
+  experiment_name: "Attention_Edge_Sampling"
 

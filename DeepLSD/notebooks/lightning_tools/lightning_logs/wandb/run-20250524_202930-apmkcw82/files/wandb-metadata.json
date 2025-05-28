@@ -1,0 +1,48 @@
+{
+  "os": "macOS-15.4.1-arm64-arm-64bit",
+  "python": "CPython 3.11.11",
+  "startedAt": "2025-05-24T18:29:30.784286Z",
+  "args": [
+    "--config",
+    "config_matin.yaml"
+  ],
+  "program": "/Users/marvin/Documents/ETHZ/MA4/3DVision/repo/DeepLSD/notebooks/lightning_tools/train.py",
+  "codePath": "DeepLSD/notebooks/lightning_tools/train.py",
+  "git": {
+    "remote": "git@github.com:marvin-koch/3D-Vision.git",
+    "commit": "2458befdca5c53505add713c290f47e0773e2426"
+  },
+  "email": "marvinkoch2306@gmail.com",
+  "root": "lightning_logs",
+  "host": "marvins-macbook-pro-2.home",
+  "executable": "/opt/homebrew/opt/python@3.11/bin/python3.11",
+  "codePathLocal": "train.py",
+  "cpu_count": 10,
+  "cpu_count_logical": 10,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "985352077312"
+    },
+    "/System/Volumes/Data": {
+      "total": "994662584320",
+      "used": "985352077312"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "cpu": {
+    "count": 10,
+    "countLogical": 10
+  },
+  "apple": {
+    "name": "Apple M1 Pro",
+    "ecpuCores": 2,
+    "pcpuCores": 8,
+    "gpuCores": 16,
+    "memoryGb": 16,
+    "swapTotalBytes": "5368709120",
+    "ramTotalBytes": "17179869184"
+  }
+}
