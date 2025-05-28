@@ -2,7 +2,7 @@ import json
 import os
 import numpy as np
 
-OUTPUT_DIR = "/work/scratch/maurdu/data/json_output"
+OUTPUT_DIR = "scannet_output"
 
 def convert_np(o):
     """Recursively convert NumPy scalars to native Python types."""

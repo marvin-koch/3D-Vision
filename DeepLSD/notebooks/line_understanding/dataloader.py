@@ -79,6 +79,28 @@ class BaseDataLoader:
         return self.base_dir.joinpath(*segments)
 
 
+
+class ScanNetLoader(BaseDataLoader):
+    def load_color(self, idx: str) -> np.ndarray:
+        path = self.base_dir / "color" / f"{idx}.jpg"
+        
+        return FileLoader.load_image(path, cv2.COLOR_BGR2RGB)
+
+    def load_depth(self, idx: int) -> np.ndarray:
+        path = self.base_dir / "depth" / f"{idx}.png"
+        depth_mm = FileLoader.load_image(path)
+        return (depth_mm.astype(np.float32) / 1000.0)  # back to meters
+
+
+    def load_intrinsics(self) -> np.ndarray:
+        # Read the 4×4 camera-to-sensor matrix, then take upper-left 3×3
+        txt = self.base_dir / "intrinsic"/ "intrinsic_color.txt"
+        K4 = np.loadtxt(txt, dtype=np.float32)      # shape (4,4)
+        K = K4[:3, :3]                              # drop the last row/col
+        return K
+
+
+
 class HypersimLoader(BaseDataLoader):
     """Loader for Hypersim dataset."""
 

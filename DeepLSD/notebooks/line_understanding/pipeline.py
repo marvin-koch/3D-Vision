@@ -9,7 +9,7 @@ import torch
 
 from line_understanding.visualization import *
 from line_understanding.save import save_lines_to_json
-from line_understanding.dataloader import HypersimLoader, ETH3DLoader
+from line_understanding.dataloader import HypersimLoader, ETH3DLoader, ScanNetLoader
 from line_understanding.edges import *
 from line_understanding.geometry import *
 from line_understanding.plane_fitting import *
@@ -44,6 +44,13 @@ def load_data(
         K = loader.load_intrinsics()
         world_coords = reproject_depth_to_points(depth_map, K)
         normal_map = compute_normal_map_from_points(world_coords, ksize=3)
+    elif dataset=="scannet":
+        loader = ScanNetLoader(data_dir)
+        color_img = loader.load_color((frame_str))
+        depth_map = loader.load_depth((frame_str))
+        K = loader.load_intrinsics()
+        world_coords = reproject_depth_to_points(depth_map, K)
+        normal_map = compute_normal_map_from_points(world_coords, ksize=3)
     else:
         raise ValueError(f"Unsupported dataset: {dataset}")
 
@@ -74,6 +81,7 @@ def process_image(
     print(f"Start: {start}")
 
     data_root = Path(base_dir)
+    
     color_img, depth_map, world_coords, normal_map = load_data(
         image_id, frame_str, dataset, data_root
     )
