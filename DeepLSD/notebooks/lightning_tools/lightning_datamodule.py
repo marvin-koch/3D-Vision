@@ -45,16 +45,16 @@ class GraphDataModuleInductive(pl.LightningDataModule):
             raise FileNotFoundError(f"JSON directory not found: {self.h5_path}")
 
     def setup(self, stage: str = None):
-        # Load full dataset once
-        if self.full_dataset is None:
-            self.full_dataset = GraphDatasetInductive(
-                h5_path=self.h5_path,
-                roi_output_size=self.roi_output_size,
-                method=self.method,
-                edge_sample_size=self.edge_sample_size
-            )
+        # ── 1) Build a “no‐augmentation” dataset for splitting & for val/test ──
+        noaug_dataset = GraphDatasetInductive(
+            h5_path=self.h5_path,
+            roi_output_size=self.roi_output_size,
+            method=self.method,
+            edge_sample_size=self.edge_sample_size,
+            augment=False,            # NO augmentation
+        )
 
-        n_total = len(self.full_dataset)
+        n_total = len(noaug_dataset)
         n_train = int(self.train_split * n_total)
         n_val   = int(self.val_split   * n_total)
         n_test  = n_total - n_train - n_val
@@ -62,25 +62,96 @@ class GraphDataModuleInductive(pl.LightningDataModule):
         if n_train <= 0 or n_val <= 0 or n_test <= 0:
             raise ValueError(f"Dataset size {n_total} is too small for the requested splits.")
 
-        # Create ordered index lists
+        # ── 2) Build a separate “augment” dataset for training ──
+        aug_dataset = GraphDatasetInductive(
+            h5_path=self.h5_path,
+            roi_output_size=self.roi_output_size,
+            method=self.method,
+            edge_sample_size=self.edge_sample_size,
+            augment=False,
+        )
+
+        # ── 3) Define index ranges (ordered, deterministic) ──
         train_idxs = list(range(0,               n_train))
         val_idxs   = list(range(n_train,         n_train + n_val))
         test_idxs  = list(range(n_train + n_val, n_total))
 
-        # Wrap each in a Subset (preserves order)
-        self.train_ds = Subset(self.full_dataset, train_idxs)
-        self.val_ds   = Subset(self.full_dataset, val_idxs)
-        self.test_ds  = Subset(self.full_dataset, test_idxs)
+        # ── 4) Wrap Subsets: train uses aug_dataset; val/test use noaug_dataset ──
+        self.train_ds = Subset( aug_dataset, train_idxs )
+        self.val_ds   = Subset( noaug_dataset, val_idxs   )
+        self.test_ds  = Subset( noaug_dataset, test_idxs  )
 
         print(f"Dataset split: Train={len(self.train_ds)}, Val={len(self.val_ds)}, Test={len(self.test_ds)}")
 
-
     def train_dataloader(self):
-        return DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)
-    
+        return DataLoader(
+            self.train_ds,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            persistent_workers=(self.num_workers > 0),
+        )
 
     def val_dataloader(self):
-        return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)
+        return DataLoader(
+            self.val_ds,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            persistent_workers=(self.num_workers > 0),
+        )
 
     def test_dataloader(self):
-        return DataLoader(self.test_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)
+        return DataLoader(
+            self.test_ds,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            persistent_workers=(self.num_workers > 0),
+        )
+    
+
+
+    #     def setup(self, stage: str = None):
+    #     # Load full dataset once
+    #     if self.full_dataset is None:
+    #         self.full_dataset = GraphDatasetInductive(
+    #             h5_path=self.h5_path,
+    #             roi_output_size=self.roi_output_size,
+    #             method=self.method,
+    #             edge_sample_size=self.edge_sample_size
+    #         )
+
+    #     n_total = len(self.full_dataset)
+    #     n_train = int(self.train_split * n_total)
+    #     n_val   = int(self.val_split   * n_total)
+    #     n_test  = n_total - n_train - n_val
+
+    #     if n_train <= 0 or n_val <= 0 or n_test <= 0:
+    #         raise ValueError(f"Dataset size {n_total} is too small for the requested splits.")
+
+    #     # Create ordered index lists
+    #     train_idxs = list(range(0,               n_train))
+    #     val_idxs   = list(range(n_train,         n_train + n_val))
+    #     test_idxs  = list(range(n_train + n_val, n_total))
+
+    #     # Wrap each in a Subset (preserves order)
+    #     self.train_ds = Subset(self.full_dataset, train_idxs)
+    #     self.val_ds   = Subset(self.full_dataset, val_idxs)
+    #     self.test_ds  = Subset(self.full_dataset, test_idxs)
+
+    #     print(f"Dataset split: Train={len(self.train_ds)}, Val={len(self.val_ds)}, Test={len(self.test_ds)}")
+
+
+    # def train_dataloader(self):
+    #     return DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)
+    
+
+    # def val_dataloader(self):
+    #     return DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)
+
+    # def test_dataloader(self):
+    #     return DataLoader(self.test_ds, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers,pin_memory=True, persistent_workers=self.num_workers > 0)

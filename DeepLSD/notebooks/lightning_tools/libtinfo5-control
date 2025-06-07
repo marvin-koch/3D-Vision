@@ -1,0 +1,8 @@
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Package: libtinfo5
+Version: 6.1-1
+Maintainer: Dummy <dummy@example.com>
+Architecture: amd64
+Description: Dummy package to satisfy libtinfo5 dependency

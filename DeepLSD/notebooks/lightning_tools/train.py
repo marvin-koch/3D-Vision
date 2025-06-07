@@ -99,30 +99,60 @@ def main(config_path: str):
             edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
         )
     else:
-        model = AttentionCNN(
-            in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
-            in_channels=cfg_model.get('in_channels', 1024),
-            hidden_channels=cfg_model.get('hidden_channels', 128),
-            hidden_channels_cnn=cfg_model.get('hidden_channels_cnn', 64),
+        # model = AttentionCNN(
+        #     in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
+        #     in_channels=cfg_model.get('in_channels', 1024),
+        #     hidden_channels=cfg_model.get('hidden_channels', 128),
+        #     hidden_channels_cnn=cfg_model.get('hidden_channels_cnn', 64),
 
-            out_channels=cfg_model.get('out_channels', 64),
-            geom_channels=cfg_model.get('geom_channels', 5),
-            roi_align_embedding_shape=roi_output_size_tuple,
-            num_layers=cfg_model.get('num_layers', 3),
-            dropout=cfg_model.get('dropout', 0.2),
-            act=cfg_model.get('act', 'relu'),
-            v2=cfg_model.get('v2', True),
-            jk_layer=jk_layer_val,
-            learning_rate=cfg_train.get('learning_rate', 1e-3),
-            node_loss_w=cfg_train.get('node_loss_w', 1.0),
-            edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
-            threshold_structural=cfg_train.get('threshold_structural', 0.5),
-            mlp_dropout=cfg_model.get('mlp_dropout',0.0),
-            skip_init=cfg_model.get('skip_init', False),
-            edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
-            edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
-        )
+        #     out_channels=cfg_model.get('out_channels', 64),
+        #     geom_channels=cfg_model.get('geom_channels', 5),
+        #     roi_align_embedding_shape=roi_output_size_tuple,
+        #     num_layers=cfg_model.get('num_layers', 3),
+        #     dropout=cfg_model.get('dropout', 0.2),
+        #     act=cfg_model.get('act', 'relu'),
+        #     v2=cfg_model.get('v2', True),
+        #     jk_layer=jk_layer_val,
+        #     learning_rate=cfg_train.get('learning_rate', 1e-3),
+        #     node_loss_w=cfg_train.get('node_loss_w', 1.0),
+        #     edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
+        #     threshold_structural=cfg_train.get('threshold_structural', 0.5),
+        #     mlp_dropout=cfg_model.get('mlp_dropout',0.0),
+        #     skip_init=cfg_model.get('skip_init', False),
+        #     edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
+        #     edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
+        # )
 
+        model = AttentionCNNCluster(
+                in_channels_DeepLSD=cfg_model.get('in_channels_DeepLSD', 1280),
+                in_channels=cfg_model.get('in_channels', 1024),
+                hidden_channels=cfg_model.get('hidden_channels', 128),
+                hidden_channels_cnn=cfg_model.get('hidden_channels_cnn', 64),
+
+                out_channels=cfg_model.get('out_channels', 64),
+                geom_channels=cfg_model.get('geom_channels', 5),
+                roi_align_embedding_shape=roi_output_size_tuple,
+                num_layers=cfg_model.get('num_layers', 3),
+                dropout=cfg_model.get('dropout', 0.2),
+                act=cfg_model.get('act', 'relu'),
+                v2=cfg_model.get('v2', True),
+                jk_layer=jk_layer_val,
+                learning_rate=cfg_train.get('learning_rate', 1e-3),
+                node_loss_w=cfg_train.get('node_loss_w', 1.0),
+                edge_loss_w=cfg_train.get('edge_loss_w', 1.0),
+                threshold_structural=cfg_train.get('threshold_structural', 0.5),
+                mlp_dropout=cfg_model.get('mlp_dropout',0.0),
+                skip_init=cfg_model.get('skip_init', False),
+                edge_sample_size=cfg_data.get('edge_sample_size', (32,8)),
+                edge_downsample_dim=cfg_model.get('edge_downsample_dim', 20),
+                delta_var= cfg_model.get('delta_var', 0.5),
+                delta_dist= cfg_model.get('delta_dist', 1.5),
+                alpha= cfg_model.get('alpha', 1.0),
+                beta= cfg_model.get('beta', 1.0),
+                gamma= cfg_model.get('gamma', 0.001),
+                embed_dim= cfg_model.get('embed_dim', 128),
+            )
+        #model = torch.compile(model, mode="reduce-overhead")
     # --- Logging and Checkpointing ---
     log_dir = cfg_train.get('log_dir', "lightning_logs")
     os.makedirs(log_dir, exist_ok=True)
@@ -139,6 +169,16 @@ def main(config_path: str):
     logger.log_hyperparams(cfg)
     monitor_metric = cfg_train.get('monitor_metric', 'val_auc')
     monitor_mode = cfg_train.get('monitor_mode', 'max')
+    normal_callback = ModelCheckpoint(
+        # monitor=monitor_metric,
+        # mode=monitor_mode,
+        filename=f'cnn-{{epoch:02d}}-{{{monitor_metric}:.4f}}',
+        save_top_k=-1,
+        every_n_epochs=1,
+
+        verbose=True
+    )
+
     checkpoint_callback = ModelCheckpoint(
         monitor=monitor_metric,
         mode=monitor_mode,
@@ -187,7 +227,7 @@ def main(config_path: str):
         max_epochs=cfg_train.get('epochs', 20),
         logger=logger,
         precision  = cfg_train.get('precision', "16-mixed"),  # "16" also works
-        callbacks=[checkpoint_callback, early_stop_callback],
+        callbacks=[early_stop_callback, normal_callback],
         accelerator=actual_accelerator, # Use resolved accelerator
         devices=actual_devices,       # Use resolved devices
         log_every_n_steps=10,
