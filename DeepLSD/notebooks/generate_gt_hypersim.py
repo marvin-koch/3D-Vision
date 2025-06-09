@@ -9,62 +9,73 @@ from line_understanding.pipeline import process_image
 if __name__ == "__main__":
 
 
-    frames = [f"{i:04d}" for i in range(1, 100)]
+    # frames = [f"{i:04d}" for i in range(1, 100)]
     
+    # desired_images = [
+    # "ai_006_001",
+    # "ai_006_002",
+    # "ai_006_003",
+    # "ai_006_004",
+    # "ai_006_005",
+    # "ai_006_006",
+    # "ai_006_007",
+    # "ai_006_008",
+    # "ai_006_009",
+    # "ai_006_010",
+    # "ai_007_001",
+    # "ai_007_002",
+    # "ai_007_003",
+    # "ai_007_004",
+    # "ai_007_005",
+    # "ai_007_006",
+    # "ai_007_007",
+    # "ai_007_008",
+    # "ai_007_009",
+    # "ai_007_010",
+    # "ai_008_001",
+    # "ai_008_002",
+    # "ai_008_003",
+    # "ai_008_004",
+    # "ai_008_005",
+    # "ai_008_006",
+    # "ai_008_007",
+    # "ai_008_008",
+    # "ai_008_009",
+    # "ai_008_010",
+    # "ai_009_001",
+    # "ai_009_002",
+    # "ai_009_003",
+    # "ai_009_004",
+    # "ai_009_005",
+    # "ai_009_006",
+    # "ai_009_007",
+    # "ai_009_008",
+    # "ai_009_009",
+    # "ai_009_010",
+    # "ai_010_001",
+    # "ai_010_002",
+    # "ai_010_003",
+    # "ai_010_004",
+    # "ai_010_005",
+    # "ai_010_006",
+    # "ai_010_007",
+    # "ai_010_008",
+    # "ai_010_009",
+    # ]
+    
+    base_dir = 'eth3d'
+
+    all_entries = os.listdir(base_dir)
+
+    # Keep only directories that start with "DSC_"
     desired_images = [
-        "ai_001_001",
-        "ai_001_002",
-        "ai_001_003",
-        "ai_001_004",
-        "ai_001_005",
-        "ai_001_006",
-        "ai_001_007",
-        "ai_001_008",
-        "ai_001_009",
-        "ai_001_010",
-        "ai_002_001",
-        "ai_002_002",
-        "ai_002_003",
-        "ai_002_004",
-        "ai_002_005",
-        "ai_002_006",
-        "ai_002_007",
-        "ai_002_008",
-        "ai_002_009",
-        "ai_002_010",
-        "ai_003_001",
-        "ai_003_002",
-        "ai_003_003",
-        "ai_003_004",
-        "ai_003_005",
-        "ai_003_006",
-        "ai_003_007",
-        "ai_003_008",
-        "ai_003_009",
-        "ai_003_010",
-        "ai_004_001",
-        "ai_004_002",
-        "ai_004_003",
-        "ai_004_004",
-        "ai_004_005",
-        "ai_004_006",
-        "ai_004_007",
-        "ai_004_008",
-        "ai_004_009",
-        "ai_004_010",
-        "ai_005_001",
-        "ai_005_002",
-        "ai_005_003",
-        "ai_005_004",
-        "ai_005_005",
-        "ai_005_006",
-        "ai_005_007",
-        "ai_005_008",
-        "ai_005_009",
-        "ai_005_010",
+        entry
+        for entry in all_entries
+        if os.path.isdir(os.path.join(base_dir, entry))
     ]
     
-    base_dir = 'data'
+
+    dataset = "midas"
     
     print("Generate Images")
     
@@ -79,20 +90,68 @@ if __name__ == "__main__":
     outer_loop = tqdm(desired_images, desc="Processing Dataset")
     for image_id in outer_loop:
         outer_loop.set_description("Processing Image {}".format(image_id))
+        image_dir = os.path.join(base_dir, image_id)
+
+        all_entries = os.listdir(image_dir)
+
+        # Keep only directories that start with "DSC_"
+        frames = [
+            entry
+            for entry in all_entries
+            if os.path.isdir(os.path.join(image_dir, entry))
+        ]
         for frame_str in tqdm(frames, desc="Processing Frames", leave=False):
-            print(f"generate for {image_id}, {frame_str}")
-            image_dir = os.path.join(base_dir, image_id)
-            cam_view_color = "scene_cam_00_final_preview"
+            print(f"Generate for {image_id}, {frame_str}")
+            
+            required_file = frame_str
+            
+            if dataset == "hypersim":
+                cam_view_color = "scene_cam_00_final_preview"
 
-            required_file = os.path.join(image_dir, image_id, "images", cam_view_color, f"frame.{frame_str}.color.jpg")
+                required_file = os.path.join(image_dir, image_id, "images", cam_view_color, f"frame.{frame_str}.color.jpg")
 
+            elif dataset=="scannet":
+                required_file = os.path.join(image_dir,"color", f"{frame_str}.jpg")
+            
+            elif dataset=="eth3d" or dataset=="diode" or dataset=="moge" or dataset=="midas":
+                required_file = os.path.join(image_dir,frame_str,"image.jpg")
+            
+            
+            
+            
             if not os.path.isfile(required_file):
                 print(f"Skipping: {os.path.join(required_file, )} does not exist.")
-                continue
-            process_image(
-                base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
-                thresh_normal=8.2e13, thresh_depth=0.2, dataset="hypersim", plot=False, file_path = required_file,
-            )
+                
+            if dataset=="hypersim":
+                process_image(
+                    base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                    thresh_normal=8.2e13, thresh_depth=0.2, dataset=dataset, plot=True, file_path = required_file,
+                )
+            elif dataset=="scannet":
+                 process_image(
+                    base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                    thresh_normal=1e14, thresh_depth=5, dataset=dataset, plot=True, file_path = required_file,
+                ) #1.7e14
+            elif dataset=="eth3d":
+                process_image(
+                    base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                    thresh_normal=140000000000000, thresh_depth=800, dataset=dataset, plot=False, file_path = required_file,
+                ) #1.7e14
+            elif dataset=="diode":    
+                process_image(
+                    base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                    thresh_normal=70000000000000, thresh_depth=50, dataset=dataset, plot=False, file_path = required_file,
+                ) #1.7e14
+            elif dataset=="moge":
+                process_image(
+                    base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                    thresh_normal=70000000000000, thresh_depth=1, dataset=dataset, plot=False, file_path = required_file,
+                ) #1.7e14
+            else:
+                process_image(
+                    base_dir=base_dir, image_id=image_id, frame_str=frame_str, net=net, device=device, thickness = 1,
+                    thresh_normal=90000000000000, thresh_depth=5, dataset=dataset, plot=False, file_path = required_file,
+                )
         if cuda_available:
             torch.cuda.empty_cache()
             

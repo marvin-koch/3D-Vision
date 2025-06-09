@@ -9,7 +9,7 @@ import torch
 
 from line_understanding.visualization import *
 from line_understanding.save import save_lines_to_hdf5
-from line_understanding.dataloader import HypersimLoader, ETH3DLoader
+from line_understanding.dataloader import HypersimLoader, ETH3DLoader, MogeLoader, GeoMidasLoader
 from line_understanding.edges import *
 from line_understanding.geometry import *
 from line_understanding.plane_fitting import *
@@ -37,13 +37,104 @@ def load_data(
         depth_map = loader.raydepth2depth(depth_map, K)
         world_coords = reproject_depth_to_points(depth_map, K)
         normal_map = loader.load_normal(image_id, frame_str, "scene_cam_00_geometry_hdf5")
-    elif dataset == "ETH3D":
+    elif dataset == "eth3d" or dataset=="diode":
+        
+        data_dir = data_dir / frame_str
         loader = ETH3DLoader(data_dir)
         color_img = loader.load_color_image()
+        h,w = color_img.shape[:2]
+        
+        color_img = cv2.resize(color_img, dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
         depth_map = loader.load_depth_png()
+        depth_map = cv2.resize(depth_map,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
+        # plot_images([depth_map], ["Depth Cleaned"], cmaps='gray')
+        h_new,w_new = color_img.shape[:2]
+
         K = loader.load_intrinsics()
-        world_coords = reproject_depth_to_points(depth_map, K)
-        normal_map = compute_normal_map_from_points(world_coords, ksize=3)
+        
+        K[0, 0] *= w_new  # fx
+        K[0, 2] *= w_new  # cx
+        K[1, 1] *= h_new  # fy
+        K[1, 2] *= h_new  # cy   
+        depth_map_cleaned = cv2.medianBlur(depth_map.astype(np.float32), 5)
+
+        world_coords = reproject_depth_to_points(depth_map_cleaned, K)
+        
+        X_channel = world_coords[..., 0]
+        Y_channel = world_coords[..., 1]
+        Z_channel = world_coords[..., 2]
+        # plot_images([X_channel, Y_channel, Z_channel],
+        #             ["X Channel", "Y Channel", "Z Channel"],
+        #             cmaps=['viridis', 'viridis', 'viridis'])
+        normal_map = compute_normal_map_from_points(world_coords, ksize=1)
+        
+   
+        normal_map = cv2.medianBlur(normal_map.astype(np.float32), 5)
+    elif dataset == "moge":
+        data_dir = data_dir / frame_str
+        loader = MogeLoader(data_dir)
+        color_img = loader.load_color_image()
+        h,w = color_img.shape[:2]
+        
+        color_img = cv2.resize(color_img, dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
+        depth_map = loader.load_depth_png()
+        depth_map = cv2.resize(depth_map,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
+        # plot_images([depth_map], ["Depth Cleaned"], cmaps='gray')
+        h_new,w_new = color_img.shape[:2]
+
+        K = loader.load_intrinsics()
+        
+        K[0, 0] *= w_new  # fx
+        K[0, 2] *= w_new  # cx
+        K[1, 1] *= h_new  # fy
+        K[1, 2] *= h_new  # cy   
+        depth_map_cleaned = cv2.medianBlur(depth_map.astype(np.float32), 5)
+
+        world_coords = reproject_depth_to_points(depth_map_cleaned, K)
+        
+        X_channel = world_coords[..., 0]
+        Y_channel = world_coords[..., 1]
+        Z_channel = world_coords[..., 2]
+        # plot_images([X_channel, Y_channel, Z_channel],
+        #             ["X Channel", "Y Channel", "Z Channel"],
+        #             cmaps=['viridis', 'viridis', 'viridis'])
+        normal_map = compute_normal_map_from_points(world_coords, ksize=1)
+    elif dataset == "midas":
+        data_dir = data_dir / frame_str
+        loader = GeoMidasLoader(data_dir)
+        color_img = loader.load_color_image()
+        h,w = color_img.shape[:2]
+        
+        color_img = cv2.resize(color_img, dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
+        depth_map = loader.load_depth_png()
+        print(depth_map.shape)
+        depth_map = cv2.resize(depth_map,dsize=(int(w/2), int(h/2)),interpolation=cv2.INTER_CUBIC)
+
+        # plot_images([depth_map], ["Depth Cleaned"], cmaps='gray')
+        h_new,w_new = color_img.shape[:2]
+
+        K = loader.load_intrinsics()
+        
+        K[0, 0] *= w_new  # fx
+        K[0, 2] *= w_new  # cx
+        K[1, 1] *= h_new  # fy
+        K[1, 2] *= h_new  # cy   
+        depth_map_cleaned = cv2.medianBlur(depth_map.astype(np.float32), 5)
+
+        world_coords = reproject_depth_to_points(depth_map_cleaned, K)
+        
+        X_channel = world_coords[..., 0]
+        Y_channel = world_coords[..., 1]
+        Z_channel = world_coords[..., 2]
+        # plot_images([X_channel, Y_channel, Z_channel],
+        #             ["X Channel", "Y Channel", "Z Channel"],
+        #             cmaps=['viridis', 'viridis', 'viridis'])
+        normal_map = compute_normal_map_from_points(world_coords, ksize=1)
     else:
         raise ValueError(f"Unsupported dataset: {dataset}")
 
@@ -106,65 +197,68 @@ def process_image(
     num_labels, labels_im = cv2.connectedComponents(binary_mask)
     print(f"CC computed: {time.time() - start}, labels: {num_labels}")
 
-    # RANSAC plane fitting
-    cluster_planes: Dict[int, Any] = {}
-    for lbl in np.unique(labels_im):
-        if lbl == 0: continue
-        pts = world_coords[labels_im == lbl]
-        if pts.shape[0] < 50: continue
-        model, inliers = ransac_plane_fit(
-            pts, num_iterations=100, threshold=0.04, min_inliers_ratio=0.8
-        )
-        if model is None: continue
-        in_pts = pts[inliers]
-        errs = compute_distance_to_plane(in_pts, model[0], model[1])
-        if errs.mean() > 0.1: continue
-        A = np.c_[in_pts[:,0], in_pts[:,1], np.ones(in_pts.shape[0])]
-        B = in_pts[:,2]
-        sol, *_ = np.linalg.lstsq(A, B, rcond=None)
-        n_ls = np.array([sol[0], sol[1], -1.0])
-        n_ls /= np.linalg.norm(n_ls)
-        cluster_planes[lbl] = {'ls_model': (n_ls, sol[2]), 'inliers_mask': inliers}
-    print(f"RANSAC done: {time.time() - start}")
+    if not dataset == "midas":
 
-    # Filter clusters
-    new_labels = labels_im.copy()
-    for lbl in np.unique(labels_im):
-        if lbl != 0 and lbl not in cluster_planes:
-            new_labels[new_labels == lbl] = 0
+        # RANSAC plane fitting
+        cluster_planes: Dict[int, Any] = {}
+        for lbl in np.unique(labels_im):
+            if lbl == 0: continue
+            pts = world_coords[labels_im == lbl]
+            if pts.shape[0] < 50: continue
+            model, inliers = ransac_plane_fit(
+                pts, num_iterations=2000, threshold=0.7, min_inliers_ratio=0.3
+            )
+            if model is None: continue
+            in_pts = pts[inliers]
+            errs = compute_distance_to_plane(in_pts, model[0], model[1])
+            if errs.mean() > 0.4: continue
+            A = np.c_[in_pts[:,0], in_pts[:,1], np.ones(in_pts.shape[0])]
+            B = in_pts[:,2]
+            sol, *_ = np.linalg.lstsq(A, B, rcond=None)
+            n_ls = np.array([sol[0], sol[1], -1.0])
+            n_ls /= np.linalg.norm(n_ls)
+            cluster_planes[lbl] = {'ls_model': (n_ls, sol[2]), 'inliers_mask': inliers}
+        print(f"RANSAC done: {time.time() - start}")
 
-    # Build RAG and merge planes
-    import networkx as nx
-    def are_planes_similar(p1, p2,
-                            normal_thresh=0.98,
-                            dist_thresh=0.02) -> bool:
-        n1, d1 = p1['ls_model']; n2, d2 = p2['ls_model']
-        return (abs(n1.dot(n2)) >= normal_thresh) and (abs(d1 - d2) <= dist_thresh)
+        # Filter clusters
+        new_labels = labels_im.copy()
+        for lbl in np.unique(labels_im):
+            if lbl != 0 and lbl not in cluster_planes:
+                new_labels[new_labels == lbl] = 0
 
-    G = nx.Graph()
-    labels = list(cluster_planes.keys())
-    for lbl in labels:
-        G.add_node(lbl)
-    masks = {lbl: (new_labels == lbl).astype(np.uint8) for lbl in labels}
-    dil = {lbl: cv2.dilate(masks[lbl], np.ones((12,12), np.uint8), iterations=7)
-           for lbl in labels}
-    for i, l1 in enumerate(labels):
-        for l2 in labels[i+1:]:
-            if np.any(dil[l1] & masks[l2]) and are_planes_similar(
-               cluster_planes[l1], cluster_planes[l2], 0.99, 0.01):
-                G.add_edge(l1, l2)
-    merged_groups = list(nx.connected_components(G))
+        # Build RAG and merge planes
+        import networkx as nx
+        def are_planes_similar(p1, p2,
+                                normal_thresh=0.98,
+                                dist_thresh=0.02) -> bool:
+            n1, d1 = p1['ls_model']; n2, d2 = p2['ls_model']
+            return (abs(n1.dot(n2)) >= normal_thresh) and (abs(d1 - d2) <= dist_thresh)
 
-    # Create merged map
-    merged_map = np.zeros_like(labels_im)
-    new_lbl = 1
-    for group in merged_groups:
-        for lbl in group:
-            merged_map[labels_im == lbl] = new_lbl
-        new_lbl += 1
-    print(f"Planes merged: {time.time() - start}")
+        G = nx.Graph()
+        labels = list(cluster_planes.keys())
+        for lbl in labels:
+            G.add_node(lbl)
+        masks = {lbl: (new_labels == lbl).astype(np.uint8) for lbl in labels}
+        dil = {lbl: cv2.dilate(masks[lbl], np.ones((12,12), np.uint8), iterations=7)
+            for lbl in labels}
+        for i, l1 in enumerate(labels):
+            for l2 in labels[i+1:]:
+                if np.any(dil[l1] & masks[l2]) and are_planes_similar(
+                cluster_planes[l1], cluster_planes[l2], 0.99, 0.01):
+                    G.add_edge(l1, l2)
+        merged_groups = list(nx.connected_components(G))
 
+        # Create merged map
+        merged_map = np.zeros_like(labels_im)
+        new_lbl = 1
+        for group in merged_groups:
+            for lbl in group:
+                merged_map[labels_im == lbl] = new_lbl
+            new_lbl += 1
+        print(f"Planes merged: {time.time() - start}")
 
+    else:
+        merged_map = labels_im.copy()
   
     # Coplanarity labeling
     dilated_map = merged_map.copy()
@@ -197,7 +291,10 @@ def process_image(
 
     # Optional plotting
     if plot:
+        import matplotlib
+
         import matplotlib.pyplot as plt
+        
         fig, axes = plt.subplots(4, 3, figsize=(15, 10))
         axs = axes.ravel()
         axs[0].imshow(sobel_n, cmap='gray'); axs[0].set_title('Sobel Normal'); axs[0].axis('off')
@@ -209,12 +306,13 @@ def process_image(
         axs[5].imshow(comp_rgb); axs[5].set_title('Line Splitting'); axs[5].axis('off')
         def make_color(img): return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         axs[6].imshow(make_color(color_map(labels_im, num_labels))); axs[6].set_title('Connected Components'); axs[6].axis('off')
-        axs[7].imshow(make_color(color_map(new_labels, num_labels))); axs[7].set_title('Valid Clusters'); axs[7].axis('off')
+        axs[7].imshow(make_color(color_map(new_labels if not dataset == "midas" else labels_im, num_labels))); axs[7].set_title('Valid Clusters'); axs[7].axis('off')
         axs[8].imshow(make_color(color_map(merged_map, num_labels))); axs[8].set_title('Merged Planes'); axs[8].axis('off')
         axs[9].imshow(make_color(color_map(dilated_map, num_labels))); axs[9].set_title('Dilated'); axs[9].axis('off')
         plot_coplanar_lines(axs[10], new_lines, line_planes, color_img); axs[10].set_title('Line Coplanarity'); axs[10].axis('off')
         axs[11].imshow(make_color(color_img)); axs[11].set_title('Original Image'); axs[11].axis('off')
-        plt.tight_layout(); plt.show()
+        plt.tight_layout()
+        plt.show()
 
 
 

@@ -90,7 +90,7 @@ def save_lines_to_hdf5(
     angle_np: np.ndarray, 
     downsample_h: float , 
     downsample_w : float,  
-    h5_path: str = "lines_data.h5",
+    h5_path: str = "midas_eth3d_data.h5",
     file_path_str: str = None,
     compression: str = "gzip",
     compression_level: int = 4
