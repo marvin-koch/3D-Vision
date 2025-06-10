@@ -1,0 +1,57 @@
+data:
+  data_dir: '../data/'
+  json_dir: '../json_output/'      # Path to the directory containing graph JSON files
+  precompute_dir: '../data/graph_data/'
+  # roi_output_size: [64,32]       # Output size (height, width) for ROI Align features
+  roi_output_size: [32,32]       # Output size (height, width) for ROI Align features
+
+  # edge_sample_size: [32,24]       # Output size (height, width) for edge sampling
+  edge_sample_size: [16,16]       # Output size (height, width) for edge sampling
+
+  batch_size:  1             # Number of graphs per batch
+  train_split: 0.8                # Proportion of data for training (0.0 to 1.0)
+  val_split: 0.1                  # Proportion of data for validation (0.0 to 1.0)
+  # test_split is implicitly 1.0 - train_split - val_split
+  num_workers: 2               # Number of subprocesses for data loading (set to 0 if issues arise or no GPU)
+  accum_grads: 64                # Gradient accumulation
+  method: 'sample'
+  use_precomputed: false # use pre_computed
+  k_nn: 10 # ToDo: Implement value to use for the k_nn graph
+model:
+  # Input dimensions
+  in_channels_DeepLSD: 1280       # Dimension of the initial DeepLSD embedding feature per node
+  # CNN output channels_conv_roi_embedding = (roi_output_size[0]//2 * roi_output_size[1]//2) -> calculated internally
+  in_channels: 128               # Dimension expected by the roi_GAT
+  geom_channels: 5          # ← new do not change without changing code in gluestick_{...}.py
+
+  edge_downsample_dim: 20 # project embedded edges to this dimension/num_channels
+  hidden_channels: 128           # Number of hidden units in GAT layers
+  out_channels: 128                #  Output dimension of the GAT layers (input to the final MLP))
+  num_layers: 6                   # Number of GAT layers
+  dropout: 0.2                    # Dropout rate within GAT layers
+  act: 'relu'                     # Activation function for GAT ('relu', 'elu', etc.)
+  v2: true                        # Use GATv2 formulation (set to false for GATv1)
+  jk_layer: 'cat'                # Jumping Knowledge connection type ('lstm', 'cat', 'max', 'mean', null for None)
+  skip_init: "False"
+  only_linear: true               # use only linear layers no conv
+  # MLP Drop-outs
+  mlp_dropout: 0.2
+  # Final MLP parameters are derived (input = out_channels, hidden = out_channels, output = 1)
+ 
+  load_model_path: "/Users/marvin/Documents/ETHZ/MA4/3DVision/repo/DeepLSD/notebooks/lightning_tools/lightning_logs/lightning_project/ixo5vlgg/checkpoints/best-model-epoch=00-val_edge_pr_auc_epoch=0.3119.ckpt"
+training:
+  learning_rate: 0.0001            # Optimizer learning rate
+  node_loss_w: 1.0                # Weight for the node classification loss term (if multiple losses were used)
+  edge_loss_w: 1.0                # Weight for the edge classification loss term (if multiple losses were used)
+
+  threshold_structural: 0.5       # Threshold for converting probabilities to binary predictions for Acc/Recall metrics
+  epochs: 50                      # Maximum number of training epochs
+  accelerator: 'auto'             # Hardware accelerator ('cpu', 'gpu', 'tpu', 'mps', 'auto')
+  devices: 'auto'                 # Devices to use ('auto', 1 for 1 GPU, [0, 1] for GPUs 0 and 1, etc.)
+  log_dir: "lightning_logs"       # Base directory for saving logs and checkpoints
+  early_stopping_patience: 20      # Number of epochs with no improvement in monitored metric before stopping
+  monitor_metric: 'val_edge_pr_auc_epoch'       # Metric to monitor for checkpointing and early stopping ('val_loss_epoch', 'val_auc', etc.)
+  monitor_mode: 'max'             # 'max' if higher metric is better (e.g., AUC, Acc), 'min' if lower is better (e.g., Loss)
+  seed: 42                        # Random seed for reproducibility
+  experiment_name: "Attention_Edge_Sampling"
+

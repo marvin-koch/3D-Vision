@@ -71,7 +71,12 @@ __pycache__
 cython_debug/
 
 # Ignore DeepLSD data directory
-/DeepLSD/notebooks/data/
-/DeepLSD/notebooks/json_output/
-/DeepLSD/.DS_Store
+/src/line_classification/data/
+/src/line_classification/json_output/
+/src/line_classification/diode_output/
+/src/line_classification/eth3d_output/
+/src/line_classification/scannet_output/
+
+/src/.DS_Store
+
 
