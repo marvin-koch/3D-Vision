@@ -18,7 +18,7 @@ Process images with DeepLSD line detection to generate ground truth data for dif
 ### Basic Usage
 
 ```bash
-python /src/line_classification/generate_ground_truth.py
+python src/line_classification/generate_ground_truth.py
 ```
 
 
@@ -32,7 +32,7 @@ python /src/line_classification/generate_ground_truth.py
 
 ```bash
 # Combine both options
-python /src/line_classification/generate_ground_truth.py --base_dir /path/to/your/data --dataset hypersim
+python src/line_classification/generate_ground_truth.py --base_dir /path/to/your/data --dataset hypersim
 ```
 
 ### Dataset-Specific Processing
@@ -49,19 +49,19 @@ The script automatically applies different processing parameters based on the se
 
 We provide the config we used to train our model, you can change the hyperparameters with it. 
 ```bash
-cd /src/line_classification/lightning_tools/
+cd src/line_classification/lightning_tools/
 python train.py --config config.yaml
 ```
 
 Our trained model weight can be found in:
 
 ```
-/src/notebooks/lightning_tools/checkpoint
+src/line_classification/lightning_tools/checkpoint
 ```
 
 
 ## Inference Notebook
 An example inference notebook with visualizations can be found in:
 ```
-/src/notebooks/InferenceGNN.ipynb
+src/line_classification/InferenceGNN.ipynb
 ```

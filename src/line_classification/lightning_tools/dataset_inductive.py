@@ -267,8 +267,7 @@ from torch.utils.data import Dataset
 from torch_geometric.data import Data
 from sklearn.neighbors import NearestNeighbors
 
-from line_sampler import LineSampler, EdgeSampler      # <-- your LightningModule
-from line_sampler import extract_line_feature_ROIAlign
+from lightning_tools.line_sampler import LineSampler, EdgeSampler, extract_line_feature_ROIAlign
 
 
 class GraphDatasetInductive(Dataset):
